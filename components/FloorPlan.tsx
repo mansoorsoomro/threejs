@@ -201,21 +201,22 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
     const endwallSegmentsList = calculateEndwallSegments();
 
     // Calculate X mark positions (at segment boundaries - start and end of each segment)
-    const sidewallXPositions = [
-      ...new Set([
+    // Use Array.from to avoid iterating Set directly (ES5 target without downlevelIteration)
+    const sidewallXPositions = Array.from(
+      new Set([
         0,
         ...sidewallSegmentsList.flatMap(s => [s.start * scale, s.end * scale]),
-        buildingWidth
-      ])
-    ].sort((a, b) => a - b);
+        buildingWidth,
+      ]),
+    ).sort((a, b) => a - b);
     
-    const endwallXPositions = [
-      ...new Set([
+    const endwallXPositions = Array.from(
+      new Set([
         0,
         ...endwallSegmentsList.flatMap(s => [s.start * scale, s.end * scale]),
-        buildingHeight
-      ])
-    ].sort((a, b) => a - b);
+        buildingHeight,
+      ]),
+    ).sort((a, b) => a - b);
 
     // Add grid lines for truss spacing
     // Vertical grid lines (sidewall segments)
