@@ -73,11 +73,11 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   yPos += 10;
 
   // Colors
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Colors', margin, yPos);
   yPos += 7;
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   pdf.text(`Wall: ${design.wallColor.charAt(0).toUpperCase() + design.wallColor.slice(1)}`, margin, yPos);
   yPos += 6;
   pdf.text(`Trim: ${design.trimColor.charAt(0).toUpperCase() + design.trimColor.slice(1)}`, margin, yPos);
@@ -86,11 +86,11 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   yPos += 10;
 
   // Additional Services
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Additional Services', margin, yPos);
   yPos += 7;
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   if (design.sitePreparation) {
     pdf.text('• Site Preparation', margin, yPos);
     yPos += 6;
