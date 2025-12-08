@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BuildingDesign, Opening } from '@/types/building';
-import { windowOptions, doorOptions } from '@/data/windowsDoors';
+import { windowOptions, doorOptions, OpeningOption } from '@/data/windowsDoors';
 
 interface OpeningPlacementProps {
   design: BuildingDesign;
@@ -13,9 +13,9 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
   const [selectedOpening, setSelectedOpening] = useState<string | null>(null);
   const [selectedWall, setSelectedWall] = useState<'front' | 'back' | 'left' | 'right'>('front');
 
-  const allOptions = [...windowOptions, ...doorOptions];
+  const allOptions: OpeningOption[] = [...windowOptions, ...doorOptions];
 
-  const handleAddOpening = (option: typeof windowOptions[0] | typeof doorOptions[0]) => {
+  const handleAddOpening = (option: OpeningOption) => {
     const newOpening: Opening = {
       id: `${option.type}-${Date.now()}`,
       type: option.type,
