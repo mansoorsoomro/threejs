@@ -21,22 +21,22 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
 
   // Client Information
   pdf.setFontSize(12);
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Client Information', margin, yPos);
   yPos += 7;
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   pdf.text(`Name: ${design.clientName}`, margin, yPos);
   yPos += 6;
   pdf.text(`Address: ${design.clientAddress}`, margin, yPos);
   yPos += 10;
 
   // Building Specifications
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Building Specifications', margin, yPos);
   yPos += 7;
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   const sqft = design.width * design.length;
   const perimeter = (design.width + design.length) * 2;
   
@@ -56,11 +56,11 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   yPos += 10;
 
   // Structural Details
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.text('Structural Details', margin, yPos);
   yPos += 7;
 
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   pdf.text(`Sidewall Posts: ${design.sidewallPosts}`, margin, yPos);
   yPos += 6;
   pdf.text(`Girt Type: ${design.girtType}`, margin, yPos);
@@ -111,11 +111,11 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
 
   // Windows & Doors
   if (design.openings.length > 0) {
-    pdf.setFont(undefined, 'bold');
+    pdf.setFont('helvetica', 'bold');
     pdf.text('Windows & Doors', margin, yPos);
     yPos += 7;
 
-    pdf.setFont(undefined, 'normal');
+    pdf.setFont('helvetica', 'normal');
     design.openings.forEach(opening => {
       pdf.text(`• ${opening.name} - ${opening.wall} wall - $${opening.price}`, margin, yPos);
       yPos += 6;
@@ -148,7 +148,7 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
     })),
   });
 
-  pdf.setFont(undefined, 'bold');
+  pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
   pdf.text('Total Estimated Price', margin, yPos);
   yPos += 8;
@@ -158,7 +158,7 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   yPos += 8;
 
   pdf.setFontSize(10);
-  pdf.setFont(undefined, 'normal');
+  pdf.setFont('helvetica', 'normal');
   pdf.text(`Price per sq ft: $${(totalPrice / sqft).toFixed(2)}`, margin, yPos);
   yPos += 10;
 
