@@ -5,6 +5,7 @@ export interface PricingConfig {
     '4': number;
     '6': number;
     '8': number;
+    '9': number;
   };
   floorFinish: {
     'dirt-gravel': number;
@@ -49,6 +50,7 @@ export const defaultPricing: PricingConfig = {
     '4': 1.0,
     '6': 0.95,
     '8': 0.90,
+    '9': 0.88,
   },
   floorFinish: {
     'dirt-gravel': 0,
