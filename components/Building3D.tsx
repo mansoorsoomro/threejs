@@ -818,46 +818,227 @@ export default function Building3D({ design }: Building3DProps) {
           framingGroup.add(floor);
 
         } else if (framingType === 'ladder-frame-construction') {
-          // LADDER FRAME IMPL (Simplified)
-          const studSpacing = 2;
-          const sW = 0.15; // 1.5"
-          const sD = 0.45; // 5.5"
+          // LADDER FRAME CONSTRUCTION - Matching user images exactly
+          // End walls: 4 posts, Side walls: 5 posts
+          const studWidth = 0.15; // 1.5" (2x4 stud width)
+          const studDepth = 0.45; // 5.5" (2x4 stud depth)
+          const girtHeight = 0.15; // 1.5" (2x4 girt height)
+          const girtDepth = 0.45; // 5.5" (2x4 girt depth)
+          const gradeBoardHeight = 0.65; // ~8 inches (2x8 grade board)
+          const gradeBoardDepth = 0.125; // 1.5 inches
 
-          // Plates
-          const plateGeo = new THREE.BoxGeometry(sD, sW, buildingLength);
-          const lBP = new THREE.Mesh(plateGeo, treatedWoodMaterial); lBP.position.set(-buildingWidth / 2 + sD / 2, sW / 2, 0); framingGroup.add(lBP);
-          const rBP = new THREE.Mesh(plateGeo, treatedWoodMaterial); rBP.position.set(buildingWidth / 2 - sD / 2, sW / 2, 0); framingGroup.add(rBP);
-          const tPlateGeo = new THREE.BoxGeometry(sD, sW * 2, buildingLength);
-          const lTP = new THREE.Mesh(tPlateGeo, woodMaterial); lTP.position.set(-buildingWidth / 2 + sD / 2, buildingHeight - sW, 0); framingGroup.add(lTP);
-          const rTP = new THREE.Mesh(tPlateGeo, woodMaterial); rTP.position.set(buildingWidth / 2 - sD / 2, buildingHeight - sW, 0); framingGroup.add(rTP);
+          // Helper function to create member (same as post-frame)
+          const createMemberLocal = (p1: THREE.Vector3, p2: THREE.Vector3, width: number, depth: number, material: THREE.Material) => {
+            const length = p1.distanceTo(p2);
+            const geometry = new THREE.BoxGeometry(width, length, depth);
+            const mesh = new THREE.Mesh(geometry, material);
+            const midpoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+            mesh.position.copy(midpoint);
+            const direction = new THREE.Vector3().subVectors(p2, p1).normalize();
+            const axis = new THREE.Vector3(0, 1, 0);
+            const quaternion = new THREE.Quaternion().setFromUnitVectors(axis, direction);
+            mesh.setRotationFromQuaternion(quaternion);
+            return mesh;
+          };
 
-          // Studs
-          const studGeo = new THREE.BoxGeometry(sD, buildingHeight - sW * 3, sW);
-          const numStuds = Math.ceil(buildingLength / studSpacing) + 1;
-          for (let i = 0; i < numStuds; i++) {
-            const z = -buildingLength / 2 + i * (buildingLength / (numStuds - 1));
-            const lS = new THREE.Mesh(studGeo, woodMaterial); lS.position.set(-buildingWidth / 2 + sD / 2, buildingHeight / 2, z); framingGroup.add(lS);
-            const rS = new THREE.Mesh(studGeo, woodMaterial); rS.position.set(buildingWidth / 2 - sD / 2, buildingHeight / 2, z); framingGroup.add(rS);
+          // Calculate roof metrics
+          let peakHeight = buildingHeight;
+          let roofAngle = 0;
+          const pitchParts = roofPitch.split('/');
+          if (pitchParts.length === 2) {
+            const rise = parseFloat(pitchParts[0]);
+            const run = parseFloat(pitchParts[1]);
+            if (!isNaN(rise) && !isNaN(run) && run > 0) {
+              const halfSpan = buildingWidth / 2;
+              const extraHeight = (halfSpan * rise) / run;
+              peakHeight = buildingHeight + extraHeight;
+              roofAngle = Math.atan2(extraHeight, halfSpan);
+            }
           }
 
-          // End Walls
-          const ewWidth = buildingWidth - sD * 2;
-          const ewPlateGeo = new THREE.BoxGeometry(ewWidth, sW, sD);
-          const fBP = new THREE.Mesh(ewPlateGeo, treatedWoodMaterial); fBP.position.set(0, sW / 2, buildingLength / 2 - sD / 2); framingGroup.add(fBP);
-          const bBP = new THREE.Mesh(ewPlateGeo, treatedWoodMaterial); bBP.position.set(0, sW / 2, -buildingLength / 2 + sD / 2); framingGroup.add(bBP);
-
-          const ewStudGeo = new THREE.BoxGeometry(sW, buildingHeight - sW * 3, sD);
-          const numEStuds = Math.ceil(ewWidth / studSpacing) + 1;
-          for (let k = 0; k < numEStuds; k++) {
-            const x = -ewWidth / 2 + k * (ewWidth / (numEStuds - 1));
-            const fS = new THREE.Mesh(ewStudGeo, woodMaterial); fS.position.set(x, buildingHeight / 2, buildingLength / 2 - sD / 2); framingGroup.add(fS);
-            const bS = new THREE.Mesh(ewStudGeo, woodMaterial); bS.position.set(x, buildingHeight / 2, -buildingLength / 2 + sD / 2); framingGroup.add(bS);
+          // 1. SIDE WALLS - 5 POSTS (as shown in image)
+          const numSidePosts = 5;
+          const sidePostSpacing = buildingLength / (numSidePosts - 1);
+          
+          for (let i = 0; i < numSidePosts; i++) {
+            const z = -buildingLength / 2 + i * sidePostSpacing;
+            
+            // Left side wall post
+            const leftStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
+            const leftStud = new THREE.Mesh(leftStudGeo, woodMaterial);
+            leftStud.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
+            framingGroup.add(leftStud);
+            
+            // Right side wall post
+            const rightStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
+            const rightStud = new THREE.Mesh(rightStudGeo, woodMaterial);
+            rightStud.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
+            framingGroup.add(rightStud);
           }
 
-          // Floor (Dirt)
+          // 2. SIDE WALL GIRTS - 4 horizontal members (as shown in image)
+          const numSideGirts = 4;
+          const girtStartHeight = gradeBoardHeight + 0.5;
+          const girtEndHeight = buildingHeight - 0.5;
+          const girtSpacing = (girtEndHeight - girtStartHeight) / (numSideGirts - 1);
+          
+          const sideGirtGeo = new THREE.BoxGeometry(girtDepth, girtHeight, buildingLength);
+          
+          for (let g = 0; g < numSideGirts; g++) {
+            const y = girtStartHeight + (g * girtSpacing);
+            
+            // Left side wall girt
+            const leftGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
+            leftGirt.position.set(-buildingWidth / 2 + studDepth / 2, y, 0);
+            framingGroup.add(leftGirt);
+            
+            // Right side wall girt
+            const rightGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
+            rightGirt.position.set(buildingWidth / 2 - studDepth / 2, y, 0);
+            framingGroup.add(rightGirt);
+          }
+
+          // 3. GRADE BOARD (Bottom Plate) - Treated Wood
+          const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
+          
+          // Left side grade board
+          const leftGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+          leftGradeBoard.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight / 2, 0);
+          framingGroup.add(leftGradeBoard);
+          
+          // Right side grade board
+          const rightGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+          rightGradeBoard.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight / 2, 0);
+          framingGroup.add(rightGradeBoard);
+
+          // 4. TOP PLATE
+          const topPlateGeo = new THREE.BoxGeometry(studDepth, studWidth * 2, buildingLength);
+          const leftTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
+          leftTopPlate.position.set(-buildingWidth / 2 + studDepth / 2, buildingHeight - studWidth, 0);
+          framingGroup.add(leftTopPlate);
+          
+          const rightTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
+          rightTopPlate.position.set(buildingWidth / 2 - studDepth / 2, buildingHeight - studWidth, 0);
+          framingGroup.add(rightTopPlate);
+
+          // 5. END WALLS - 4 POSTS (as shown in image)
+          const numEndPosts = 4;
+          const endPostSpacing = buildingWidth / (numEndPosts - 1);
+          
+          [1, -1].forEach(dir => {
+            const z = (buildingLength / 2 - studWidth / 2) * dir;
+            
+            // Create 4 posts evenly spaced across end wall width
+            for (let i = 0; i < numEndPosts; i++) {
+              const x = -buildingWidth / 2 + i * endPostSpacing;
+              
+              // Adjust post height for roof slope on end walls
+              const dist = Math.abs(x);
+              const slopeH = peakHeight - buildingHeight;
+              const roofH = peakHeight - (dist * (slopeH / (buildingWidth / 2)));
+              const postHeight = roofH - gradeBoardHeight;
+              
+              const endStudGeo = new THREE.BoxGeometry(studWidth, postHeight, studDepth);
+              const endStud = new THREE.Mesh(endStudGeo, woodMaterial);
+              endStud.position.set(x, gradeBoardHeight + postHeight / 2, z);
+              framingGroup.add(endStud);
+            }
+
+            // 6. END WALL GIRTS - 5 horizontal members (as shown in image)
+            const numEndGirts = 5;
+            const endGirtStartHeight = gradeBoardHeight + 0.5;
+            const endGirtEndHeight = buildingHeight - 0.5;
+            const endGirtSpacing = (endGirtEndHeight - endGirtStartHeight) / (numEndGirts - 1);
+            
+            const endWallWidth = buildingWidth;
+            const endGirtGeo = new THREE.BoxGeometry(endWallWidth, girtHeight, girtDepth);
+            
+            for (let g = 0; g < numEndGirts; g++) {
+              const y = endGirtStartHeight + (g * endGirtSpacing);
+              if (y > buildingHeight - 0.5) continue;
+              
+              const endGirt = new THREE.Mesh(endGirtGeo, woodMaterial);
+              endGirt.position.set(0, y, z);
+              framingGroup.add(endGirt);
+            }
+
+            // 7. END WALL GRADE BOARD
+            const endGradeBoardGeo = new THREE.BoxGeometry(endWallWidth, gradeBoardHeight, gradeBoardDepth);
+            const endGradeBoard = new THREE.Mesh(endGradeBoardGeo, treatedWoodMaterial);
+            endGradeBoard.position.set(0, gradeBoardHeight / 2, z);
+            framingGroup.add(endGradeBoard);
+
+            // 8. END WALL TOP PLATE
+            const endTopPlateGeo = new THREE.BoxGeometry(endWallWidth, studWidth * 2, studDepth);
+            const endTopPlate = new THREE.Mesh(endTopPlateGeo, woodMaterial);
+            endTopPlate.position.set(0, buildingHeight - studWidth, z);
+            framingGroup.add(endTopPlate);
+          });
+
+          // 9. ROOF TRUSSES (Simple truss for ladder frame)
+          const trussSpacing = parseFloat(design.trussSpacing || '6');
+          const numTrusses = Math.ceil(buildingLength / trussSpacing);
+          const actualTrussSpacing = buildingLength / numTrusses;
+          
+          for (let i = 0; i <= numTrusses; i++) {
+            const z = -buildingLength / 2 + i * actualTrussSpacing;
+            
+            // Bottom chord
+            const botChordGeo = new THREE.BoxGeometry(buildingWidth, studDepth, studWidth);
+            const botChord = new THREE.Mesh(botChordGeo, woodMaterial);
+            botChord.position.set(0, buildingHeight + studDepth / 2, z);
+            framingGroup.add(botChord);
+            
+            // Rafters (top chords)
+            const slopeHeight = peakHeight - buildingHeight;
+            const roofSlopeLen = Math.sqrt(Math.pow(buildingWidth / 2, 2) + Math.pow(slopeHeight, 2));
+            const rafterGeo = new THREE.BoxGeometry(roofSlopeLen, studDepth, studWidth);
+            
+            const leftRafter = new THREE.Mesh(rafterGeo, woodMaterial);
+            leftRafter.rotation.z = roofAngle;
+            leftRafter.position.set(-buildingWidth / 4, buildingHeight + slopeHeight / 2, z);
+            framingGroup.add(leftRafter);
+            
+            const rightRafter = new THREE.Mesh(rafterGeo, woodMaterial);
+            rightRafter.rotation.z = -roofAngle;
+            rightRafter.position.set(buildingWidth / 4, buildingHeight + slopeHeight / 2, z);
+            framingGroup.add(rightRafter);
+          }
+
+          // 10. ROOF PURLINS
+          const purlinOverhang = endWallOverhang > 0 ? parseFloat(design.endWallOverhang || '0') : 1.5;
+          const purlinLength = buildingLength + (purlinOverhang * 2);
+          const purlinW = 0.29; // 3.5"
+          const purlinH = 0.125; // 1.5"
+          const pSlopeLen = Math.sqrt(Math.pow(buildingWidth / 2, 2) + Math.pow(peakHeight - buildingHeight, 2));
+          const purlinSpacing = 2.0; // 2 feet spacing
+          const numPurlins = Math.floor(pSlopeLen / purlinSpacing);
+          const purlinGeo = new THREE.BoxGeometry(purlinW, purlinH, purlinLength);
+
+          for (let p = 1; p <= numPurlins; p++) {
+            const dist = p * purlinSpacing;
+            const ratio = dist / pSlopeLen;
+            const x = ratio * (buildingWidth / 2);
+            const yDrop = ratio * (peakHeight - buildingHeight);
+
+            const lP = new THREE.Mesh(purlinGeo, woodMaterial);
+            lP.rotation.z = roofAngle;
+            lP.position.set(-x, peakHeight - yDrop + 0.2, 0);
+            framingGroup.add(lP);
+
+            const rP = new THREE.Mesh(purlinGeo, woodMaterial);
+            rP.rotation.z = -roofAngle;
+            rP.position.set(x, peakHeight - yDrop + 0.2, 0);
+            framingGroup.add(rP);
+          }
+
+          // 11. FLOOR
           const floorGeo = new THREE.PlaneGeometry(buildingWidth, buildingLength);
-          const floor = new THREE.Mesh(floorGeo, new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 1.0, side: THREE.DoubleSide }));
-          floor.rotation.x = -Math.PI / 2; floor.position.y = 0.05; framingGroup.add(floor);
+          const floorMat = new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 1.0, side: THREE.DoubleSide });
+          const floor = new THREE.Mesh(floorGeo, floorMat);
+          floor.rotation.x = -Math.PI / 2;
+          floor.position.y = 0.05;
+          framingGroup.add(floor);
         }
 
         // --- MODIFY LAYER POSITIONS ---
