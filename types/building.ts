@@ -11,7 +11,7 @@ export interface BuildingDesign {
   // Store Selection
   buildingZipCode?: string;
   selectedStore?: Store;
-  
+
   // Client Information
   clientName: string;
   clientAddress: string;
@@ -29,13 +29,21 @@ export interface BuildingDesign {
   sitePreparation: boolean;
   sidewallPosts: '4x6' | '6x6' | 'columns';
   clearHeight: '8' | '10' | '12' | '14' | '16' | '18' | '20';
-  girtType: '2x4' | '2x6';
-  gradeBoard: '2x6' | '2x8';
+  gradeBoard: '2x6' | '2x8' | '2x10' | '2x6-centermatch' | '2x6-fusion-centermatch';
+  girtType: 'flat' | 'bookshelf' | 'double';
+  girtSize: '2x4' | '2x6';
+  centermatchRows?: {
+    sidewallA: number;
+    sidewallB: number;
+    endwallC: number;
+    endwallD: number;
+  };
   wallColor: string;
   trimColor: string;
   roofColor: string;
   endWallOverhang: '0' | '1' | '2';
   sidewallOverhang: '0' | '1' | '2';
+  postFoundation?: 'Post Embedded' | 'Secured to Concrete';
   openings: Opening[];
 }
 

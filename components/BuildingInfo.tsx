@@ -98,29 +98,31 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
     currentDesign.buildingUse === 'agricultural'
       ? 'Post Frame Design'
       : currentDesign.buildingUse === 'residential'
-      ? 'Residential Design'
-      : 'Building Design';
+        ? 'Residential Design'
+        : 'Building Design';
 
   return (
-    <div className="h-screen bg-gray-50 overflow-hidden">
-      <div className="w-full h-full p-2">
-        <div className="grid grid-cols-12 gap-[10px] h-full">
-          {/* Left Column - Options panel (Floor, posts, colors, overhangs) */}
-          <div className="bg-white rounded-lg shadow-md p-4 col-span-12 lg:col-span-4 flex flex-col h-full overflow-hidden">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
-              Building Parameters
-            </h2>
+    <div className="flex flex-col h-[calc(100vh-140px)] overflow-hidden">
+      {/* 3D Preview + Controls Area */}
+      <div className="flex-1 flex min-h-0">
 
-            <div className="space-y-3 overflow-y-auto flex-1 pr-2">
-              {/* Floor */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'floor'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+        {/* Left Controls - Color/Style Selections - Scrollable */}
+        <div className="w-[340px] flex flex-col bg-gray-50 border-r border-gray-200 overflow-hidden shrink-0">
+          <div className="p-4 border-b border-gray-200 bg-white shadow-sm shrink-0">
+            <h2 className="text-lg font-bold text-gray-800">Building Options</h2>
+            <p className="text-xs text-gray-500">Customize appearance</p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Floor Type */}
+
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'floor'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('floor')}
-              >
+              onClick={() => setActiveSection('floor')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'floor' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Floor</p>
@@ -132,9 +134,8 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                         floorFinish: e.target.value as BuildingDesign['floorFinish'],
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.floorFinish ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.floorFinish ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
                     <option value="dirt-gravel">Dirt / Gravel</option>
                     <option value="concrete">Concrete</option>
@@ -161,17 +162,16 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                   </div>
                 )}
               </div>
-              </div>
+            </div>
 
-              {/* Sidewall Posts */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'sidewallPosts'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+            {/* Sidewall Posts */}
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'sidewallPosts'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('sidewallPosts')}
-              >
+              onClick={() => setActiveSection('sidewallPosts')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'sidewallPosts' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Sidewall Posts</p>
@@ -183,9 +183,8 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                         sidewallPosts: e.target.value as BuildingDesign['sidewallPosts'],
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.sidewallPosts ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.sidewallPosts ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
                     <option value="4x6">4x6</option>
                     <option value="6x6">6x6</option>
@@ -193,17 +192,16 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                   </select>
                 </div>
               </div>
-              </div>
+            </div>
 
-              {/* Post Foundation */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'postFoundation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+            {/* Post Foundation */}
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'postFoundation'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('postFoundation')}
-              >
+              onClick={() => setActiveSection('postFoundation')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'postFoundation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Post Foundation</p>
@@ -211,85 +209,82 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                   <select
                     value={postFoundation}
                     onChange={e => {
-                      setPostFoundation(e.target.value);
+                      const val = e.target.value as 'Post Embedded' | 'Secured to Concrete';
+                      setPostFoundation(val); // Keep local state for UI conditional logic
+                      handleDesignChange({ postFoundation: val }); // Update design for 3D
                       // Reset activeSection if switching to Secured to Concrete
-                      if (e.target.value === 'Secured to Concrete' && activeSection === 'postEmbedment') {
+                      if (val === 'Secured to Concrete' && activeSection === 'postEmbedment') {
                         setActiveSection('postFoundation');
                       }
                     }}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      postFoundation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${postFoundation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
                     <option value="Post Embedded">Post Embedded</option>
                     <option value="Secured to Concrete">Secured to Concrete</option>
                   </select>
                 </div>
               </div>
-              </div>
+            </div>
 
-              {/* Post Embedment - Only show when Post Embedded is selected */}
-              {postFoundation === 'Post Embedded' && (
+            {/* Post Embedment - Only show when Post Embedded is selected */}
+            {postFoundation === 'Post Embedded' && (
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'postEmbedment'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'postEmbedment'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('postEmbedment')}
               >
-              <div className={`px-4 py-2 ${activeSection === 'postEmbedment' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Post Embedment</p>
-                <p className="text-xs text-gray-700">Select the post embedment depth</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'postEmbedment' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Select embedment depth</span>
-                  <select
-                    value={postEmbedmentDepth}
-                    onChange={e => setPostEmbedmentDepth(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      postEmbedmentDepth ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="4 ft">4 ft</option>
-                    <option value="6 ft">6 ft</option>
-                  </select>
+                <div className={`px-4 py-2 ${activeSection === 'postEmbedment' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Post Embedment</p>
+                  <p className="text-xs text-gray-700">Select the post embedment depth</p>
                 </div>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Select footing size</span>
-                  <select
-                    value={footingSize}
-                    onChange={e => setFootingSize(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      footingSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <optgroup label="Pre-Cast">
-                      <option value="14 in x 4 in (Pre-cast)">14 in x 4 in (Pre-cast)</option>
-                      <option value="20 in x 6 in (Pre-cast)">20 in x 6 in (Pre-cast)</option>
-                      <option value="24 in x 8 in (Pre-cast)">24 in x 8 in (Pre-cast)</option>
-                    </optgroup>
-                    <optgroup label="Poured Concrete">
-                      <option value="14 in x 4 in (Poured)">14 in x 4 in (Poured)</option>
-                      <option value="20 in x 6 in (Poured)">20 in x 6 in (Poured)</option>
-                      <option value="24 in x 8 in (Poured)">24 in x 8 in (Poured)</option>
-                    </optgroup>
-                  </select>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'postEmbedment' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Select embedment depth</span>
+                    <select
+                      value={postEmbedmentDepth}
+                      onChange={e => setPostEmbedmentDepth(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${postEmbedmentDepth ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="4 ft">4 ft</option>
+                      <option value="6 ft">6 ft</option>
+                    </select>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Select footing size</span>
+                    <select
+                      value={footingSize}
+                      onChange={e => setFootingSize(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${footingSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <optgroup label="Pre-Cast">
+                        <option value="14 in x 4 in (Pre-cast)">14 in x 4 in (Pre-cast)</option>
+                        <option value="20 in x 6 in (Pre-cast)">20 in x 6 in (Pre-cast)</option>
+                        <option value="24 in x 8 in (Pre-cast)">24 in x 8 in (Pre-cast)</option>
+                      </optgroup>
+                      <optgroup label="Poured Concrete">
+                        <option value="14 in x 4 in (Poured)">14 in x 4 in (Poured)</option>
+                        <option value="20 in x 6 in (Poured)">20 in x 6 in (Poured)</option>
+                        <option value="24 in x 8 in (Poured)">24 in x 8 in (Poured)</option>
+                      </optgroup>
+                    </select>
+                  </div>
                 </div>
               </div>
-              </div>
-              )}
+            )}
 
-              {/* Gradeboard */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'gradeboard'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+            {/* Gradeboard */}
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gradeboard'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('gradeboard')}
-              >
+              onClick={() => setActiveSection('gradeboard')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'gradeboard' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Gradeboard</p>
@@ -301,9 +296,8 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                         gradeBoard: e.target.value as BuildingDesign['gradeBoard'],
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.gradeBoard ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.gradeBoard ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
                     <option value="2x6">2x6 Treated Gradeboard</option>
                     <option value="2x8">2x8 Treated Gradeboard</option>
@@ -313,17 +307,56 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                   </select>
                 </div>
               </div>
-              </div>
 
-              {/* Girt Type */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'girtType'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+              {(currentDesign.gradeBoard === '2x6-centermatch' || currentDesign.gradeBoard === '2x6-fusion-centermatch') && (
+                <div className="mt-4 space-y-3 pt-3 border-t border-yellow-300/50">
+                  {[
+                    { label: 'Sidewall A rows of centermatch', key: 'sidewallA' },
+                    { label: 'Sidewall B rows of centermatch', key: 'sidewallB' },
+                    { label: 'Endwall C rows of centermatch', key: 'endwallC' },
+                    { label: 'Endwall D rows of centermatch', key: 'endwallD' },
+                  ].map((field) => (
+                    <div key={field.key}>
+                      <span className="text-xs text-gray-700 block mb-2">{field.label}</span>
+                      <select
+                        value={currentDesign.centermatchRows?.[field.key as keyof typeof currentDesign.centermatchRows] ?? 2}
+                        onChange={(e) => {
+                          const val = parseInt(e.target.value);
+                          const currentRows = currentDesign.centermatchRows || {
+                            sidewallA: 2,
+                            sidewallB: 2,
+                            endwallC: 2,
+                            endwallD: 2
+                          };
+                          handleDesignChange({
+                            centermatchRows: {
+                              ...currentRows,
+                              [field.key]: val
+                            }
+                          });
+                        }}
+                        className="w-full px-3 py-2 border rounded-md text-sm border-gray-300 bg-white"
+                      >
+                        {Array.from({ length: 9 }, (_, i) => i + 2).map(num => (
+                          <option key={num} value={num}>
+                            {num} rows = {num * 5}"
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Girt Type */}
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'girtType'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('girtType')}
-              >
+              onClick={() => setActiveSection('girtType')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'girtType' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Girt Type</p>
@@ -335,26 +368,25 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                         girtType: e.target.value as BuildingDesign['girtType'],
                       })
                     }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.girtType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.girtType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
-                    <option value="2x4">2x4</option>
-                    <option value="2x6">2x6</option>
+                    <option value="flat">Flat Girts (Standard)</option>
+                    <option value="bookshelf">Bookshelf Girts</option>
+                    <option value="double">Double Girts</option>
                   </select>
                 </div>
               </div>
-              </div>
+            </div>
 
-              {/* Girt Size */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'girtSize'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
+            {/* Girt Size */}
+            <div
+              className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'girtSize'
+                ? 'bg-yellow-100 border-2 border-yellow-300'
+                : 'bg-transparent border-0 hover:bg-gray-50'
                 }`}
-                onClick={() => setActiveSection('girtSize')}
-              >
+              onClick={() => setActiveSection('girtSize')}
+            >
               <div className={`px-4 py-4 ${activeSection === 'girtSize' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                 <div>
                   <p className="text-sm font-bold text-gray-900 mb-2">Girt Size</p>
@@ -362,376 +394,352 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                   <select
                     value={girtSize}
                     onChange={e => setGirtSize(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      girtSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
+                    className={`w-full px-3 py-2 border rounded-md text-sm ${girtSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      }`}
                   >
                     <option value="2x4">2x4</option>
                     <option value="2x6">2x6</option>
                   </select>
                 </div>
               </div>
-              </div>
 
               {/* Wall Color */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'steelWall'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'steelWall'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('steelWall')}
               >
-              <div className={`px-4 py-2 ${activeSection === 'steelWall' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Steel Wall Panels</p>
-                <p className="text-xs text-gray-700">Steel panel type &amp; wall color</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelWall' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Steel Panel Type</span>
-                  <select
-                    value={wallPanelType}
-                    onChange={e => setWallPanelType(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      wallPanelType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="Pro-Rib">Pro-Rib</option>
-                    <option value="Premium Pro-Rib">Premium Pro-Rib</option>
-                  </select>
+                <div className={`px-4 py-2 ${activeSection === 'steelWall' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Steel Wall Panels</p>
+                  <p className="text-xs text-gray-700">Steel panel type &amp; wall color</p>
                 </div>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Choose wall color</span>
-                  <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => {
-                      setSelectedColorForModal(currentDesign.wallColor || '');
-                      setShowWallColorModal(true);
-                    }}
-                    className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                      currentDesign.wallColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    {wallColors.find(c => c.value === currentDesign.wallColor)?.label || 'Select color'}
-                  </button>
-                    <div
-                      className="w-10 h-10 border border-gray-300 rounded"
-                      style={{
-                        backgroundColor: wallColors.find(c => c.value === currentDesign.wallColor)?.hex || '#808080'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              </div>
-
-              {/* Roof Color */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'steelRoof'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
-                onClick={() => setActiveSection('steelRoof')}
-              >
-              <div className={`px-4 py-2 ${activeSection === 'steelRoof' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Steel Roof Panels</p>
-                <p className="text-xs text-gray-700">Steel panel type &amp; roof color</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelRoof' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Steel Panel Type</span>
-                  <select
-                    value={roofPanelType}
-                    onChange={e => setRoofPanelType(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      roofPanelType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="Pro-Rib">Pro-Rib</option>
-                    <option value="Premium Pro-Rib">Premium Pro-Rib</option>
-                  </select>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Choose roof color</span>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedColorForModal(currentDesign.roofColor || '');
-                        setShowRoofColorModal(true);
-                      }}
-                      className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                        currentDesign.roofColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
-                    >
-                      {roofColors.find(c => c.value === currentDesign.roofColor)?.label || 'Select color'}
-                    </button>
-                    <div
-                      className="w-10 h-10 border border-gray-300 rounded"
-                      style={{
-                        backgroundColor: roofColors.find(c => c.value === currentDesign.roofColor)?.hex || '#808080'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              </div>
-
-              {/* Trim Color */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'trimColor'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
-                onClick={() => setActiveSection('trimColor')}
-              >
-              <div className={`px-4 py-4 ${activeSection === 'trimColor' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 mb-2">Trim Color</p>
-                  <p className="text-xs text-gray-700 mb-3">Choose trim color</p>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => {
-                        setSelectedColorForModal(currentDesign.trimColor || '');
-                        setShowTrimColorModal(true);
-                      }}
-                      className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                        currentDesign.trimColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
-                    >
-                      {trimColors.find(c => c.value === currentDesign.trimColor)?.label || 'Select color'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setSelectedColorForModal(currentDesign.trimColor || '');
-                        setShowTrimColorModal(true);
-                      }}
-                      className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
-                      style={{
-                        backgroundColor: trimColors.find(c => c.value === currentDesign.trimColor)?.hex || '#808080'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-              </div>
-
-              {/* Overhangs */}
-              <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'overhangs'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
-                onClick={() => setActiveSection('overhangs')}
-              >
-              <div className={`px-4 py-2 ${activeSection === 'overhangs' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Overhangs</p>
-                <p className="text-xs text-gray-700">Endwall and sidewall overhang length</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'overhangs' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Endwall overhang length</span>
-                  <select
-                    value={currentDesign.endWallOverhang}
-                    onChange={e =>
-                      handleDesignChange({
-                        endWallOverhang: e.target.value as BuildingDesign['endWallOverhang'],
-                      })
-                    }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.endWallOverhang ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="0">0ft</option>
-                    <option value="1">1ft</option>
-                    <option value="2">2ft</option>
-                  </select>
-                </div>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Sidewall overhang length</span>
-                  <select
-                    value={currentDesign.sidewallOverhang}
-                    onChange={e =>
-                      handleDesignChange({
-                        sidewallOverhang: e.target.value as BuildingDesign['sidewallOverhang'],
-                      })
-                    }
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      currentDesign.sidewallOverhang ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="0">0ft</option>
-                    <option value="1">1ft</option>
-                    <option value="2">2ft</option>
-                  </select>
-                </div>
-                {/* Soffit Color - Show when either overhang is > 0 */}
-                {(currentDesign.endWallOverhang !== '0' || currentDesign.sidewallOverhang !== '0') && (
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelWall' ? 'bg-yellow-50' : 'bg-transparent'}`}>
                   <div>
-                    <span className="text-xs text-gray-700 block mb-2">Choose soffit color</span>
+                    <span className="text-xs text-gray-700 block mb-2">Steel Panel Type</span>
+                    <select
+                      value={wallPanelType}
+                      onChange={e => setWallPanelType(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${wallPanelType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="Pro-Rib">Pro-Rib</option>
+                      <option value="Premium Pro-Rib">Premium Pro-Rib</option>
+                    </select>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Choose wall color</span>
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => {
-                          setSelectedColorForModal(soffitColor || '');
-                          setShowSoffitColorModal(true);
+                          setSelectedColorForModal(currentDesign.wallColor || '');
+                          setShowWallColorModal(true);
                         }}
-                        className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                          soffitColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                        }`}
+                        className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${currentDesign.wallColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                          }`}
                       >
-                        {trimColors.find(c => c.value === soffitColor)?.label || 'Select color'}
+                        {wallColors.find(c => c.value === currentDesign.wallColor)?.label || 'Select color'}
                       </button>
-                      <button
-                        onClick={() => {
-                          setSelectedColorForModal(soffitColor || '');
-                          setShowSoffitColorModal(true);
-                        }}
-                        className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                      <div
+                        className="w-10 h-10 border border-gray-300 rounded"
                         style={{
-                          backgroundColor: trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
+                          backgroundColor: wallColors.find(c => c.value === currentDesign.wallColor)?.hex || '#808080'
                         }}
                       />
                     </div>
                   </div>
-                )}
+                </div>
               </div>
+
+              {/* Roof Color */}
+              <div
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'steelRoof'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
+                onClick={() => setActiveSection('steelRoof')}
+              >
+                <div className={`px-4 py-2 ${activeSection === 'steelRoof' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Steel Roof Panels</p>
+                  <p className="text-xs text-gray-700">Steel panel type &amp; roof color</p>
+                </div>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelRoof' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Steel Panel Type</span>
+                    <select
+                      value={roofPanelType}
+                      onChange={e => setRoofPanelType(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${roofPanelType ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="Pro-Rib">Pro-Rib</option>
+                      <option value="Premium Pro-Rib">Premium Pro-Rib</option>
+                    </select>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Choose roof color</span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedColorForModal(currentDesign.roofColor || '');
+                          setShowRoofColorModal(true);
+                        }}
+                        className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${currentDesign.roofColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                          }`}
+                      >
+                        {roofColors.find(c => c.value === currentDesign.roofColor)?.label || 'Select color'}
+                      </button>
+                      <div
+                        className="w-10 h-10 border border-gray-300 rounded"
+                        style={{
+                          backgroundColor: roofColors.find(c => c.value === currentDesign.roofColor)?.hex || '#808080'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Trim Color */}
+              <div
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'trimColor'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
+                onClick={() => setActiveSection('trimColor')}
+              >
+                <div className={`px-4 py-4 ${activeSection === 'trimColor' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 mb-2">Trim Color</p>
+                    <p className="text-xs text-gray-700 mb-3">Choose trim color</p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedColorForModal(currentDesign.trimColor || '');
+                          setShowTrimColorModal(true);
+                        }}
+                        className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${currentDesign.trimColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                          }`}
+                      >
+                        {trimColors.find(c => c.value === currentDesign.trimColor)?.label || 'Select color'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelectedColorForModal(currentDesign.trimColor || '');
+                          setShowTrimColorModal(true);
+                        }}
+                        className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                        style={{
+                          backgroundColor: trimColors.find(c => c.value === currentDesign.trimColor)?.hex || '#808080'
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Overhangs */}
+              <div
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'overhangs'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
+                onClick={() => setActiveSection('overhangs')}
+              >
+                <div className={`px-4 py-2 ${activeSection === 'overhangs' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Overhangs</p>
+                  <p className="text-xs text-gray-700">Endwall and sidewall overhang length</p>
+                </div>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'overhangs' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Endwall overhang length</span>
+                    <select
+                      value={currentDesign.endWallOverhang}
+                      onChange={e =>
+                        handleDesignChange({
+                          endWallOverhang: e.target.value as BuildingDesign['endWallOverhang'],
+                        })
+                      }
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.endWallOverhang ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="0">0ft</option>
+                      <option value="1">1ft</option>
+                      <option value="2">2ft</option>
+                    </select>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Sidewall overhang length</span>
+                    <select
+                      value={currentDesign.sidewallOverhang}
+                      onChange={e =>
+                        handleDesignChange({
+                          sidewallOverhang: e.target.value as BuildingDesign['sidewallOverhang'],
+                        })
+                      }
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${currentDesign.sidewallOverhang ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="0">0ft</option>
+                      <option value="1">1ft</option>
+                      <option value="2">2ft</option>
+                    </select>
+                  </div>
+                  {/* Soffit Color - Show when either overhang is > 0 */}
+                  {(currentDesign.endWallOverhang !== '0' || currentDesign.sidewallOverhang !== '0') && (
+                    <div>
+                      <span className="text-xs text-gray-700 block mb-2">Choose soffit color</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => {
+                            setSelectedColorForModal(soffitColor || '');
+                            setShowSoffitColorModal(true);
+                          }}
+                          className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${soffitColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
+                        >
+                          {trimColors.find(c => c.value === soffitColor)?.label || 'Select color'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedColorForModal(soffitColor || '');
+                            setShowSoffitColorModal(true);
+                          }}
+                          className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                          style={{
+                            backgroundColor: trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Fascia */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'fascia'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'fascia'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('fascia')}
               >
-              <div className={`px-4 py-2 ${activeSection === 'fascia' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Fascia</p>
-                <p className="text-xs text-gray-700">Select the fascia size</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'fascia' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Select the fascia size</span>
-                  <select
-                    value={fasciaSize}
-                    onChange={e => setFasciaSize(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      fasciaSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="4 in Fascia">4 in Fascia</option>
-                    <option value="6 in Fascia">6 in Fascia</option>
-                  </select>
+                <div className={`px-4 py-2 ${activeSection === 'fascia' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Fascia</p>
+                  <p className="text-xs text-gray-700">Select the fascia size</p>
                 </div>
-              </div>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'fascia' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Select the fascia size</span>
+                    <select
+                      value={fasciaSize}
+                      onChange={e => setFasciaSize(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${fasciaSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="4 in Fascia">4 in Fascia</option>
+                      <option value="6 in Fascia">6 in Fascia</option>
+                    </select>
+                  </div>
+                </div>
               </div>
 
               {/* Fastener Placement */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'fastenerPlacement'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'fastenerPlacement'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('fastenerPlacement')}
               >
-              <div className={`px-4 py-2 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <p className="text-sm font-bold text-gray-900">Fastener Placement</p>
-                <p className="text-xs text-gray-700">Choose wall &amp; roof fastener location</p>
-              </div>
-              <div className={`px-4 py-3 space-y-3 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-50' : 'bg-transparent'}`}>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Wall fastener location</span>
-                  <select
-                    value={wallFastenerLocation}
-                    onChange={e => setWallFastenerLocation(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      wallFastenerLocation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="In the Flat">In the Flat</option>
-                    <option value="On the Rib">On the Rib</option>
-                  </select>
+                <div className={`px-4 py-2 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <p className="text-sm font-bold text-gray-900">Fastener Placement</p>
+                  <p className="text-xs text-gray-700">Choose wall &amp; roof fastener location</p>
                 </div>
-                <div>
-                  <span className="text-xs text-gray-700 block mb-2">Roof fastener location</span>
-                  <select
-                    value={roofFastenerLocation}
-                    onChange={e => setRoofFastenerLocation(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      roofFastenerLocation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="In the Flat">In the Flat</option>
-                    <option value="On the Rib">On the Rib</option>
-                  </select>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Wall fastener location</span>
+                    <select
+                      value={wallFastenerLocation}
+                      onChange={e => setWallFastenerLocation(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${wallFastenerLocation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="In the Flat">In the Flat</option>
+                      <option value="On the Rib">On the Rib</option>
+                    </select>
+                  </div>
+                  <div>
+                    <span className="text-xs text-gray-700 block mb-2">Roof fastener location</span>
+                    <select
+                      value={roofFastenerLocation}
+                      onChange={e => setRoofFastenerLocation(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${roofFastenerLocation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="In the Flat">In the Flat</option>
+                      <option value="On the Rib">On the Rib</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
               </div>
 
               {/* Plans */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'plans'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'plans'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('plans')}
               >
-              <div className={`px-4 py-4 ${activeSection === 'plans' ? 'bg-yellow-200' : 'bg-transparent'}`}>
-                <div>
-                  <p className="text-sm font-bold text-gray-900 mb-2">Plans</p>
-                  <p className="text-xs text-gray-700 mb-3">Choose a Mini-Print option</p>
-                  <select
-                    value={plansOption}
-                    onChange={e => setPlansOption(e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-md text-sm ${
-                      plansOption ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                    }`}
-                  >
-                    <option value="Email Only">Email Only</option>
-                    <option value="Hardcopy & e-mail">Hardcopy and E-mail</option>
-                    <option value="None">None</option>
-                  </select>
+                <div className={`px-4 py-4 ${activeSection === 'plans' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 mb-2">Plans</p>
+                    <p className="text-xs text-gray-700 mb-3">Choose a Mini-Print option</p>
+                    <select
+                      value={plansOption}
+                      onChange={e => setPlansOption(e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${plansOption ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
+                    >
+                      <option value="Email Only">Email Only</option>
+                      <option value="Hardcopy & e-mail">Hardcopy and E-mail</option>
+                      <option value="None">None</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Right Column - Price + Tabs (Information / 3D) */}
-          <div className="bg-white rounded-lg shadow-md p-4 col-span-12 lg:col-span-8 flex flex-col h-full overflow-hidden">
-            {/* Tabs */}
-            <div className="mb-3 flex-shrink-0">
-              <div className="flex space-x-2 border-b">
-                <button
-                  onClick={() => setInfoTab('information')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${
-                    infoTab === 'information'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+        {/* Right Column - Price + Tabs (Information / 3D) */}
+        <div className="flex-1 flex flex-col bg-white rounded-lg shadow-md p-4 overflow-hidden">
+          <div className="mb-3 flex-shrink-0">
+            <div className="flex space-x-2 border-b">
+              <button
+                onClick={() => setInfoTab('information')}
+                className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${infoTab === 'information'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
-                >
-                  Information
-                </button>
-                <button
-                  onClick={() => setInfoTab('3d')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${
-                    infoTab === '3d'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              >
+                Information
+              </button>
+              <button
+                onClick={() => setInfoTab('3d')}
+                className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${infoTab === '3d'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                   }`}
-                >
-                  3D Scene
-                </button>
-              </div>
+              >
+                3D Scene
+              </button>
             </div>
+          </div>
 
-            {/* Tab content */}
-            <div className="flex-1 overflow-y-auto">
+          <div className="flex-1 overflow-y-auto">
             {infoTab === 'information' && (
               <>
                 {/* Price Summary Box */}
@@ -743,7 +751,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                     <div className="flex flex-col gap-1">
                       <div>
                         <span className="text-sm font-semibold text-gray-700 mr-1">Building Price:</span>
-                        <span className="text-lg font-bold text-gray-900 align-baseline">
+                        <span className="text-xl font-bold text-gray-900 align-baseline">
                           ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </span>
                       </div>
@@ -878,7 +886,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'postEmbedment' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Post Embedment</h3>
-                    
+
                     {/* All three images in one row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {/* Footing Pad Size Guidelines */}
@@ -935,7 +943,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'gradeboard' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Gradeboard</h3>
-                    
+
                     {/* All four images in one row */}
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                       {/* Treated Gradeboard */}
@@ -1000,7 +1008,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'girtType' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Girt Type</h3>
-                    
+
                     {/* All three images in one row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                       {/* Flat Girts */}
@@ -1081,7 +1089,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'steelWall' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Steel Wall Panels</h3>
-                    
+
                     {/* Three images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                       {/* Steel Panel Options */}
@@ -1158,7 +1166,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'steelRoof' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Steel Roof Panels</h3>
-                    
+
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* Steel Panel Options */}
@@ -1278,7 +1286,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'fascia' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Fascia</h3>
-                    
+
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* 4" Fascia */}
@@ -1317,7 +1325,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'fastenerPlacement' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Fastener Placement</h3>
-                    
+
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* Screws in the Flat */}
@@ -1355,7 +1363,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 {activeSection === 'plans' && (
                   <div className="mb-4">
                     <h3 className="text-base font-bold text-gray-900 mb-3">Plans</h3>
-                    
+
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* Hard Copy and Email */}
@@ -1410,494 +1418,493 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                 <Building3D design={currentDesign} />
               </div>
             )}
-            </div>
-            {/* Bottom actions (Next button) */}
-            {onNext && (
-              <div className="mt-4 flex justify-end flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onNext) {
-                      onNext();
-                    }
-                  }}
-                  className="px-4 py-1.5 rounded-md font-semibold text-white transition-colors text-sm bg-green-600 hover:bg-green-700"
-                >
-                  Next: Accessories
-                </button>
-              </div>
-            )}
+          </div>
+          {/* Bottom actions (Next button) */}
+          <div className="mt-4 flex justify-end flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => {
+                if (onNext) {
+                  onNext();
+                }
+              }}
+              disabled={!onNext}
+              className={`px-4 py-1.5 rounded-md font-semibold text-white transition-colors text-sm ${onNext
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-gray-400 cursor-not-allowed'
+                }`}
+            >
+              Next: Accessories
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Wall Color Selection Modal */}
-      {showWallColorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowWallColorModal(false)}>
-          <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            {/* Green Banner */}
-            <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
-              <h2 className="text-base font-bold">Choose wall color</h2>
-            </div>
-
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Color Sections */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Designer Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Designer Colors</h3>
-                    <div className="flex gap-3">
-                      {wallColors.filter(c => ['gray', 'charcoal', 'tan', 'beige'].includes(c.value)).map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Standard Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                    <div className="grid grid-cols-5 gap-3">
-                      {wallColors.map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
-                        />
-                      ))}
-                      {/* Galvanized option */}
-                      <button
-                        onClick={() => setSelectedColorForModal('galvanized')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${
-                          selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Galvanized"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Woodgrain Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Woodgrain Colors</h3>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setSelectedColorForModal('woodgrain-natural')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-amber-200 to-amber-600 ${
-                          selectedColorForModal === 'woodgrain-natural' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Natural Woodgrain"
-                      />
-                      <button
-                        onClick={() => setSelectedColorForModal('woodgrain-weathered')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-400 to-gray-600 ${
-                          selectedColorForModal === 'woodgrain-weathered' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Weathered Woodgrain"
-                      />
-                    </div>
-                  </div>
+      <>
+        {/* Wall Color Selection Modal */}
+        {
+          showWallColorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowWallColorModal(false)}>
+              <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Green Banner */}
+                <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+                  <h2 className="text-base font-bold">Choose wall color</h2>
                 </div>
 
-                {/* Right Side - Current Selection */}
-                <div className="lg:col-span-1">
-                  <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                    <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? wallColors.find(c => c.value === selectedColorForModal)?.label || 
-                          (selectedColorForModal === 'galvanized' ? 'Galvanized' : 
-                           selectedColorForModal === 'woodgrain-natural' ? 'Natural Woodgrain' :
-                           selectedColorForModal === 'woodgrain-weathered' ? 'Weathered Woodgrain' : '')
-                        : wallColors.find(c => c.value === currentDesign.wallColor)?.label || 'Select a color'}
-                    </p>
-                    <div 
-                      className="w-full h-32 rounded border-2 border-gray-300 mb-4"
-                      style={{
-                        backgroundColor: selectedColorForModal 
-                          ? wallColors.find(c => c.value === selectedColorForModal)?.hex || 
-                            (selectedColorForModal === 'galvanized' ? '#C0C0C0' :
-                             selectedColorForModal === 'woodgrain-natural' ? '#D4A574' :
-                             selectedColorForModal === 'woodgrain-weathered' ? '#808080' : '#808080')
-                          : wallColors.find(c => c.value === currentDesign.wallColor)?.hex || '#808080'
-                      }}
-                    />
+                <div className="p-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Left Side - Color Sections */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Designer Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Designer Colors</h3>
+                        <div className="flex gap-3">
+                          {wallColors.filter(c => ['gray', 'charcoal', 'tan', 'beige'].includes(c.value)).map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Standard Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
+                        <div className="grid grid-cols-5 gap-3">
+                          {wallColors.map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                          {/* Galvanized option */}
+                          <button
+                            onClick={() => setSelectedColorForModal('galvanized')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Galvanized"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Woodgrain Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Woodgrain Colors</h3>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => setSelectedColorForModal('woodgrain-natural')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-amber-200 to-amber-600 ${selectedColorForModal === 'woodgrain-natural' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Natural Woodgrain"
+                          />
+                          <button
+                            onClick={() => setSelectedColorForModal('woodgrain-weathered')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-400 to-gray-600 ${selectedColorForModal === 'woodgrain-weathered' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Weathered Woodgrain"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side - Current Selection */}
+                    <div className="lg:col-span-1">
+                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+                        <p className="text-sm font-bold text-gray-900 mb-3">
+                          {selectedColorForModal
+                            ? wallColors.find(c => c.value === selectedColorForModal)?.label ||
+                            (selectedColorForModal === 'galvanized' ? 'Galvanized' :
+                              selectedColorForModal === 'woodgrain-natural' ? 'Natural Woodgrain' :
+                                selectedColorForModal === 'woodgrain-weathered' ? 'Weathered Woodgrain' : '')
+                            : wallColors.find(c => c.value === currentDesign.wallColor)?.label || 'Select a color'}
+                        </p>
+                        <div
+                          className="w-full h-32 rounded border-2 border-gray-300 mb-4"
+                          style={{
+                            backgroundColor: selectedColorForModal
+                              ? wallColors.find(c => c.value === selectedColorForModal)?.hex ||
+                              (selectedColorForModal === 'galvanized' ? '#C0C0C0' :
+                                selectedColorForModal === 'woodgrain-natural' ? '#D4A574' :
+                                  selectedColorForModal === 'woodgrain-weathered' ? '#808080' : '#808080')
+                              : wallColors.find(c => c.value === currentDesign.wallColor)?.hex || '#808080'
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            if (selectedColorForModal) {
+                              // Handle special cases
+                              if (selectedColorForModal === 'galvanized') {
+                                handleDesignChange({ wallColor: 'gray' }); // Use gray as fallback for galvanized
+                              } else if (selectedColorForModal === 'woodgrain-natural' || selectedColorForModal === 'woodgrain-weathered') {
+                                handleDesignChange({ wallColor: 'tan' }); // Use tan as fallback for woodgrain
+                              } else {
+                                handleDesignChange({ wallColor: selectedColorForModal });
+                              }
+                            }
+                            setShowWallColorModal(false);
+                            setSelectedColorForModal('');
+                          }}
+                          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                        >
+                          Select
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cancel Button */}
+                  <div className="mt-4 flex justify-center">
                     <button
                       onClick={() => {
-                        if (selectedColorForModal) {
-                          // Handle special cases
-                          if (selectedColorForModal === 'galvanized') {
-                            handleDesignChange({ wallColor: 'gray' }); // Use gray as fallback for galvanized
-                          } else if (selectedColorForModal === 'woodgrain-natural' || selectedColorForModal === 'woodgrain-weathered') {
-                            handleDesignChange({ wallColor: 'tan' }); // Use tan as fallback for woodgrain
-                          } else {
-                            handleDesignChange({ wallColor: selectedColorForModal });
-                          }
-                        }
                         setShowWallColorModal(false);
                         setSelectedColorForModal('');
                       }}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                      className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
                     >
-                      Select
+                      Cancel
                     </button>
                   </div>
+
+                  {/* Disclaimer */}
+                  <p className="mt-4 text-xs text-gray-600 text-center">
+                    Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
+                  </p>
                 </div>
               </div>
-
-              {/* Cancel Button */}
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => {
-                    setShowWallColorModal(false);
-                    setSelectedColorForModal('');
-                  }}
-                  className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {/* Disclaimer */}
-              <p className="mt-4 text-xs text-gray-600 text-center">
-                Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-              </p>
             </div>
-          </div>
-        </div>
-      )}
+          )
+        }
 
-      {/* Roof Color Selection Modal */}
-      {showRoofColorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowRoofColorModal(false)}>
-          <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            {/* Green Banner */}
-            <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
-              <h2 className="text-base font-bold">Choose roof color</h2>
-            </div>
-
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Color Sections */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Designer Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Designer Colors</h3>
-                    <div className="flex gap-3">
-                      {roofColors.filter(c => ['gray', 'charcoal', 'tan', 'beige'].includes(c.value)).map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
-                        />
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Standard Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                    <div className="grid grid-cols-5 gap-3">
-                      {roofColors.map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
-                        />
-                      ))}
-                      {/* Galvanized option */}
-                      <button
-                        onClick={() => setSelectedColorForModal('galvanized')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${
-                          selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Galvanized"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Woodgrain Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Woodgrain Colors</h3>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => setSelectedColorForModal('woodgrain-natural')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-amber-200 to-amber-600 ${
-                          selectedColorForModal === 'woodgrain-natural' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Natural Woodgrain"
-                      />
-                      <button
-                        onClick={() => setSelectedColorForModal('woodgrain-weathered')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-400 to-gray-600 ${
-                          selectedColorForModal === 'woodgrain-weathered' ? 'border-green-600' : 'border-gray-400'
-                        }`}
-                        title="Weathered Woodgrain"
-                      />
-                    </div>
-                  </div>
+        {/* Roof Color Selection Modal */}
+        {
+          showRoofColorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowRoofColorModal(false)}>
+              <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Green Banner */}
+                <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+                  <h2 className="text-base font-bold">Choose roof color</h2>
                 </div>
 
-                {/* Right Side - Current Selection */}
-                <div className="lg:col-span-1">
-                  <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                    <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? roofColors.find(c => c.value === selectedColorForModal)?.label || 
-                          (selectedColorForModal === 'galvanized' ? 'Galvanized' : 
-                           selectedColorForModal === 'woodgrain-natural' ? 'Natural Woodgrain' :
-                           selectedColorForModal === 'woodgrain-weathered' ? 'Weathered Woodgrain' : '')
-                        : roofColors.find(c => c.value === currentDesign.roofColor)?.label || 'Select a color'}
-                    </p>
-                    <div 
-                      className="w-full h-24 rounded border-2 border-gray-300 mb-3"
-                      style={{
-                        backgroundColor: selectedColorForModal 
-                          ? roofColors.find(c => c.value === selectedColorForModal)?.hex || 
-                            (selectedColorForModal === 'galvanized' ? '#C0C0C0' :
-                             selectedColorForModal === 'woodgrain-natural' ? '#D4A574' :
-                             selectedColorForModal === 'woodgrain-weathered' ? '#808080' : '#808080')
-                          : roofColors.find(c => c.value === currentDesign.roofColor)?.hex || '#808080'
-                      }}
-                    />
+                <div className="p-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Left Side - Color Sections */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Designer Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Designer Colors</h3>
+                        <div className="flex gap-3">
+                          {roofColors.filter(c => ['gray', 'charcoal', 'tan', 'beige'].includes(c.value)).map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Standard Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
+                        <div className="grid grid-cols-5 gap-3">
+                          {roofColors.map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                          {/* Galvanized option */}
+                          <button
+                            onClick={() => setSelectedColorForModal('galvanized')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Galvanized"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Woodgrain Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Woodgrain Colors</h3>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => setSelectedColorForModal('woodgrain-natural')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-amber-200 to-amber-600 ${selectedColorForModal === 'woodgrain-natural' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Natural Woodgrain"
+                          />
+                          <button
+                            onClick={() => setSelectedColorForModal('woodgrain-weathered')}
+                            className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-400 to-gray-600 ${selectedColorForModal === 'woodgrain-weathered' ? 'border-green-600' : 'border-gray-400'
+                              }`}
+                            title="Weathered Woodgrain"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side - Current Selection */}
+                    <div className="lg:col-span-1">
+                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+                        <p className="text-sm font-bold text-gray-900 mb-3">
+                          {selectedColorForModal
+                            ? roofColors.find(c => c.value === selectedColorForModal)?.label ||
+                            (selectedColorForModal === 'galvanized' ? 'Galvanized' :
+                              selectedColorForModal === 'woodgrain-natural' ? 'Natural Woodgrain' :
+                                selectedColorForModal === 'woodgrain-weathered' ? 'Weathered Woodgrain' : '')
+                            : roofColors.find(c => c.value === currentDesign.roofColor)?.label || 'Select a color'}
+                        </p>
+                        <div
+                          className="w-full h-24 rounded border-2 border-gray-300 mb-3"
+                          style={{
+                            backgroundColor: selectedColorForModal
+                              ? roofColors.find(c => c.value === selectedColorForModal)?.hex ||
+                              (selectedColorForModal === 'galvanized' ? '#C0C0C0' :
+                                selectedColorForModal === 'woodgrain-natural' ? '#D4A574' :
+                                  selectedColorForModal === 'woodgrain-weathered' ? '#808080' : '#808080')
+                              : roofColors.find(c => c.value === currentDesign.roofColor)?.hex || '#808080'
+                          }}
+                        />
+                        <button
+                          onClick={() => {
+                            if (selectedColorForModal) {
+                              // Handle special cases
+                              if (selectedColorForModal === 'galvanized') {
+                                handleDesignChange({ roofColor: 'gray' }); // Use gray as fallback for galvanized
+                              } else if (selectedColorForModal === 'woodgrain-natural' || selectedColorForModal === 'woodgrain-weathered') {
+                                handleDesignChange({ roofColor: 'tan' }); // Use tan as fallback for woodgrain
+                              } else {
+                                handleDesignChange({ roofColor: selectedColorForModal });
+                              }
+                            }
+                            setShowRoofColorModal(false);
+                            setSelectedColorForModal('');
+                          }}
+                          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                        >
+                          Select
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Cancel Button */}
+                  <div className="mt-4 flex justify-center">
                     <button
                       onClick={() => {
-                        if (selectedColorForModal) {
-                          // Handle special cases
-                          if (selectedColorForModal === 'galvanized') {
-                            handleDesignChange({ roofColor: 'gray' }); // Use gray as fallback for galvanized
-                          } else if (selectedColorForModal === 'woodgrain-natural' || selectedColorForModal === 'woodgrain-weathered') {
-                            handleDesignChange({ roofColor: 'tan' }); // Use tan as fallback for woodgrain
-                          } else {
-                            handleDesignChange({ roofColor: selectedColorForModal });
-                          }
-                        }
                         setShowRoofColorModal(false);
                         setSelectedColorForModal('');
                       }}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                      className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
                     >
-                      Select
+                      Cancel
                     </button>
                   </div>
+
+                  {/* Disclaimer */}
+                  <p className="mt-4 text-xs text-gray-600 text-center">
+                    Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
+                  </p>
                 </div>
               </div>
-
-              {/* Cancel Button */}
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => {
-                    setShowRoofColorModal(false);
-                    setSelectedColorForModal('');
-                  }}
-                  className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {/* Disclaimer */}
-              <p className="mt-4 text-xs text-gray-600 text-center">
-                Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-              </p>
             </div>
-          </div>
-        </div>
-      )}
+          )
+        }
 
-      {/* Trim Color Selection Modal */}
-      {showTrimColorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowTrimColorModal(false)}>
-          <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            {/* Green Banner */}
-            <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
-              <h2 className="text-base font-bold">Choose trim color</h2>
-            </div>
+        {/* Trim Color Selection Modal */}
+        {
+          showTrimColorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowTrimColorModal(false)}>
+              <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Green Banner */}
+                <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+                  <h2 className="text-base font-bold">Choose trim color</h2>
+                </div>
 
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Color Sections */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Standard Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                    <div className="grid grid-cols-5 gap-3">
-                      {trimColors.map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
+                <div className="p-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Left Side - Color Sections */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Standard Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
+                        <div className="grid grid-cols-5 gap-3">
+                          {trimColors.map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side - Current Selection */}
+                    <div className="lg:col-span-1">
+                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+                        <p className="text-sm font-bold text-gray-900 mb-3">
+                          {selectedColorForModal
+                            ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
+                            : trimColors.find(c => c.value === currentDesign.trimColor)?.label || 'Select a color'}
+                        </p>
+                        <div
+                          className="w-full h-24 rounded border-2 border-gray-300 mb-3"
+                          style={{
+                            backgroundColor: selectedColorForModal
+                              ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#808080'
+                              : trimColors.find(c => c.value === currentDesign.trimColor)?.hex || '#808080'
+                          }}
                         />
-                      ))}
+                        <button
+                          onClick={() => {
+                            if (selectedColorForModal) {
+                              handleDesignChange({ trimColor: selectedColorForModal });
+                            }
+                            setShowTrimColorModal(false);
+                            setSelectedColorForModal('');
+                          }}
+                          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                        >
+                          Select
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right Side - Current Selection */}
-                <div className="lg:col-span-1">
-                  <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                    <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
-                        : trimColors.find(c => c.value === currentDesign.trimColor)?.label || 'Select a color'}
-                    </p>
-                    <div 
-                      className="w-full h-24 rounded border-2 border-gray-300 mb-3"
-                      style={{
-                        backgroundColor: selectedColorForModal 
-                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#808080'
-                          : trimColors.find(c => c.value === currentDesign.trimColor)?.hex || '#808080'
-                      }}
-                    />
+                  {/* Cancel Button */}
+                  <div className="mt-4 flex justify-center">
                     <button
                       onClick={() => {
-                        if (selectedColorForModal) {
-                          handleDesignChange({ trimColor: selectedColorForModal });
-                        }
                         setShowTrimColorModal(false);
                         setSelectedColorForModal('');
                       }}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                      className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
                     >
-                      Select
+                      Cancel
                     </button>
                   </div>
+
+                  {/* Disclaimer */}
+                  <p className="mt-4 text-xs text-gray-600 text-center">
+                    Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
+                  </p>
                 </div>
               </div>
-
-              {/* Cancel Button */}
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => {
-                    setShowTrimColorModal(false);
-                    setSelectedColorForModal('');
-                  }}
-                  className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {/* Disclaimer */}
-              <p className="mt-4 text-xs text-gray-600 text-center">
-                Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-              </p>
             </div>
-          </div>
-        </div>
-      )}
+          )
+        }
 
-      {/* Soffit Color Selection Modal */}
-      {showSoffitColorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowSoffitColorModal(false)}>
-          <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            {/* Green Banner */}
-            <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
-              <h2 className="text-base font-bold">Choose soffit color</h2>
-            </div>
+        {/* Soffit Color Selection Modal */}
+        {
+          showSoffitColorModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowSoffitColorModal(false)}>
+              <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                {/* Green Banner */}
+                <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+                  <h2 className="text-base font-bold">Choose soffit color</h2>
+                </div>
 
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Color Sections */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Standard Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                    <div className="grid grid-cols-5 gap-3">
-                      {trimColors.map(color => (
-                        <button
-                          key={color.value}
-                          onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                          style={{ backgroundColor: color.hex }}
-                          title={color.label}
+                <div className="p-4">
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* Left Side - Color Sections */}
+                    <div className="lg:col-span-2 space-y-4">
+                      {/* Standard Colors */}
+                      <div>
+                        <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
+                        <div className="grid grid-cols-5 gap-3">
+                          {trimColors.map(color => (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                                }`}
+                              style={{ backgroundColor: color.hex }}
+                              title={color.label}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right Side - Current Selection */}
+                    <div className="lg:col-span-1">
+                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
+                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+                        <p className="text-sm font-bold text-gray-900 mb-3">
+                          {selectedColorForModal
+                            ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
+                            : trimColors.find(c => c.value === soffitColor)?.label || 'Select a color'}
+                        </p>
+                        <div
+                          className="w-full h-24 rounded border-2 border-gray-300 mb-3"
+                          style={{
+                            backgroundColor: selectedColorForModal
+                              ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#808080'
+                              : trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
+                          }}
                         />
-                      ))}
+                        <button
+                          onClick={() => {
+                            if (selectedColorForModal) {
+                              setSoffitColor(selectedColorForModal);
+                            }
+                            setShowSoffitColorModal(false);
+                            setSelectedColorForModal('');
+                          }}
+                          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                        >
+                          Select
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Right Side - Current Selection */}
-                <div className="lg:col-span-1">
-                  <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                    <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
-                        : trimColors.find(c => c.value === soffitColor)?.label || 'Select a color'}
-                    </p>
-                    <div 
-                      className="w-full h-24 rounded border-2 border-gray-300 mb-3"
-                      style={{
-                        backgroundColor: selectedColorForModal 
-                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#808080'
-                          : trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
-                      }}
-                    />
+                  {/* Cancel Button */}
+                  <div className="mt-4 flex justify-center">
                     <button
                       onClick={() => {
-                        if (selectedColorForModal) {
-                          setSoffitColor(selectedColorForModal);
-                        }
                         setShowSoffitColorModal(false);
                         setSelectedColorForModal('');
                       }}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
+                      className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
                     >
-                      Select
+                      Cancel
                     </button>
                   </div>
+
+                  {/* Disclaimer */}
+                  <p className="mt-4 text-xs text-gray-600 text-center">
+                    Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
+                  </p>
                 </div>
               </div>
-
-              {/* Cancel Button */}
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => {
-                    setShowSoffitColorModal(false);
-                    setSelectedColorForModal('');
-                  }}
-                  className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {/* Disclaimer */}
-              <p className="mt-4 text-xs text-gray-600 text-center">
-                Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-              </p>
             </div>
-          </div>
-        </div>
-      )}
+          )
+        }
+      </>
     </div>
   );
 }

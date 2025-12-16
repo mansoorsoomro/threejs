@@ -44,6 +44,8 @@ export default function Building3D({ design }: Building3DProps) {
   const trimMeshesRef = useRef<any[]>([]);
   const framingGroupRef = useRef<any>(null);
   const backgroundGroupRef = useRef<any>(null);
+  const skyRef = useRef<any>(null);
+  const threeRef = useRef<any>(null);
 
   // CSS 3D Fallback state (always declared, used conditionally)
   const [rotation, setRotation] = useState({ x: -20, y: 45 });
@@ -201,6 +203,18 @@ export default function Building3D({ design }: Building3DProps) {
     if (backgroundGroupRef.current) {
       backgroundGroupRef.current.visible = showBackground;
     }
+    // Sky visibility
+    // Sky visibility
+    if (skyRef.current && threeRef.current) {
+      skyRef.current.visible = showBackground;
+      // Also update scene background to match (if sky is hidden, show white/simple bg, else sky blue)
+      if (sceneRef.current) {
+        // Use threeRef.current directly to avoid ReferenceError
+        sceneRef.current.background = showBackground
+          ? new threeRef.current.Color(0x87ceeb)
+          : new threeRef.current.Color(0xf0f0f0);
+      }
+    }
 
     // Hide any backWall or other wall meshes in the scene when frame is shown
     if (sceneRef.current) {
@@ -223,7 +237,11 @@ export default function Building3D({ design }: Building3DProps) {
     let animationId: number;
 
     // Dynamically import Three.js
-    import('three').then((THREE) => {
+    // Dynamically import Three.js and Sky
+    Promise.all([
+      import('three'),
+      import('three/examples/jsm/objects/Sky.js')
+    ]).then(([THREE, { Sky }]) => {
       if (!mountRef.current) return;
 
       try {
@@ -300,6 +318,36 @@ export default function Building3D({ design }: Building3DProps) {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87ceeb);
 
+        // Add Sky
+        const sky = new Sky();
+        sky.scale.setScalar(450000);
+        scene.add(sky);
+        skyRef.current = sky; // Store reference
+        sky.visible = showBackground; // Set initial visibility
+
+        const sun = new THREE.Vector3();
+        const effectController = {
+          turbidity: 10,
+          rayleigh: 3,
+          mieCoefficient: 0.005,
+          mieDirectionalG: 0.7,
+          elevation: 2,
+          azimuth: 180,
+          exposure: renderer.toneMappingExposure
+        };
+
+        const uniforms = sky.material.uniforms;
+        uniforms['turbidity'].value = effectController.turbidity;
+        uniforms['rayleigh'].value = effectController.rayleigh;
+        uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+        uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+
+        const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+        const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+
+        sun.setFromSphericalCoords(1, phi, theta);
+        uniforms['sunPosition'].value.copy(sun);
+
         // Camera
         const width = design.width || 24;
         const length = design.length || 30;
@@ -317,8 +365,8 @@ export default function Building3D({ design }: Building3DProps) {
           camera.position.set(0, height * 0.4, length * 0.3);
           camera.lookAt(0, height * 0.4, -length / 2);
         } else {
-          // Exterior view: camera outside building
-          camera.position.set(width * 0.8, length * 0.6, width * 0.8);
+          // Exterior view: camera outside building - ZOOMED OUT
+          camera.position.set(width * 1.5, length * 1.0, width * 1.5);
           camera.lookAt(0, 0, 0);
         }
 
@@ -365,6 +413,7 @@ export default function Building3D({ design }: Building3DProps) {
         cameraRef.current = camera;
         sceneRef.current = scene;
         rendererRef.current = renderer;
+        threeRef.current = THREE;
 
         // Get colors from local state (allows real-time updates)
         const wallColorHex = wallColors.find(c => c.value === localWallColor)?.hex || '#808080';
@@ -453,6 +502,12 @@ export default function Building3D({ design }: Building3DProps) {
           roughness: 0.8,
           metalness: 0.1
         });
+        const fusionWoodColor = new THREE.Color(0x5a5a5a); // Dark Grey/Brown for Fusion
+        const fusionWoodMaterial = new THREE.MeshStandardMaterial({
+          color: fusionWoodColor,
+          roughness: 0.8,
+          metalness: 0.1
+        });
 
         // Create walls - transparent in interior view, solid in exterior
         // Create walls - Solid and OFF-SET from frame
@@ -507,7 +562,8 @@ export default function Building3D({ design }: Building3DProps) {
 
           const postWidth = 0.5; // 6x6 nominal (0.5 ft)
           const postDepth = 0.5;
-          const buriedDepth = 4.0; // 4ft buried
+          const isSecuredToConcrete = design.postFoundation === 'Secured to Concrete';
+          const buriedDepth = isSecuredToConcrete ? 0.0 : 4.0; // 0 if secured to concrete, 4ft buried otherwise
           const trussThickness = 0.125; // 1.5"
           const trussDepth = 0.46; // 5.5" (2x6)
           const girtHeightReal = 0.125; // 1.5 inch
@@ -548,11 +604,16 @@ export default function Building3D({ design }: Building3DProps) {
             rightPost.position.set(buildingWidth / 2 - postWidth / 2, postCenterY, z);
             framingGroup.add(rightPost);
 
-            // Footings
-            const fGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.0, 16);
-            const fMesh = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ color: 0x999999 }));
-            const leftF = fMesh.clone(); leftF.position.set(-buildingWidth / 2 + postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(leftF);
-            const rightF = fMesh.clone(); rightF.position.set(buildingWidth / 2 - postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(rightF);
+            // Footings (Only show if buried)
+            if (!isSecuredToConcrete) {
+              const fGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.0, 16);
+              const fMesh = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ color: 0x999999 }));
+              const leftF = fMesh.clone(); leftF.position.set(-buildingWidth / 2 + postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(leftF);
+              const rightF = fMesh.clone(); rightF.position.set(buildingWidth / 2 - postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(rightF);
+            } else {
+              // Show bracket/anchor if secured to concrete (optional, simplified as just sitting on floor)
+              // For now, just no footing since it's on the slab
+            }
 
             // TRUSS (Fink/W-truss pattern as shown in image)
             // Bottom Chord (horizontal)
@@ -625,36 +686,212 @@ export default function Building3D({ design }: Building3DProps) {
           const girtEndHeight = buildingHeight - 0.5; // End just below roof
           const girtSpacing = (girtEndHeight - girtStartHeight) / (girtCount - 1);
 
+          // 2.5 GRADE BOARD (Bottom Plate) - Treated Wood
+          const gradeBoardDepth = 0.125; // 1.5 inches
+          const gradeBoardHeightUnit = 5 / 12; // 5 inches per row for Centermatch
+
+          // Check for Centermatch
+          const isCentermatch = design.gradeBoard && (design.gradeBoard.includes('centermatch'));
+
+          // Define gradeBoardHeight in outer scope for use in V-Bracing later
+          let gradeBoardHeight = 0.60; // Default
+
+          // Calculate Centermatch heights for Side A and Side B
+          let centermatchHeightA = 0;
+          let centermatchHeightB = 0;
+
+          if (isCentermatch) {
+            const rowsA = design.centermatchRows?.sidewallA || 1;
+            const rowsB = design.centermatchRows?.sidewallB || 1;
+            centermatchHeightA = rowsA * gradeBoardHeightUnit;
+            centermatchHeightB = rowsB * gradeBoardHeightUnit;
+            // Update main gradeBoardHeight to max for other calcs if needed
+            gradeBoardHeight = Math.max(centermatchHeightA, centermatchHeightB);
+          } else if (design.gradeBoard) {
+            if (design.gradeBoard.includes('2x6')) gradeBoardHeight = 0.46;
+            else if (design.gradeBoard.includes('2x8')) gradeBoardHeight = 0.60;
+            else if (design.gradeBoard.includes('2x10')) gradeBoardHeight = 0.77;
+          }
+
+
+          // Girt Dimensions based on Type
+          const girtType = design.girtType || 'flat'; // Default to flat
+          const girtSize = design.girtSize || '2x4'; // Default size
+
+          const girtWidthVal = girtSize === '2x6' ? 0.46 : 0.29; // 5.5" or 3.5"
+          const girtDepthVal = 0.125; // 1.5" thickness
+
+          // Standard Flat Girts (Exterior) geometry
+          const girtGeoFlat = new THREE.BoxGeometry(girtDepthVal, girtWidthVal, buildingLength);
+
+          // Bookshelf Girts (Between Posts) geometry
+          // Spacing between posts is `actualPostSpacing`. Girts fit in between.
+          // We need multiple small segments instead of one long board.
+          // ... calculated inside loop
+
+          // Interior Girts (Double) geometry
+          const girtGeoInterior = new THREE.BoxGeometry(girtDepthVal, girtWidthVal, buildingLength);
+
+
           for (let g = 0; g < girtCount; g++) {
             const y = girtStartHeight + (g * girtSpacing);
             if (y > buildingHeight - 0.5) continue;
 
-            // Left (Outside Post) - girts attach to outside face of posts
-            const lGirt = new THREE.Mesh(girtGeoSide, woodMaterial);
-            lGirt.position.set(-buildingWidth / 2 - girtDepthReal / 2, y, 0);
-            framingGroup.add(lGirt);
+            const isAboveCentermatchA = !isCentermatch || y > centermatchHeightA;
+            const isAboveCentermatchB = !isCentermatch || y > centermatchHeightB;
 
-            // Right (Outside Post) - girts attach to outside face of posts
-            const rGirt = new THREE.Mesh(girtGeoSide, woodMaterial);
-            rGirt.position.set(buildingWidth / 2 + girtDepthReal / 2, y, 0);
-            framingGroup.add(rGirt);
+            // 1. EXT. FLAT GIRTS (Standard) - Render for 'flat', 'bookshelf', and 'double'
+            // User said Bookshelf and Double ALSO have exterior flat girts.
+            // "Bookshelf Girts ... 2x4 flat wall girts are applied to the outside"
+            // "Double Girts ... flat wall girts on the outside"
+
+            // Left Side (A) Exterior
+            if (isAboveCentermatchA) {
+              const lGirt = new THREE.Mesh(girtGeoFlat, woodMaterial);
+              // Position: Outside the post (-X)
+              lGirt.position.set(-buildingWidth / 2 - girtDepthVal / 2, y, 0);
+              framingGroup.add(lGirt);
+            }
+
+            // Right Side (B) Exterior
+            if (isAboveCentermatchB) {
+              const rGirt = new THREE.Mesh(girtGeoFlat, woodMaterial);
+              // Position: Outside the post (+X)
+              rGirt.position.set(buildingWidth / 2 + girtDepthVal / 2, y, 0);
+              framingGroup.add(rGirt);
+            }
+
+            // 2. INTERIOR GIRTS (Double Only)
+            if (girtType === 'double') {
+              // Left Side (A) Interior
+              // Always show interior girts (they are on the inside face)
+              {
+                const lGirtIn = new THREE.Mesh(girtGeoInterior, woodMaterial);
+                // Position: Inside the post (+X relative to wall)
+                // Wall is at -buildingWidth/2. Post depth is postDepth.
+                // Interior face is -buildingWidth/2 + postDepth
+                lGirtIn.position.set(-buildingWidth / 2 + postDepth + girtDepthVal / 2, y, 0);
+                framingGroup.add(lGirtIn);
+              }
+
+              // Right Side (B) Interior
+              {
+                const rGirtIn = new THREE.Mesh(girtGeoInterior, woodMaterial);
+                // Position: Inside the post (-X relative to wall)
+                // Wall is at +buildingWidth/2. Post is inside.
+                rGirtIn.position.set(buildingWidth / 2 - postDepth - girtDepthVal / 2, y, 0);
+                framingGroup.add(rGirtIn);
+              }
+            }
+
+            // 3. BOOKSHELF GIRTS (Between Posts)
+            if (girtType === 'bookshelf') {
+              // We need to generate segments between posts.
+              // Iterate bays.
+              for (let b = 0; b < numBays; b++) {
+                const zCenter = -buildingLength / 2 + (b * actualPostSpacing) + (actualPostSpacing / 2);
+                // Width of segment = post spacing - post width
+                const segmentLen = actualPostSpacing - postWidth;
+                // Use '2x6' (0.46) for bookshelf usually, or match girtSize? 
+                // User said "2x6 wall girts that are laid horizontally between". Let's use 2x6 (0.46) height/width?
+                // Actually wood is usually flat horizontally for bookshelf? 
+                // "laid horizontally ... to put batt insulation between"
+                // This usually means the "Wide" face is horizontal? Or vertical?
+                // Standard girt is vertical face. Bookshelf means wide face is horizontal (like a shelf).
+                // So depth is 5.5" (0.46), height is 1.5" (0.125).
+                const bsDepth = 0.46; // 5.5" deep (filling the wall cavity)
+                const bsHeight = 0.125; // 1.5" thick
+
+                const bsGeo = new THREE.BoxGeometry(bsDepth, bsHeight, segmentLen); // Z is length in this orientation? No buildingLength is Z.
+                // BoxGeometry args: Width (X), Height (Y), Depth (Z)
+                // Here we want Width to be 5.5" (X), Height 1.5" (Y), Length (Z)
+                const bsGeoCorrect = new THREE.BoxGeometry(bsDepth, bsHeight, segmentLen);
+
+                // Left Side Bookshelf
+                // Always show bookshelf girts (visible from inside)
+                {
+                  const lBS = new THREE.Mesh(bsGeoCorrect, woodMaterial);
+                  // Position: Centered in the wall (align with posts)
+                  // Post center X is -buildingWidth/2 + postDepth/2
+                  lBS.position.set(-buildingWidth / 2 + postDepth / 2, y, zCenter);
+                  framingGroup.add(lBS);
+                }
+
+                // Right Side Bookshelf
+                {
+                  const rBS = new THREE.Mesh(bsGeoCorrect, woodMaterial);
+                  rBS.position.set(buildingWidth / 2 - postDepth / 2, y, zCenter);
+                  framingGroup.add(rBS);
+                }
+              }
+            }
           }
 
 
-          // 2.5 GRADE BOARD (Bottom Plate) - Treated Wood
-          const gradeBoardHeight = 0.65; // ~8 inches (2x8)
-          const gradeBoardDepth = 0.125; // 1.5 inches
-          const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
+          if (isCentermatch) {
+            // Centermatch Stacking Logic
+            const rowsA = design.centermatchRows?.sidewallA || 1;
+            const rowsB = design.centermatchRows?.sidewallB || 1;
 
-          // Left Side Grade Board (attached to outside of posts, at bottom)
-          const lGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-          lGradeBoard.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
-          framingGroup.add(lGradeBoard);
+            const gbGeoUnit = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeightUnit, buildingLength);
 
-          // Right Side Grade Board
-          const rGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-          rGradeBoard.position.set(buildingWidth / 2 + gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
-          framingGroup.add(rGradeBoard);
+            const isFusion = design.gradeBoard && design.gradeBoard.toLowerCase().includes('fusion');
+            const gbMaterial = isFusion ? fusionWoodMaterial : treatedWoodMaterial;
+
+            // Left Side (Sidewall A)
+            for (let i = 0; i < rowsA; i++) {
+              const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+              const lGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
+              lGB.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, y, 0);
+              framingGroup.add(lGB);
+            }
+
+            // Right Side (Sidewall B)
+            for (let i = 0; i < rowsB; i++) {
+              const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+              const rGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
+              rGB.position.set(buildingWidth / 2 + gradeBoardDepth / 2, y, 0);
+              framingGroup.add(rGB);
+            }
+
+            // Endwall C (Front)
+            const rowsC = design.centermatchRows?.endwallC || 1;
+            for (let i = 0; i < rowsC; i++) {
+              const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+              const gb = new THREE.Mesh(new THREE.BoxGeometry(buildingWidth + 0.2, gradeBoardHeightUnit, gradeBoardDepth), gbMaterial);
+              gb.position.set(0, y, buildingLength / 2 + gradeBoardDepth / 2);
+              framingGroup.add(gb);
+            }
+
+            // Endwall D (Back)
+            const rowsD = design.centermatchRows?.endwallD || 1;
+            for (let i = 0; i < rowsD; i++) {
+              const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+              const gb = new THREE.Mesh(new THREE.BoxGeometry(buildingWidth + 0.2, gradeBoardHeightUnit, gradeBoardDepth), gbMaterial);
+              gb.position.set(0, y, -buildingLength / 2 - gradeBoardDepth / 2);
+              framingGroup.add(gb);
+            }
+          } else {
+            // Standard Gradeboard Logic (Single Board)
+            // gradeBoardHeight is already initialized to 0.60, update if specific size selected
+            if (design.gradeBoard) {
+              if (design.gradeBoard.includes('2x6')) gradeBoardHeight = 0.46; // 5.5"
+              else if (design.gradeBoard.includes('2x8')) gradeBoardHeight = 0.60; // 7.25"
+              else if (design.gradeBoard.includes('2x10')) gradeBoardHeight = 0.77; // 9.25"
+            }
+
+            const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
+
+            // Left Side Grade Board
+            const lGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+            lGradeBoard.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
+            framingGroup.add(lGradeBoard);
+
+            // Right Side Grade Board
+            const rGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+            rGradeBoard.position.set(buildingWidth / 2 + gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
+            framingGroup.add(rGradeBoard);
+          }
 
           // 2.6 SIDE WALL V-BRACING (Diagonals)
           const braceThick = 0.125; // 1.5"
@@ -721,11 +958,13 @@ export default function Building3D({ design }: Building3DProps) {
               const p = new THREE.Mesh(pGeo, treatedWoodMaterial);
               p.position.set(x, (roofH - buriedDepth) / 2, z);
               framingGroup.add(p);
-              // Footing
-              const fGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.0, 16);
-              const f = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ color: 0x999999 }));
-              f.position.set(x, -buriedDepth - 0.5, z);
-              framingGroup.add(f);
+              // Footing (only if buried)
+              if (!isSecuredToConcrete) {
+                const fGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.0, 16);
+                const f = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ color: 0x999999 }));
+                f.position.set(x, -buriedDepth - 0.5, z);
+                framingGroup.add(f);
+              }
             });
 
             // Diagonal Brace logic (User Image: Top-Corner -> Bottom-Intermediate)
@@ -740,6 +979,34 @@ export default function Building3D({ design }: Building3DProps) {
               const pCornerTop = new THREE.Vector3(buildingWidth / 2 - postWidth / 2, buildingHeight - 1.0, z); // Top of Corner Post
               const pInnerBot = new THREE.Vector3(xRight, 1.0, z); // Bottom of Intermediate
               framingGroup.add(createMemberLocal(pCornerTop, pInnerBot, 0.125, 0.46, woodMaterial));
+            }
+
+            // End Wall Grade Board
+            if (isCentermatch) {
+              const rows = (dir === 1) ? (design.centermatchRows?.endwallC || 1) : (design.centermatchRows?.endwallD || 1);
+              const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeightUnit, gradeBoardDepth);
+
+              for (let i = 0; i < rows; i++) {
+                const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+                const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
+                // Position on outside face of end posts
+                const zPos = (dir === 1)
+                  ? (buildingLength / 2 + gradeBoardDepth / 2)
+                  : (-buildingLength / 2 - gradeBoardDepth / 2);
+
+                gb.position.set(0, y, zPos);
+                framingGroup.add(gb);
+              }
+            } else {
+              // Standard Gradeboard Logic (Single Board)
+              const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeight, gradeBoardDepth);
+              const zPos = (dir === 1)
+                ? (buildingLength / 2 + gradeBoardDepth / 2)
+                : (-buildingLength / 2 - gradeBoardDepth / 2);
+
+              const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
+              gb.position.set(0, gradeBoardHeight / 2 + 0.1, zPos);
+              framingGroup.add(gb);
             }
 
             // End Wall Girts (Between Posts - exactly 5 girts as shown in image)
@@ -809,9 +1076,15 @@ export default function Building3D({ design }: Building3DProps) {
           rCap.position.set(0, peakHeight + 0.2 + ROOF_OFFSET, 0);
           framingGroup.add(rCap);
 
-          // 3.5 FLOOR
+          // 3.5 FLOOR - Internal Building Pad
           const floorGeo = new THREE.PlaneGeometry(buildingWidth, buildingLength);
-          const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9, side: THREE.DoubleSide });
+          const floorMatColor = design.floorFinish === 'concrete' ? 0xd3d3d3 : 0x9b7653; // Grey or Dirt Brown
+          const floorMatRoughness = design.floorFinish === 'concrete' ? 0.9 : 1.0;
+          const floorMat = new THREE.MeshStandardMaterial({
+            color: floorMatColor,
+            roughness: floorMatRoughness,
+            side: THREE.DoubleSide
+          });
           const floor = new THREE.Mesh(floorGeo, floorMat);
           floor.rotation.x = -Math.PI / 2;
           floor.position.y = 0.05;
@@ -820,11 +1093,49 @@ export default function Building3D({ design }: Building3DProps) {
         } else if (framingType === 'ladder-frame-construction') {
           // LADDER FRAME CONSTRUCTION - Matching user images exactly
           // End walls: 4 posts, Side walls: 5 posts
+          const isSecuredToConcrete = design.postFoundation === 'Secured to Concrete';
+          // For ladder frame, posts usually sit on grade board or slab, but if "buried" option exists, we simulate same logic
+          // Actually, ladder frame descriptions often imply on-slab or on-grade-board. 
+          // If the user wants "Secured to Concrete" to mean "No pillars below", it implies buried pillars DO exist in default.
+          // Let's assume default Ladder Frame posts (studs) currently sit on Grade Board which is at y=gradeBoardHeight/2
+
+          // Wait, the current ladder frame posts (lines 901) are positioned:
+          // gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2
+          // Height: buildingHeight - gradeBoardHeight
+          // So they start AT grade board top. They don't go underground?
+          // Let's check "buriedDepth" in Ladder section. It wasn't defined.
+
+          // However, user said "pillors nahi huge neshe wale".
+          // If current ladder frame implementation DOES NOT have buried posts, then there's nothing to hide?
+          // Let's check if there are footings or extensions in Ladder frame code.
+          // Lines 899-902: `buildingHeight - gradeBoardHeight`. Position y is centered.
+          // Bottom y = gradeBoardHeight.
+          // Grade board is at y=gradeBoardHeight/2. Bottom is 0.
+
+          // So currently Ladder frame posts START at Y=0 (or Y=gradeBoardHeight).
+          // They DO NOT extend underground (-y).
+
+          // BUT, if the user sees "pillars below" maybe they selected Post Frame?
+          // Or maybe I should check if they want changes in Ladder Frame too?
+          // User selected "Secured To Concrete".
+          // If I look at the code for Post frame, it explicitly has `buriedDepth = 4.0`.
+
+          // I will assume for now I only need to modify Post Frame section (which I did in previous chunks).
+          // But I'll leave this check here just in case I need to add buried logic to Ladder Frame later (which I won't do now as it wasn't there).
+
           const studWidth = 0.15; // 1.5" (2x4 stud width)
           const studDepth = 0.45; // 5.5" (2x4 stud depth)
           const girtHeight = 0.15; // 1.5" (2x4 girt height)
           const girtDepth = 0.45; // 5.5" (2x4 girt depth)
-          const gradeBoardHeight = 0.65; // ~8 inches (2x8 grade board)
+
+          // Determine gradeboard height based on selection
+          let gradeBoardHeight = 0.60; // Default 2x8 approx (7.25")
+          if (design.gradeBoard) {
+            if (design.gradeBoard.includes('2x6')) gradeBoardHeight = 0.46; // 5.5"
+            else if (design.gradeBoard.includes('2x8')) gradeBoardHeight = 0.60; // 7.25"
+            else if (design.gradeBoard.includes('2x10')) gradeBoardHeight = 0.77; // 9.25"
+          }
+
           const gradeBoardDepth = 0.125; // 1.5 inches
 
           // Helper function to create member (same as post-frame)
@@ -859,16 +1170,16 @@ export default function Building3D({ design }: Building3DProps) {
           // 1. SIDE WALLS - 5 POSTS (as shown in image)
           const numSidePosts = 5;
           const sidePostSpacing = buildingLength / (numSidePosts - 1);
-          
+
           for (let i = 0; i < numSidePosts; i++) {
             const z = -buildingLength / 2 + i * sidePostSpacing;
-            
+
             // Left side wall post
             const leftStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
             const leftStud = new THREE.Mesh(leftStudGeo, woodMaterial);
             leftStud.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
             framingGroup.add(leftStud);
-            
+
             // Right side wall post
             const rightStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
             const rightStud = new THREE.Mesh(rightStudGeo, woodMaterial);
@@ -881,17 +1192,17 @@ export default function Building3D({ design }: Building3DProps) {
           const girtStartHeight = gradeBoardHeight + 0.5;
           const girtEndHeight = buildingHeight - 0.5;
           const girtSpacing = (girtEndHeight - girtStartHeight) / (numSideGirts - 1);
-          
+
           const sideGirtGeo = new THREE.BoxGeometry(girtDepth, girtHeight, buildingLength);
-          
+
           for (let g = 0; g < numSideGirts; g++) {
             const y = girtStartHeight + (g * girtSpacing);
-            
+
             // Left side wall girt
             const leftGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
             leftGirt.position.set(-buildingWidth / 2 + studDepth / 2, y, 0);
             framingGroup.add(leftGirt);
-            
+
             // Right side wall girt
             const rightGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
             rightGirt.position.set(buildingWidth / 2 - studDepth / 2, y, 0);
@@ -900,12 +1211,12 @@ export default function Building3D({ design }: Building3DProps) {
 
           // 3. GRADE BOARD (Bottom Plate) - Treated Wood
           const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
-          
+
           // Left side grade board
           const leftGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
           leftGradeBoard.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight / 2, 0);
           framingGroup.add(leftGradeBoard);
-          
+
           // Right side grade board
           const rightGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
           rightGradeBoard.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight / 2, 0);
@@ -916,7 +1227,7 @@ export default function Building3D({ design }: Building3DProps) {
           const leftTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
           leftTopPlate.position.set(-buildingWidth / 2 + studDepth / 2, buildingHeight - studWidth, 0);
           framingGroup.add(leftTopPlate);
-          
+
           const rightTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
           rightTopPlate.position.set(buildingWidth / 2 - studDepth / 2, buildingHeight - studWidth, 0);
           framingGroup.add(rightTopPlate);
@@ -924,20 +1235,20 @@ export default function Building3D({ design }: Building3DProps) {
           // 5. END WALLS - 4 POSTS (as shown in image)
           const numEndPosts = 4;
           const endPostSpacing = buildingWidth / (numEndPosts - 1);
-          
+
           [1, -1].forEach(dir => {
             const z = (buildingLength / 2 - studWidth / 2) * dir;
-            
+
             // Create 4 posts evenly spaced across end wall width
             for (let i = 0; i < numEndPosts; i++) {
               const x = -buildingWidth / 2 + i * endPostSpacing;
-              
+
               // Adjust post height for roof slope on end walls
               const dist = Math.abs(x);
               const slopeH = peakHeight - buildingHeight;
               const roofH = peakHeight - (dist * (slopeH / (buildingWidth / 2)));
               const postHeight = roofH - gradeBoardHeight;
-              
+
               const endStudGeo = new THREE.BoxGeometry(studWidth, postHeight, studDepth);
               const endStud = new THREE.Mesh(endStudGeo, woodMaterial);
               endStud.position.set(x, gradeBoardHeight + postHeight / 2, z);
@@ -949,14 +1260,14 @@ export default function Building3D({ design }: Building3DProps) {
             const endGirtStartHeight = gradeBoardHeight + 0.5;
             const endGirtEndHeight = buildingHeight - 0.5;
             const endGirtSpacing = (endGirtEndHeight - endGirtStartHeight) / (numEndGirts - 1);
-            
+
             const endWallWidth = buildingWidth;
             const endGirtGeo = new THREE.BoxGeometry(endWallWidth, girtHeight, girtDepth);
-            
+
             for (let g = 0; g < numEndGirts; g++) {
               const y = endGirtStartHeight + (g * endGirtSpacing);
               if (y > buildingHeight - 0.5) continue;
-              
+
               const endGirt = new THREE.Mesh(endGirtGeo, woodMaterial);
               endGirt.position.set(0, y, z);
               framingGroup.add(endGirt);
@@ -979,26 +1290,26 @@ export default function Building3D({ design }: Building3DProps) {
           const trussSpacing = parseFloat(design.trussSpacing || '6');
           const numTrusses = Math.ceil(buildingLength / trussSpacing);
           const actualTrussSpacing = buildingLength / numTrusses;
-          
+
           for (let i = 0; i <= numTrusses; i++) {
             const z = -buildingLength / 2 + i * actualTrussSpacing;
-            
+
             // Bottom chord
             const botChordGeo = new THREE.BoxGeometry(buildingWidth, studDepth, studWidth);
             const botChord = new THREE.Mesh(botChordGeo, woodMaterial);
             botChord.position.set(0, buildingHeight + studDepth / 2, z);
             framingGroup.add(botChord);
-            
+
             // Rafters (top chords)
             const slopeHeight = peakHeight - buildingHeight;
             const roofSlopeLen = Math.sqrt(Math.pow(buildingWidth / 2, 2) + Math.pow(slopeHeight, 2));
             const rafterGeo = new THREE.BoxGeometry(roofSlopeLen, studDepth, studWidth);
-            
+
             const leftRafter = new THREE.Mesh(rafterGeo, woodMaterial);
             leftRafter.rotation.z = roofAngle;
             leftRafter.position.set(-buildingWidth / 4, buildingHeight + slopeHeight / 2, z);
             framingGroup.add(leftRafter);
-            
+
             const rightRafter = new THREE.Mesh(rafterGeo, woodMaterial);
             rightRafter.rotation.z = -roofAngle;
             rightRafter.position.set(buildingWidth / 4, buildingHeight + slopeHeight / 2, z);
@@ -1032,9 +1343,15 @@ export default function Building3D({ design }: Building3DProps) {
             framingGroup.add(rP);
           }
 
-          // 11. FLOOR
+          // 11. FLOOR - Internal Building Pad
           const floorGeo = new THREE.PlaneGeometry(buildingWidth, buildingLength);
-          const floorMat = new THREE.MeshStandardMaterial({ color: 0x3d2817, roughness: 1.0, side: THREE.DoubleSide });
+          const floorMatColor = design.floorFinish === 'concrete' ? 0xd3d3d3 : 0x9b7653; // Grey or Dirt Brown
+          const floorMatRoughness = design.floorFinish === 'concrete' ? 0.9 : 1.0;
+          const floorMat = new THREE.MeshStandardMaterial({
+            color: floorMatColor,
+            roughness: floorMatRoughness,
+            side: THREE.DoubleSide
+          });
           const floor = new THREE.Mesh(floorGeo, floorMat);
           floor.rotation.x = -Math.PI / 2;
           floor.position.y = 0.05;
@@ -1282,16 +1599,21 @@ export default function Building3D({ design }: Building3DProps) {
           return texture;
         };
 
-        // Floor - with texture (dirt/gravel texture for interior, grass for exterior)
-        const floorGeometry = new THREE.PlaneGeometry(200, 200);
+        // Floor - Garden Look
+        // Make it much larger to feel like a "real garden" environment
+        const floorGeometry = new THREE.PlaneGeometry(1000, 1000);
         const floorTexture = createGrassTexture();
-        const floorColor = design.floorFinish === 'concrete' ? 0xd3d3d3 : (isInteriorView ? 0x8b4513 : 0x7cb342); // Brown for interior dirt, green for exterior grass
+        // Repeat texture more for larger area
+        floorTexture.repeat.set(50, 50);
+
+        const floorColor = isInteriorView ? 0x8b4513 : 0x7cb342;
         const floorMaterial = new THREE.MeshStandardMaterial({
           map: floorTexture,
           color: floorColor,
-          roughness: 0.9
+          roughness: 1,
+          metalness: 0
         });
-        // Create background group (Floor + Trees)
+
         const bgGroup = new THREE.Group();
         bgGroup.name = 'background';
 
@@ -1371,10 +1693,12 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Simple controls
         let isDragging = false;
+        let isAutoRotating = true; // Start with auto-rotation enabled
         let previousMousePosition = { x: 0, y: 0 };
 
         const onMouseDown = (e: MouseEvent) => {
           isDragging = true;
+          isAutoRotating = false; // Stop auto-rotation on user interaction
           previousMousePosition = { x: e.clientX, y: e.clientY };
         };
 
@@ -1402,6 +1726,7 @@ export default function Building3D({ design }: Building3DProps) {
 
         const onWheel = (e: WheelEvent) => {
           e.preventDefault();
+          isAutoRotating = false; // Stop auto-rotation on zoom
           const distance = camera.position.length();
           const newDistance = distance + e.deltaY * 0.01;
           if (newDistance > 10 && newDistance < 200) {
@@ -1417,6 +1742,16 @@ export default function Building3D({ design }: Building3DProps) {
         // Animation
         const animate = () => {
           animationId = requestAnimationFrame(animate);
+
+          // Auto-rotation logic
+          if (isAutoRotating) {
+            const spherical = new THREE.Spherical();
+            spherical.setFromVector3(camera.position);
+            spherical.theta += 0.001; // Slow rotation speed
+            camera.position.setFromSpherical(spherical);
+            camera.lookAt(0, 0, 0);
+          }
+
           renderer.render(scene, camera);
         };
         animate();
@@ -1641,7 +1976,7 @@ export default function Building3D({ design }: Building3DProps) {
         cameraRef.current.position.set(0, height * 0.4, length * 0.3);
         cameraRef.current.lookAt(0, height * 0.4, -length / 2);
       } else {
-        cameraRef.current.position.set(width * 0.8, length * 0.6, width * 0.8);
+        cameraRef.current.position.set(width * 1.5, length * 1.0, width * 1.5);
         cameraRef.current.lookAt(0, 0, 0);
       }
     }
