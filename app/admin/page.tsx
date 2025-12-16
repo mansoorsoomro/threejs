@@ -25,7 +25,7 @@ export default function AdminPage() {
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6">
         <h1 className="text-3xl font-bold mb-6">Admin - Pricing Management</h1>
-        
+
         {saved && (
           <div className="mb-4 p-3 bg-green-100 text-green-700 rounded">
             Pricing saved successfully!
@@ -202,23 +202,33 @@ export default function AdminPage() {
           {/* Girt Type */}
           <div>
             <label className="block text-sm font-medium mb-2">Girt Type ($ per linear ft)</label>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-xs text-gray-600 mb-1">2x4</label>
+                <label className="block text-xs text-gray-600 mb-1">Flat</label>
                 <input
                   type="number"
-                  value={pricing.girtType['2x4']}
-                  onChange={(e) => setPricing({ ...pricing, girtType: { ...pricing.girtType, '2x4': parseFloat(e.target.value) } })}
+                  value={pricing.girtType['flat']}
+                  onChange={(e) => setPricing({ ...pricing, girtType: { ...pricing.girtType, 'flat': parseFloat(e.target.value) } })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   step="0.01"
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-600 mb-1">2x6</label>
+                <label className="block text-xs text-gray-600 mb-1">Bookshelf</label>
                 <input
                   type="number"
-                  value={pricing.girtType['2x6']}
-                  onChange={(e) => setPricing({ ...pricing, girtType: { ...pricing.girtType, '2x6': parseFloat(e.target.value) } })}
+                  value={pricing.girtType['bookshelf']}
+                  onChange={(e) => setPricing({ ...pricing, girtType: { ...pricing.girtType, 'bookshelf': parseFloat(e.target.value) } })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  step="0.01"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-600 mb-1">Double</label>
+                <input
+                  type="number"
+                  value={pricing.girtType['double']}
+                  onChange={(e) => setPricing({ ...pricing, girtType: { ...pricing.girtType, 'double': parseFloat(e.target.value) } })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md"
                   step="0.01"
                 />
