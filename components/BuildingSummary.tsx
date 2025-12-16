@@ -109,9 +109,10 @@ export default function BuildingSummary({ design, onNext }: BuildingSummaryProps
   };
 
   const getGirtTypeLabel = () => {
-    if (design.girtType === '2x4') return 'Flat';
-    if (design.girtType === '2x6') return '2x6';
-    return design.girtType;
+    if (design.girtType === 'flat') return 'Flat Girts';
+    if (design.girtType === 'bookshelf') return 'Bookshelf Girts';
+    if (design.girtType === 'double') return 'Double Girts';
+    return design.girtType || 'Flat Girts';
   };
 
   const getFloorFinishLabel = () => {

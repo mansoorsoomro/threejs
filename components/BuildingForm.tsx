@@ -23,7 +23,8 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
       sitePreparation: false,
       sidewallPosts: '4x6',
       clearHeight: '12',
-      girtType: '2x4',
+      girtType: 'flat',
+      girtSize: '2x4',
       gradeBoard: '2x6',
       endWallOverhang: '0',
       sidewallOverhang: '0',
@@ -57,7 +58,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
   return (
     <form onSubmit={handleSubmit(onSubmitForm)} className="space-y-6 p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-4">Building Specifications</h2>
-      
+
       {mode === 'full' && (
         <>
           {/* Client Information */}
@@ -223,6 +224,19 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Girt Type *</label>
         <select
           {...register('girtType', { required: true })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+        >
+          <option value="flat">Flat Girts (Standard)</option>
+          <option value="bookshelf">Bookshelf Girts</option>
+          <option value="double">Double Girts</option>
+        </select>
+      </div>
+
+      {/* Girt Size */}
+      <div>
+        <label className="block text-sm font-medium mb-1">Girt Size *</label>
+        <select
+          {...register('girtSize', { required: true })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md"
         >
           <option value="2x4">2x4</option>
