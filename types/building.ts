@@ -44,6 +44,8 @@ export interface BuildingDesign {
   endWallOverhang: '0' | '1' | '2';
   sidewallOverhang: '0' | '1' | '2';
   postFoundation?: 'Post Embedded' | 'Secured to Concrete';
+  postEmbedmentDepth?: '4 ft' | '6 ft';
+  footingSize?: string;
   openings: Opening[];
 }
 

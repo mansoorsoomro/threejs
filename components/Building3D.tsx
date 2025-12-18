@@ -56,6 +56,19 @@ export default function Building3D({ design }: Building3DProps) {
     setIsMounted(true);
   }, []);
 
+  // Sync local color state with design prop changes (for preview updates)
+  useEffect(() => {
+    setLocalWallColor(design.wallColor || 'white');
+  }, [design.wallColor]);
+  
+  useEffect(() => {
+    setLocalRoofColor(design.roofColor || 'charcoal');
+  }, [design.roofColor]);
+  
+  useEffect(() => {
+    setLocalTrimColor(design.trimColor || 'white');
+  }, [design.trimColor]);
+
   // Update colors when local state changes
   useEffect(() => {
     console.log("Building3D: v3 - Client Grade Framing Loaded");
@@ -560,10 +573,39 @@ export default function Building3D({ design }: Building3DProps) {
         if (framingType === 'post-frame-construction') {
           // --- POST FRAME CONSTRUCTION (Standard / User Diagram) ---
 
-          const postWidth = 0.5; // 6x6 nominal (0.5 ft)
-          const postDepth = 0.5;
+          // Determine post dimensions based on selection
+          const getPostDimensions = (type?: string) => {
+            switch (type) {
+              case '4x6': return { width: 3.5 / 12, depth: 5.5 / 12 }; // 0.29 ft x 0.46 ft
+              case '6x6': return { width: 5.5 / 12, depth: 5.5 / 12 }; // 0.46 ft x 0.46 ft
+              case 'columns': return { width: 5.5 / 12, depth: 5.5 / 12 }; // 0.46 ft x 0.46 ft
+              default: return { width: 5.5 / 12, depth: 5.5 / 12 }; // default 6x6
+            }
+          };
+
+          const postDims = getPostDimensions(design.sidewallPosts);
+          const postWidth = postDims.width;
+          const postDepth = postDims.depth;
           const isSecuredToConcrete = design.postFoundation === 'Secured to Concrete';
-          const buriedDepth = isSecuredToConcrete ? 0.0 : 4.0; // 0 if secured to concrete, 4ft buried otherwise
+          const postEmbedmentVal = design.postEmbedmentDepth ? parseInt(design.postEmbedmentDepth) : 4;
+          const buriedDepth = isSecuredToConcrete ? 0.0 : postEmbedmentVal; // Use selected depth if not secured to concrete
+
+          // Helper to parse footing size string
+          const parseFootingSize = (sizeStr?: string) => {
+            const defaultSize = { diameter: 20 / 12, height: 6 / 12 }; // Default 20x6
+            if (!sizeStr) return defaultSize;
+
+            const match = sizeStr.match(/(\d+)\s*in\s*x\s*(\d+)\s*in/);
+            if (match && match[1] && match[2]) {
+              return {
+                diameter: parseInt(match[1]) / 12, // convert inches to feet
+                height: parseInt(match[2]) / 12
+              };
+            }
+            return defaultSize;
+          };
+
+          const footingDims = parseFootingSize(design.footingSize);
           const trussThickness = 0.125; // 1.5"
           const trussDepth = 0.46; // 5.5" (2x6)
           const girtHeightReal = 0.125; // 1.5 inch
@@ -606,10 +648,20 @@ export default function Building3D({ design }: Building3DProps) {
 
             // Footings (Only show if buried)
             if (!isSecuredToConcrete) {
-              const fGeo = new THREE.CylinderGeometry(0.8, 0.8, 1.0, 16);
+              const fRadius = footingDims.diameter / 2;
+              const fHeight = footingDims.height;
+              const fGeo = new THREE.CylinderGeometry(fRadius, fRadius, fHeight, 16);
               const fMesh = new THREE.Mesh(fGeo, new THREE.MeshStandardMaterial({ color: 0x999999 }));
-              const leftF = fMesh.clone(); leftF.position.set(-buildingWidth / 2 + postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(leftF);
-              const rightF = fMesh.clone(); rightF.position.set(buildingWidth / 2 - postWidth / 2, -buriedDepth - 0.5, z); framingGroup.add(rightF);
+
+              const footingY = -buriedDepth - (fHeight / 2);
+
+              const leftF = fMesh.clone();
+              leftF.position.set(-buildingWidth / 2 + postWidth / 2, footingY, z);
+              framingGroup.add(leftF);
+
+              const rightF = fMesh.clone();
+              rightF.position.set(buildingWidth / 2 - postWidth / 2, footingY, z);
+              framingGroup.add(rightF);
             } else {
               // Show bracket/anchor if secured to concrete (optional, simplified as just sitting on floor)
               // For now, just no footing since it's on the slab
