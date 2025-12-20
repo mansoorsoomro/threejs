@@ -51,6 +51,14 @@ export interface BuildingDesign {
   fastenerLocation?: 'Wall & Roof' | 'Wall Only' | 'Roof Only';
   miniPrintOption?: 'Standard' | 'Premium';
   openings: Opening[];
+  openWalls?: {
+    isOpen: boolean;
+    sideWallA: boolean;
+    sideWallB: boolean;
+    endWallC: boolean;
+    endWallD: boolean;
+    removeEveryOtherPost: boolean;
+  };
 }
 
 export interface Opening {

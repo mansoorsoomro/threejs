@@ -40,12 +40,32 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
   >('openWall');
 
   // Local state for all options
-  const [openWall, setOpenWall] = useState<string>('No');
-  const [openSideWallA, setOpenSideWallA] = useState<string>('No');
-  const [openSideWallB, setOpenSideWallB] = useState<string>('No');
-  const [openEndWallC, setOpenEndWallC] = useState<string>('No');
-  const [openEndWallD, setOpenEndWallD] = useState<string>('No');
-  const [removeEveryOtherPost, setRemoveEveryOtherPost] = useState<string>('No');
+  // Open Wall configuration derives from design prop
+  const openWall = design.openWalls?.isOpen ? 'Yes' : 'No';
+  const openSideWallA = design.openWalls?.sideWallA ? 'Yes' : 'No';
+  const openSideWallB = design.openWalls?.sideWallB ? 'Yes' : 'No';
+  const openEndWallC = design.openWalls?.endWallC ? 'Yes' : 'No';
+  const openEndWallD = design.openWalls?.endWallD ? 'Yes' : 'No';
+  const removeEveryOtherPost = design.openWalls?.removeEveryOtherPost ? 'Yes' : 'No';
+
+  // Helper to update openWalls config
+  const updateOpenWalls = (key: keyof NonNullable<BuildingDesign['openWalls']>, value: boolean) => {
+    const currentConfig = design.openWalls || {
+      isOpen: false,
+      sideWallA: false,
+      sideWallB: false,
+      endWallC: false,
+      endWallD: false,
+      removeEveryOtherPost: false
+    };
+
+    handleDesignChange({
+      openWalls: {
+        ...currentConfig,
+        [key]: value
+      }
+    });
+  };
   const [gableAccent, setGableAccent] = useState<string>('No');
   const [gableAccentEndWallC, setGableAccentEndWallC] = useState<string>('No');
   const [gableAccentEndWallD, setGableAccentEndWallD] = useState<string>('No');
@@ -121,8 +141,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
     currentDesign.buildingUse === 'agricultural'
       ? 'Post Frame Design'
       : currentDesign.buildingUse === 'residential'
-      ? 'Residential Design'
-      : 'Building Design';
+        ? 'Residential Design'
+        : 'Building Design';
 
   // Save accessories to localStorage whenever they change
   useEffect(() => {
@@ -181,11 +201,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
             <div className="space-y-3 overflow-y-auto flex-1 pr-2">
               {/* Open Wall */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'openWall'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'openWall'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('openWall')}
               >
                 <div className={`px-4 py-2 ${activeSection === 'openWall' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -197,16 +216,15 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <span className="text-xs text-gray-700 block mb-2">Add an open wall</span>
                     <select
                       value={openWall}
-                      onChange={e => setOpenWall(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        openWall ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      onChange={e => updateOpenWalls('isOpen', e.target.value === 'Yes')}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${openWall === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
                     </select>
                   </div>
-                  
+
                   {/* Show additional options only when "Yes" is selected */}
                   {openWall === 'Yes' && (
                     <>
@@ -214,10 +232,9 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Open Side Wall A</span>
                         <select
                           value={openSideWallA}
-                          onChange={e => setOpenSideWallA(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            openSideWallA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          onChange={e => updateOpenWalls('sideWallA', e.target.value === 'Yes')}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${openSideWallA === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -227,10 +244,9 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Open Side Wall B</span>
                         <select
                           value={openSideWallB}
-                          onChange={e => setOpenSideWallB(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            openSideWallB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          onChange={e => updateOpenWalls('sideWallB', e.target.value === 'Yes')}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${openSideWallB === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -240,10 +256,9 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Open End Wall C</span>
                         <select
                           value={openEndWallC}
-                          onChange={e => setOpenEndWallC(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            openEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          onChange={e => updateOpenWalls('endWallC', e.target.value === 'Yes')}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${openEndWallC === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -253,10 +268,9 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Open End Wall D</span>
                         <select
                           value={openEndWallD}
-                          onChange={e => setOpenEndWallD(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            openEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          onChange={e => updateOpenWalls('endWallD', e.target.value === 'Yes')}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${openEndWallD === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -266,10 +280,9 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Remove every other post</span>
                         <select
                           value={removeEveryOtherPost}
-                          onChange={e => setRemoveEveryOtherPost(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            removeEveryOtherPost ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          onChange={e => updateOpenWalls('removeEveryOtherPost', e.target.value === 'Yes')}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${removeEveryOtherPost === 'Yes' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -282,11 +295,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Gable Accent */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'gableAccent'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gableAccent'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('gableAccent')}
               >
                 <div className={`px-4 py-2 ${activeSection === 'gableAccent' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -299,15 +311,14 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={gableAccent}
                       onChange={e => setGableAccent(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        gableAccent ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${gableAccent ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
                     </select>
                   </div>
-                  
+
                   {/* Show additional options only when "Yes" is selected */}
                   {gableAccent === 'Yes' && (
                     <>
@@ -316,9 +327,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={gableAccentEndWallC}
                           onChange={e => setGableAccentEndWallC(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            gableAccentEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${gableAccentEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -329,9 +339,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={gableAccentEndWallD}
                           onChange={e => setGableAccentEndWallD(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            gableAccentEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${gableAccentEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -345,9 +354,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                               setSelectedColorForModal(gableAccentColor || '');
                               setShowGableAccentColorModal(true);
                             }}
-                            className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                              gableAccentColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                            }`}
+                            className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${gableAccentColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                              }`}
                           >
                             {trimColors.find(c => c.value === gableAccentColor)?.label || 'Select color'}
                           </button>
@@ -370,11 +378,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Wainscot */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'wainscot'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wainscot'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('wainscot')}
               >
                 <div className={`px-4 py-2 ${activeSection === 'wainscot' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -387,15 +394,14 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={wainscot}
                       onChange={e => setWainscot(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        wainscot ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${wainscot ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
                     </select>
                   </div>
-                  
+
                   {/* Show additional options only when "Yes" is selected */}
                   {wainscot === 'Yes' && (
                     <>
@@ -404,9 +410,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={wainscotSideWallA}
                           onChange={e => setWainscotSideWallA(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            wainscotSideWallA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSideWallA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -417,9 +422,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={wainscotSideWallB}
                           onChange={e => setWainscotSideWallB(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            wainscotSideWallB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSideWallB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -430,9 +434,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={wainscotEndWallC}
                           onChange={e => setWainscotEndWallC(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            wainscotEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -443,9 +446,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={wainscotEndWallD}
                           onChange={e => setWainscotEndWallD(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            wainscotEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="No">No</option>
                           <option value="Yes">Yes</option>
@@ -456,9 +458,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <select
                           value={wainscotSize}
                           onChange={e => setWainscotSize(e.target.value)}
-                          className={`w-full px-3 py-2 border rounded-md text-sm ${
-                            wainscotSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                          }`}
+                          className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                            }`}
                         >
                           <option value="24 in">24 in</option>
                           <option value="30 in">30 in</option>
@@ -475,9 +476,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                               setSelectedColorForModal(wainscotColor || '');
                               setShowWainscotColorModal(true);
                             }}
-                            className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${
-                              wainscotColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                            }`}
+                            className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${wainscotColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                              }`}
                           >
                             {trimColors.find(c => c.value === wainscotColor)?.label || 'Select color'}
                           </button>
@@ -500,11 +500,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Wall Insulation */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'wallInsulation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wallInsulation'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('wallInsulation')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'wallInsulation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -514,9 +513,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={wallInsulation}
                       onChange={e => setWallInsulation(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        wallInsulation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${wallInsulation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="6&quot; Batt 23&quot;">6&quot; Batt 23&quot;</option>
@@ -529,11 +527,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Wall Condensation Control */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'wallCondensation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wallCondensation'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('wallCondensation')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'wallCondensation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -543,9 +540,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={wallCondensation}
                       onChange={e => setWallCondensation(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        wallCondensation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${wallCondensation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Block-It House Wrap">Block-It House Wrap</option>
@@ -558,11 +554,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Interior Wall Liner */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'interiorWallLiner'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'interiorWallLiner'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('interiorWallLiner')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'interiorWallLiner' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -572,9 +567,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={interiorWallLiner}
                       onChange={e => setInteriorWallLiner(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        interiorWallLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${interiorWallLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="ProRib">ProRib</option>
@@ -587,11 +581,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Roof Condensation Control */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'roofCondensation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'roofCondensation'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('roofCondensation')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'roofCondensation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -601,9 +594,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={roofCondensation}
                       onChange={e => setRoofCondensation(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        roofCondensation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${roofCondensation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Reflectix Bubble Insulation">Reflectix Bubble Insulation</option>
@@ -615,11 +607,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Ceiling Insulation */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'ceilingInsulation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ceilingInsulation'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('ceilingInsulation')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'ceilingInsulation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -629,9 +620,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={ceilingInsulation}
                       onChange={e => setCeilingInsulation(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        ceilingInsulation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${ceilingInsulation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="4&quot; Fiberglass Blow In (R-11)">4&quot; Fiberglass Blow In (R-11)</option>
@@ -653,11 +643,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Ceiling Liner */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'ceilingLiner'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ceilingLiner'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('ceilingLiner')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'ceilingLiner' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -667,9 +656,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={ceilingLiner}
                       onChange={e => setCeilingLiner(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        ceilingLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${ceilingLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="ProRib">ProRib</option>
@@ -682,11 +670,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Ridge Options */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'ridgeOptions'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ridgeOptions'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('ridgeOptions')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'ridgeOptions' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -696,9 +683,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={ridgeOptions}
                       onChange={e => setRidgeOptions(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        ridgeOptions ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${ridgeOptions ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="Universal Ridge Cap">Universal Ridge Cap</option>
                       <option value="Pro-Sky Ridge Cap">Pro-Sky Ridge Cap</option>
@@ -709,11 +695,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Outside Closure Strip */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'outsideClosure'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'outsideClosure'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('outsideClosure')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'outsideClosure' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -723,9 +708,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={outsideClosure}
                       onChange={e => setOutsideClosure(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        outsideClosure ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${outsideClosure ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="Standard Non-Vented">Standard Non-Vented</option>
                       <option value="Economy Vented">Economy Vented</option>
@@ -737,11 +721,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Ridge Ventilation */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'ridgeVentilation'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ridgeVentilation'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('ridgeVentilation')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'ridgeVentilation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -752,9 +735,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={ridgeVentilation}
                       onChange={e => setRidgeVentilation(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        ridgeVentilation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${ridgeVentilation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="1">1</option>
@@ -767,11 +749,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Gable Vents */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'gableVents'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gableVents'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('gableVents')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'gableVents' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -782,9 +763,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={gableVents}
                       onChange={e => setGableVents(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        gableVents ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${gableVents ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Standard">Standard</option>
@@ -796,11 +776,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* End Caps */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'endCaps'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'endCaps'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('endCaps')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'endCaps' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -810,9 +789,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={endCaps}
                       onChange={e => setEndCaps(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        endCaps ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${endCaps ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
@@ -823,11 +801,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Snow Guards */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'snowGuards'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'snowGuards'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('snowGuards')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'snowGuards' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -837,9 +814,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={snowGuards}
                       onChange={e => setSnowGuards(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        snowGuards ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${snowGuards ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
@@ -850,11 +826,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Skylights */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'skylights'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'skylights'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('skylights')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'skylights' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -864,9 +839,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={skylights}
                       onChange={e => setSkylights(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        skylights ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${skylights ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="7 ft">7 ft</option>
@@ -879,11 +853,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Eave Light */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'eaveLight'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'eaveLight'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('eaveLight')}
               >
                 <div className={`px-4 py-2 ${activeSection === 'eaveLight' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -896,9 +869,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={eaveLightA}
                       onChange={e => setEaveLightA(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        eaveLightA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${eaveLightA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Small">Small</option>
@@ -911,9 +883,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={eaveLightB}
                       onChange={e => setEaveLightB(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        eaveLightB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${eaveLightB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Small">Small</option>
@@ -926,11 +897,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Gutters */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'gutters'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gutters'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('gutters')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'gutters' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -941,9 +911,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={gutters}
                       onChange={e => setGutters(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        gutters ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${gutters ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                       disabled={currentDesign.endWallOverhang === '0' && currentDesign.sidewallOverhang === '0'}
                     >
                       <option value="No">No</option>
@@ -955,11 +924,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
               {/* Cupolas */}
               <div
-                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${
-                  activeSection === 'cupolas'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
-                    : 'bg-transparent border-0 hover:bg-gray-50'
-                }`}
+                className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'cupolas'
+                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  : 'bg-transparent border-0 hover:bg-gray-50'
+                  }`}
                 onClick={() => setActiveSection('cupolas')}
               >
                 <div className={`px-4 py-4 ${activeSection === 'cupolas' ? 'bg-yellow-200' : 'bg-transparent'}`}>
@@ -970,9 +938,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <select
                       value={cupolas}
                       onChange={e => setCupolas(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${
-                        cupolas ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
-                      }`}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${cupolas ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                        }`}
                     >
                       <option value="None">None</option>
                       <option value="Small">Small</option>
@@ -992,21 +959,19 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
               <div className="flex space-x-2 border-b">
                 <button
                   onClick={() => setInfoTab('information')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${
-                    infoTab === 'information'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${infoTab === 'information'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                   Information
                 </button>
                 <button
                   onClick={() => setInfoTab('3d')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${
-                    infoTab === '3d'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${infoTab === '3d'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                   3D Scene
                 </button>
@@ -1015,39 +980,39 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
 
             {/* Tab content */}
             <div className="flex-1 overflow-y-auto">
-            {infoTab === 'information' && (
-              <>
-                {/* Price Summary Box */}
-                {totalPrice > 0 && (
-                  <div className="mb-4 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                    <p className="text-xs text-gray-500 mb-2">
-                      *Today&apos;s estimated price, future pricing may go up or down. Tax, labor, and delivery not included.
-                    </p>
-                    <div className="flex flex-col gap-1">
-                      <div>
-                        <span className="text-sm font-semibold text-gray-700 mr-1">Building Price:</span>
-                        <span className="text-lg font-bold text-gray-900 align-baseline">
-                          ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                        </span>
-                      </div>
-                      <p className="text-sm font-semibold text-gray-900">
-                        Design Id: <span className="font-normal">{designId}</span>
+              {infoTab === 'information' && (
+                <>
+                  {/* Price Summary Box */}
+                  {totalPrice > 0 && (
+                    <div className="mb-4 p-3 border border-gray-300 rounded-lg bg-gray-50">
+                      <p className="text-xs text-gray-500 mb-2">
+                        *Today&apos;s estimated price, future pricing may go up or down. Tax, labor, and delivery not included.
                       </p>
-                      <p className="text-sm font-semibold text-gray-900">
-                        Design Name: <span className="font-normal">{designName}</span>
+                      <div className="flex flex-col gap-1">
+                        <div>
+                          <span className="text-sm font-semibold text-gray-700 mr-1">Building Price:</span>
+                          <span className="text-lg font-bold text-gray-900 align-baseline">
+                            ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                        <p className="text-sm font-semibold text-gray-900">
+                          Design Id: <span className="font-normal">{designId}</span>
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          Design Name: <span className="font-normal">{designName}</span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Helper Banner */}
+                  {totalPrice === 0 && (
+                    <div className="mb-4 p-2 bg-blue-50 border border-blue-200 rounded">
+                      <p className="text-xs text-gray-700">
+                        Please fill in Width, Truss Spacing, Length, and Height to get a price.
                       </p>
                     </div>
-                  </div>
-                )}
-
-                {/* Helper Banner */}
-                {totalPrice === 0 && (
-                  <div className="mb-4 p-2 bg-blue-50 border border-blue-200 rounded">
-                    <p className="text-xs text-gray-700">
-                      Please fill in Width, Truss Spacing, Length, and Height to get a price.
-                    </p>
-                  </div>
-                )}
+                  )}
                   {/* Conditional Content Based on Active Section */}
                   {activeSection === 'openWall' && (
                     <div className="mb-4">
@@ -1668,14 +1633,14 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       </p>
                     </div>
                   )}
-              </>
-            )}
+                </>
+              )}
 
-            {infoTab === '3d' && (
-              <div className="h-full">
-                <Building3D design={currentDesign} />
-              </div>
-            )}
+              {infoTab === '3d' && (
+                <div className="h-full">
+                  <Building3D design={currentDesign} />
+                </div>
+              )}
             </div>
             {/* Bottom actions (Next button) */}
             {onNext && (
@@ -1718,9 +1683,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <button
                           key={color.value}
                           onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
+                          className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                            }`}
                           style={{ backgroundColor: color.hex }}
                           title={color.label}
                         />
@@ -1728,9 +1692,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       {/* Galvanized option */}
                       <button
                         onClick={() => setSelectedColorForModal('galvanized')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${
-                          selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
-                        }`}
+                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
+                          }`}
                         title="Galvanized"
                       />
                     </div>
@@ -1742,17 +1705,17 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                   <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
                     <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? trimColors.find(c => c.value === selectedColorForModal)?.label || 
-                          (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
+                      {selectedColorForModal
+                        ? trimColors.find(c => c.value === selectedColorForModal)?.label ||
+                        (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
                         : trimColors.find(c => c.value === gableAccentColor)?.label || 'Select a color'}
                     </p>
-                    <div 
+                    <div
                       className="w-full h-24 rounded border-2 border-gray-300 mb-3"
                       style={{
-                        backgroundColor: selectedColorForModal 
-                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex || 
-                            (selectedColorForModal === 'galvanized' ? '#C0C0C0' : '#808080')
+                        backgroundColor: selectedColorForModal
+                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex ||
+                          (selectedColorForModal === 'galvanized' ? '#C0C0C0' : '#808080')
                           : trimColors.find(c => c.value === gableAccentColor)?.hex || '#808080'
                       }}
                     />
@@ -1820,9 +1783,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <button
                           key={color.value}
                           onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${
-                            selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
-                          }`}
+                          className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                            }`}
                           style={{ backgroundColor: color.hex }}
                           title={color.label}
                         />
@@ -1830,9 +1792,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       {/* Galvanized option */}
                       <button
                         onClick={() => setSelectedColorForModal('galvanized')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${
-                          selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
-                        }`}
+                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
+                          }`}
                         title="Galvanized"
                       />
                     </div>
@@ -1844,17 +1805,17 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                   <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
                     <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal 
-                        ? trimColors.find(c => c.value === selectedColorForModal)?.label || 
-                          (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
+                      {selectedColorForModal
+                        ? trimColors.find(c => c.value === selectedColorForModal)?.label ||
+                        (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
                         : trimColors.find(c => c.value === wainscotColor)?.label || 'Select a color'}
                     </p>
-                    <div 
+                    <div
                       className="w-full h-24 rounded border-2 border-gray-300 mb-3"
                       style={{
-                        backgroundColor: selectedColorForModal 
-                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex || 
-                            (selectedColorForModal === 'galvanized' ? '#C0C0C0' : '#808080')
+                        backgroundColor: selectedColorForModal
+                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex ||
+                          (selectedColorForModal === 'galvanized' ? '#C0C0C0' : '#808080')
                           : trimColors.find(c => c.value === wainscotColor)?.hex || '#808080'
                       }}
                     />

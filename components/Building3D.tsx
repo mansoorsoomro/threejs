@@ -144,18 +144,28 @@ export default function Building3D({ design }: Building3DProps) {
       };
 
       // Update wall color - update both color and texture
+      // Update wall color - update both color and texture
       const wallColorHex = wallColors.find(c => c.value === localWallColor)?.hex || '#FFFFFF';
-      if (wallMeshRef.current && wallMeshRef.current.material) {
+      if (wallMeshRef.current) {
         const wallColor = new THREE.Color(wallColorHex);
-        wallMeshRef.current.material.color.set(wallColorHex);
-
-        // Dispose old texture
-        if (wallMeshRef.current.material.map) {
-          wallMeshRef.current.material.map.dispose();
-        }
         const buildingHeight = parseInt(design.clearHeight) || 12;
-        wallMeshRef.current.material.map = createCorrugatedTexture(wallColor, 256, 512, true, 1, buildingHeight / 2);
-        wallMeshRef.current.material.needsUpdate = true;
+        // Create texture once to share
+        const newTexture = createCorrugatedTexture(wallColor, 256, 512, true, 1, buildingHeight / 2);
+
+        const updateWallMesh = (mesh: any) => {
+          if (mesh.isMesh && mesh.material) {
+            mesh.material.color.set(wallColorHex);
+            if (mesh.material.map) mesh.material.map.dispose();
+            mesh.material.map = newTexture.clone(); // Clone to avoid shared state issues if any
+            mesh.material.needsUpdate = true;
+          }
+        };
+
+        if (wallMeshRef.current.isGroup) {
+          wallMeshRef.current.traverse(updateWallMesh);
+        } else {
+          updateWallMesh(wallMeshRef.current);
+        }
       }
 
       // Update roof color - update both color and texture
@@ -545,22 +555,63 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Create walls - transparent in interior view, solid in exterior
         // Create walls - Solid and OFF-SET from frame
-        const wallGeometry = new THREE.BoxGeometry(outerWallWidth, buildingHeight, outerWallLength);
+        // Create walls - separate planes to allow for "Open Wall" configuration
+        const wallGroup = new THREE.Group();
+        wallGroup.name = 'walls';
+
         const wallMaterial = new THREE.MeshStandardMaterial({
           map: wallTexture,
           color: wallColor3D,
           roughness: 0.7,
           metalness: 0.3,
-          side: THREE.DoubleSide // Visible from inside (behind framing) and outside
+          side: THREE.DoubleSide
         });
-        const walls = new THREE.Mesh(wallGeometry, wallMaterial);
-        walls.name = 'walls'; // Name it for visibility control
-        walls.position.y = buildingHeight / 2;
-        scene.add(walls);
-        wallMeshRef.current = walls; // Store reference for color updates
+
+        const openConfig = design.openWalls || { isOpen: false };
+        const sideWallGeo = new THREE.PlaneGeometry(outerWallLength, buildingHeight);
+        const endWallGeo = new THREE.PlaneGeometry(outerWallWidth, buildingHeight);
+
+        // Side Wall A (Left, -X)
+        if (!openConfig.isOpen || !openConfig.sideWallA) {
+          const leftWall = new THREE.Mesh(sideWallGeo, wallMaterial);
+          leftWall.position.set(-outerWallWidth / 2, buildingHeight / 2, 0);
+          leftWall.rotation.y = -Math.PI / 2;
+          leftWall.name = 'Wall_Left';
+          wallGroup.add(leftWall);
+        }
+
+        // Side Wall B (Right, +X)
+        if (!openConfig.isOpen || !openConfig.sideWallB) {
+          const rightWall = new THREE.Mesh(sideWallGeo, wallMaterial);
+          rightWall.position.set(outerWallWidth / 2, buildingHeight / 2, 0);
+          rightWall.rotation.y = Math.PI / 2;
+          rightWall.name = 'Wall_Right';
+          wallGroup.add(rightWall);
+        }
+
+        // End Wall C (Front, +Z)
+        if (!openConfig.isOpen || !openConfig.endWallC) {
+          const frontWall = new THREE.Mesh(endWallGeo, wallMaterial);
+          frontWall.position.set(0, buildingHeight / 2, outerWallLength / 2);
+          // Faces +Z by default
+          frontWall.name = 'Wall_Front';
+          wallGroup.add(frontWall);
+        }
+
+        // End Wall D (Back, -Z)
+        if (!openConfig.isOpen || !openConfig.endWallD) {
+          const backWall = new THREE.Mesh(endWallGeo, wallMaterial);
+          backWall.position.set(0, buildingHeight / 2, -outerWallLength / 2);
+          backWall.rotation.y = Math.PI; // Face -Z
+          backWall.name = 'Wall_Back';
+          wallGroup.add(backWall);
+        }
+
+        scene.add(wallGroup);
+        wallMeshRef.current = wallGroup;
         // Walls hidden when frame is shown (opposite of frame)
         // When frame is ON, walls are OFF. When frame is OFF, walls are ON
-        walls.visible = !showFraming;
+        wallGroup.visible = !showFraming;
 
         // OFFSET CONSTANTS for layering "Inside -> Out"
         // 0. Frame (Base)
@@ -690,16 +741,20 @@ export default function Building3D({ design }: Building3DProps) {
             const z = -buildingLength / 2 + i * actualPostSpacing;
             const postCenterY = (buildingHeight - buriedDepth) / 2;
             const totalPostHeight = buildingHeight + buriedDepth;
+            const pGeo = new THREE.BoxGeometry(postWidth, totalPostHeight, postDepth);
 
             // Posts
-            const pGeo = new THREE.BoxGeometry(postWidth, totalPostHeight, postDepth);
-            const leftPost = new THREE.Mesh(pGeo, treatedWoodMaterial);
-            leftPost.position.set(-buildingWidth / 2 + postWidth / 2, postCenterY, z);
-            framingGroup.add(leftPost);
+            if ((!openConfig.isOpen || !openConfig.sideWallA) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) {
+              const leftPost = new THREE.Mesh(pGeo, treatedWoodMaterial);
+              leftPost.position.set(-buildingWidth / 2 + postWidth / 2, postCenterY, z);
+              framingGroup.add(leftPost);
+            }
 
-            const rightPost = new THREE.Mesh(pGeo, treatedWoodMaterial);
-            rightPost.position.set(buildingWidth / 2 - postWidth / 2, postCenterY, z);
-            framingGroup.add(rightPost);
+            if ((!openConfig.isOpen || !openConfig.sideWallB) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) {
+              const rightPost = new THREE.Mesh(pGeo, treatedWoodMaterial);
+              rightPost.position.set(buildingWidth / 2 - postWidth / 2, postCenterY, z);
+              framingGroup.add(rightPost);
+            }
 
             // Footings (Only show if buried)
             if (!isSecuredToConcrete) {
@@ -712,11 +767,11 @@ export default function Building3D({ design }: Building3DProps) {
 
               const leftF = fMesh.clone();
               leftF.position.set(-buildingWidth / 2 + postWidth / 2, footingY, z);
-              framingGroup.add(leftF);
+              if ((!openConfig.isOpen || !openConfig.sideWallA) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) framingGroup.add(leftF);
 
               const rightF = fMesh.clone();
               rightF.position.set(buildingWidth / 2 - postWidth / 2, footingY, z);
-              framingGroup.add(rightF);
+              if ((!openConfig.isOpen || !openConfig.sideWallB) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) framingGroup.add(rightF);
             } else {
               // Show bracket/anchor if secured to concrete (optional, simplified as just sitting on floor)
               // For now, just no footing since it's on the slab
@@ -761,10 +816,10 @@ export default function Building3D({ design }: Building3DProps) {
             // Knee Braces (from post to bottom chord)
             const pPostL = new THREE.Vector3(-buildingWidth / 2 + postWidth / 2, buildingHeight - 2, z);
             const pChordL = new THREE.Vector3(-buildingWidth / 2 + 3, buildingHeight + trussDepth / 2, z);
-            framingGroup.add(createMemberLocal(pPostL, pChordL, trussThickness, 0.3, woodMaterial));
+            if ((!openConfig.isOpen || !openConfig.sideWallA) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) framingGroup.add(createMemberLocal(pPostL, pChordL, trussThickness, 0.3, woodMaterial));
             const pPostR = new THREE.Vector3(buildingWidth / 2 - postWidth / 2, buildingHeight - 2, z);
             const pChordR = new THREE.Vector3(buildingWidth / 2 - 3, buildingHeight + trussDepth / 2, z);
-            framingGroup.add(createMemberLocal(pPostR, pChordR, trussThickness, 0.3, woodMaterial));
+            if ((!openConfig.isOpen || !openConfig.sideWallB) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) framingGroup.add(createMemberLocal(pPostR, pChordR, trussThickness, 0.3, woodMaterial));
 
             // W-truss web members (forming W pattern)
             // Center vertical member
@@ -853,7 +908,7 @@ export default function Building3D({ design }: Building3DProps) {
             // "Double Girts ... flat wall girts on the outside"
 
             // Left Side (A) Exterior
-            if (isAboveCentermatchA) {
+            if (isAboveCentermatchA && (!openConfig.isOpen || !openConfig.sideWallA)) {
               const lGirt = new THREE.Mesh(girtGeoFlat, woodMaterial);
               // Position: Outside the post (-X)
               lGirt.position.set(-buildingWidth / 2 - girtDepthVal / 2, y, 0);
@@ -861,7 +916,7 @@ export default function Building3D({ design }: Building3DProps) {
             }
 
             // Right Side (B) Exterior
-            if (isAboveCentermatchB) {
+            if (isAboveCentermatchB && (!openConfig.isOpen || !openConfig.sideWallB)) {
               const rGirt = new THREE.Mesh(girtGeoFlat, woodMaterial);
               // Position: Outside the post (+X)
               rGirt.position.set(buildingWidth / 2 + girtDepthVal / 2, y, 0);
@@ -872,7 +927,7 @@ export default function Building3D({ design }: Building3DProps) {
             if (girtType === 'double') {
               // Left Side (A) Interior
               // Always show interior girts (they are on the inside face)
-              {
+              if (!openConfig.isOpen || !openConfig.sideWallA) {
                 const lGirtIn = new THREE.Mesh(girtGeoInterior, woodMaterial);
                 // Position: Inside the post (+X relative to wall)
                 // Wall is at -buildingWidth/2. Post depth is postDepth.
@@ -882,7 +937,7 @@ export default function Building3D({ design }: Building3DProps) {
               }
 
               // Right Side (B) Interior
-              {
+              if (!openConfig.isOpen || !openConfig.sideWallB) {
                 const rGirtIn = new THREE.Mesh(girtGeoInterior, woodMaterial);
                 // Position: Inside the post (-X relative to wall)
                 // Wall is at +buildingWidth/2. Post is inside.
@@ -916,16 +971,16 @@ export default function Building3D({ design }: Building3DProps) {
 
                 // Left Side Bookshelf
                 // Always show bookshelf girts (visible from inside)
-                {
+                if (!openConfig.isOpen || !openConfig.sideWallA) {
                   const lBS = new THREE.Mesh(bsGeoCorrect, woodMaterial);
                   // Position: Centered in the wall (align with posts)
-                  // Post center X is -buildingWidth/2 + postDepth/2
+                  // Post center X is -buildingWidth / 2 + postDepth / 2
                   lBS.position.set(-buildingWidth / 2 + postDepth / 2, y, zCenter);
                   framingGroup.add(lBS);
                 }
 
                 // Right Side Bookshelf
-                {
+                if (!openConfig.isOpen || !openConfig.sideWallB) {
                   const rBS = new THREE.Mesh(bsGeoCorrect, woodMaterial);
                   rBS.position.set(buildingWidth / 2 - postDepth / 2, y, zCenter);
                   framingGroup.add(rBS);
@@ -948,17 +1003,21 @@ export default function Building3D({ design }: Building3DProps) {
             // Left Side (Sidewall A)
             for (let i = 0; i < rowsA; i++) {
               const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
-              const lGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
-              lGB.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, y, 0);
-              framingGroup.add(lGB);
+              if (!openConfig.isOpen || !openConfig.sideWallA) {
+                const lGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
+                lGB.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, y, 0);
+                framingGroup.add(lGB);
+              }
             }
 
             // Right Side (Sidewall B)
             for (let i = 0; i < rowsB; i++) {
               const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
-              const rGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
-              rGB.position.set(buildingWidth / 2 + gradeBoardDepth / 2, y, 0);
-              framingGroup.add(rGB);
+              if (!openConfig.isOpen || !openConfig.sideWallB) {
+                const rGB = new THREE.Mesh(gbGeoUnit, gbMaterial);
+                rGB.position.set(buildingWidth / 2 + gradeBoardDepth / 2, y, 0);
+                framingGroup.add(rGB);
+              }
             }
 
             // Endwall C (Front)
@@ -990,14 +1049,18 @@ export default function Building3D({ design }: Building3DProps) {
             const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
 
             // Left Side Grade Board
-            const lGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-            lGradeBoard.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
-            framingGroup.add(lGradeBoard);
+            if (!openConfig.isOpen || !openConfig.sideWallA) {
+              const lGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+              lGradeBoard.position.set(-buildingWidth / 2 - gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
+              framingGroup.add(lGradeBoard);
+            }
 
             // Right Side Grade Board
-            const rGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-            rGradeBoard.position.set(buildingWidth / 2 + gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
-            framingGroup.add(rGradeBoard);
+            if (!openConfig.isOpen || !openConfig.sideWallB) {
+              const rGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+              rGradeBoard.position.set(buildingWidth / 2 + gradeBoardDepth / 2, gradeBoardHeight / 2 + 0.1, 0);
+              framingGroup.add(rGradeBoard);
+            }
           }
 
           // 2.6 SIDE WALL V-BRACING (Diagonals)
@@ -1024,12 +1087,12 @@ export default function Building3D({ design }: Building3DProps) {
               // Left Wall
               const pTopLeftL = new THREE.Vector3(xLeft, braceTopY, zStart + postWidth / 2);
               const pBotRightL = new THREE.Vector3(xLeft, braceBotY, zEnd - postWidth / 2);
-              framingGroup.add(createMemberLocal(pTopLeftL, pBotRightL, braceThick, braceWidth, woodMaterial));
+              if (!openConfig.isOpen || !openConfig.sideWallA) framingGroup.add(createMemberLocal(pTopLeftL, pBotRightL, braceThick, braceWidth, woodMaterial));
 
               // Right Wall
               const pTopLeftR = new THREE.Vector3(xRight, braceTopY, zStart + postWidth / 2);
               const pBotRightR = new THREE.Vector3(xRight, braceBotY, zEnd - postWidth / 2);
-              framingGroup.add(createMemberLocal(pTopLeftR, pBotRightR, braceThick, braceWidth, woodMaterial));
+              if (!openConfig.isOpen || !openConfig.sideWallB) framingGroup.add(createMemberLocal(pTopLeftR, pBotRightR, braceThick, braceWidth, woodMaterial));
 
             } else {
               // ODD BAY (1, 3...): Diagonal goes / (Top-Right to Bottom-Left)
@@ -1038,12 +1101,12 @@ export default function Building3D({ design }: Building3DProps) {
               // Left Wall
               const pTopRightL = new THREE.Vector3(xLeft, braceTopY, zEnd - postWidth / 2);
               const pBotLeftL = new THREE.Vector3(xLeft, braceBotY, zStart + postWidth / 2);
-              framingGroup.add(createMemberLocal(pTopRightL, pBotLeftL, braceThick, braceWidth, woodMaterial));
+              if (!openConfig.isOpen || !openConfig.sideWallA) framingGroup.add(createMemberLocal(pTopRightL, pBotLeftL, braceThick, braceWidth, woodMaterial));
 
               // Right Wall
               const pTopRightR = new THREE.Vector3(xRight, braceTopY, zEnd - postWidth / 2);
               const pBotLeftR = new THREE.Vector3(xRight, braceBotY, zStart + postWidth / 2);
-              framingGroup.add(createMemberLocal(pTopRightR, pBotLeftR, braceThick, braceWidth, woodMaterial));
+              if (!openConfig.isOpen || !openConfig.sideWallB) framingGroup.add(createMemberLocal(pTopRightR, pBotLeftR, braceThick, braceWidth, woodMaterial));
             }
           }
 
@@ -1057,6 +1120,12 @@ export default function Building3D({ design }: Building3DProps) {
 
             // Draw Intermediate Posts
             [xLeft, xRight].forEach(x => {
+              // Check visibility: Hide if End Wall is Open
+              const isFront = dir === 1;
+              const isEndWallOpen = isFront
+                ? (openConfig.isOpen && openConfig.endWallC)
+                : (openConfig.isOpen && openConfig.endWallD);
+
               const dist = Math.abs(x);
               const slopeH = peakHeight - buildingHeight;
               const roofH = peakHeight - (dist * (slopeH / (buildingWidth / 2)));
@@ -1075,45 +1144,59 @@ export default function Building3D({ design }: Building3DProps) {
             });
 
             // Diagonal Brace logic (User Image: Top-Corner -> Bottom-Intermediate)
-            // Left Bay Brace
-            {
-              const pCornerTop = new THREE.Vector3(-buildingWidth / 2 + postWidth / 2, buildingHeight - 1.0, z); // Top of Corner Post
-              const pInnerBot = new THREE.Vector3(xLeft, 1.0, z); // Bottom of Intermediate
-              framingGroup.add(createMemberLocal(pCornerTop, pInnerBot, 0.125, 0.46, woodMaterial));
-            }
-            // Right Bay Brace
-            {
-              const pCornerTop = new THREE.Vector3(buildingWidth / 2 - postWidth / 2, buildingHeight - 1.0, z); // Top of Corner Post
-              const pInnerBot = new THREE.Vector3(xRight, 1.0, z); // Bottom of Intermediate
-              framingGroup.add(createMemberLocal(pCornerTop, pInnerBot, 0.125, 0.46, woodMaterial));
+            const isFrontBrace = dir === 1;
+            const isEndWallOpenBrace = isFrontBrace
+              ? (openConfig.isOpen && openConfig.endWallC)
+              : (openConfig.isOpen && openConfig.endWallD);
+
+            if (!isEndWallOpenBrace) {
+              // Left Bay Brace
+              {
+                const pCornerTop = new THREE.Vector3(-buildingWidth / 2 + postWidth / 2, buildingHeight - 1.0, z); // Top of Corner Post
+                const pInnerBot = new THREE.Vector3(xLeft, 1.0, z); // Bottom of Intermediate
+                framingGroup.add(createMemberLocal(pCornerTop, pInnerBot, 0.125, 0.46, woodMaterial));
+              }
+              // Right Bay Brace
+              {
+                const pCornerTop = new THREE.Vector3(buildingWidth / 2 - postWidth / 2, buildingHeight - 1.0, z); // Top of Corner Post
+                const pInnerBot = new THREE.Vector3(xRight, 1.0, z); // Bottom of Intermediate
+                framingGroup.add(createMemberLocal(pCornerTop, pInnerBot, 0.125, 0.46, woodMaterial));
+              }
             }
 
             // End Wall Grade Board
-            if (isCentermatch) {
-              const rows = (dir === 1) ? (design.centermatchRows?.endwallC || 1) : (design.centermatchRows?.endwallD || 1);
-              const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeightUnit, gradeBoardDepth);
+            const isFrontGB = dir === 1;
+            const isEndWallOpenGB = isFrontGB
+              ? (openConfig.isOpen && openConfig.endWallC)
+              : (openConfig.isOpen && openConfig.endWallD);
 
-              for (let i = 0; i < rows; i++) {
-                const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
-                const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
-                // Position on outside face of end posts
+            if (!isEndWallOpenGB) {
+              if (isCentermatch) {
+                const rows = (dir === 1) ? (design.centermatchRows?.endwallC || 1) : (design.centermatchRows?.endwallD || 1);
+                const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeightUnit, gradeBoardDepth);
+
+                for (let i = 0; i < rows; i++) {
+                  const y = (i * gradeBoardHeightUnit) + (gradeBoardHeightUnit / 2) + 0.1;
+                  const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
+                  // Position on outside face of end posts
+                  const zPos = (dir === 1)
+                    ? (buildingLength / 2 + gradeBoardDepth / 2)
+                    : (-buildingLength / 2 - gradeBoardDepth / 2);
+
+                  gb.position.set(0, y, zPos);
+                  framingGroup.add(gb);
+                }
+              } else {
+                // Standard Gradeboard Logic (Single Board)
+                const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeight, gradeBoardDepth);
                 const zPos = (dir === 1)
                   ? (buildingLength / 2 + gradeBoardDepth / 2)
                   : (-buildingLength / 2 - gradeBoardDepth / 2);
 
-                gb.position.set(0, y, zPos);
+                const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
+                gb.position.set(0, gradeBoardHeight / 2 + 0.1, zPos);
                 framingGroup.add(gb);
               }
-            } else {
-              // Standard Gradeboard Logic (Single Board)
-              const gbGeoEnd = new THREE.BoxGeometry(buildingWidth, gradeBoardHeight, gradeBoardDepth);
-              const zPos = (dir === 1)
-                ? (buildingLength / 2 + gradeBoardDepth / 2)
-                : (-buildingLength / 2 - gradeBoardDepth / 2);
-
-              const gb = new THREE.Mesh(gbGeoEnd, treatedWoodMaterial);
-              gb.position.set(0, gradeBoardHeight / 2 + 0.1, zPos);
-              framingGroup.add(gb);
             }
 
             // End Wall Girts (Between Posts - exactly 5 girts as shown in image)
@@ -1132,17 +1215,29 @@ export default function Building3D({ design }: Building3DProps) {
               // Left Bay Girt
               const lg = new THREE.Mesh(girtGeoSide, woodMaterial);
               lg.position.set(-buildingWidth / 3, y, z);
-              framingGroup.add(lg);
+              // framingGroup.add(lg);
 
               // Center Bay Girt
               const cg = new THREE.Mesh(girtGeoCenter, woodMaterial);
               cg.position.set(0, y, z);
-              framingGroup.add(cg);
+              // framingGroup.add(cg);
 
               // Right Bay Girt
               const rg = new THREE.Mesh(girtGeoSide, woodMaterial);
               rg.position.set(buildingWidth / 3, y, z);
-              framingGroup.add(rg);
+              // ADDED LOGIC: Check Open Status for End Walls
+              // dir=1 is Front (Z>0) -> Wall C
+              // dir=-1 is Back (Z<0) -> Wall D
+              const isFront = dir === 1;
+              const isOpen = isFront
+                ? (openConfig.isOpen && openConfig.endWallC)
+                : (openConfig.isOpen && openConfig.endWallD);
+
+              if (!isOpen) {
+                framingGroup.add(lg);
+                framingGroup.add(cg);
+                framingGroup.add(rg);
+              }
             }
           });
 
@@ -1282,16 +1377,20 @@ export default function Building3D({ design }: Building3DProps) {
             const z = -buildingLength / 2 + i * sidePostSpacing;
 
             // Left side wall post
-            const leftStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
-            const leftStud = new THREE.Mesh(leftStudGeo, woodMaterial);
-            leftStud.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
-            framingGroup.add(leftStud);
+            if ((!openConfig.isOpen || !openConfig.sideWallA) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) {
+              const leftStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
+              const leftStud = new THREE.Mesh(leftStudGeo, woodMaterial);
+              leftStud.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
+              framingGroup.add(leftStud);
+            }
 
             // Right side wall post
-            const rightStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
-            const rightStud = new THREE.Mesh(rightStudGeo, woodMaterial);
-            rightStud.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
-            framingGroup.add(rightStud);
+            if ((!openConfig.isOpen || !openConfig.sideWallB) || (!openConfig.removeEveryOtherPost) || (i % 2 === 0)) {
+              const rightStudGeo = new THREE.BoxGeometry(studDepth, buildingHeight - gradeBoardHeight, studWidth);
+              const rightStud = new THREE.Mesh(rightStudGeo, woodMaterial);
+              rightStud.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight + (buildingHeight - gradeBoardHeight) / 2, z);
+              framingGroup.add(rightStud);
+            }
           }
 
           // 2. SIDE WALL GIRTS - 4 horizontal members (as shown in image)
@@ -1306,38 +1405,50 @@ export default function Building3D({ design }: Building3DProps) {
             const y = girtStartHeight + (g * girtSpacing);
 
             // Left side wall girt
-            const leftGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
-            leftGirt.position.set(-buildingWidth / 2 + studDepth / 2, y, 0);
-            framingGroup.add(leftGirt);
+            if (!openConfig.isOpen || !openConfig.sideWallA) {
+              const leftGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
+              leftGirt.position.set(-buildingWidth / 2 + studDepth / 2, y, 0);
+              framingGroup.add(leftGirt);
+            }
 
             // Right side wall girt
-            const rightGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
-            rightGirt.position.set(buildingWidth / 2 - studDepth / 2, y, 0);
-            framingGroup.add(rightGirt);
+            if (!openConfig.isOpen || !openConfig.sideWallB) {
+              const rightGirt = new THREE.Mesh(sideGirtGeo, woodMaterial);
+              rightGirt.position.set(buildingWidth / 2 - studDepth / 2, y, 0);
+              framingGroup.add(rightGirt);
+            }
           }
 
           // 3. GRADE BOARD (Bottom Plate) - Treated Wood
           const gradeBoardGeo = new THREE.BoxGeometry(gradeBoardDepth, gradeBoardHeight, buildingLength);
 
           // Left side grade board
-          const leftGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-          leftGradeBoard.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight / 2, 0);
-          framingGroup.add(leftGradeBoard);
+          if (!openConfig.isOpen || !openConfig.sideWallA) {
+            const leftGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+            leftGradeBoard.position.set(-buildingWidth / 2 + studDepth / 2, gradeBoardHeight / 2, 0);
+            framingGroup.add(leftGradeBoard);
+          }
 
           // Right side grade board
-          const rightGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
-          rightGradeBoard.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight / 2, 0);
-          framingGroup.add(rightGradeBoard);
+          if (!openConfig.isOpen || !openConfig.sideWallB) {
+            const rightGradeBoard = new THREE.Mesh(gradeBoardGeo, treatedWoodMaterial);
+            rightGradeBoard.position.set(buildingWidth / 2 - studDepth / 2, gradeBoardHeight / 2, 0);
+            framingGroup.add(rightGradeBoard);
+          }
 
           // 4. TOP PLATE
           const topPlateGeo = new THREE.BoxGeometry(studDepth, studWidth * 2, buildingLength);
-          const leftTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
-          leftTopPlate.position.set(-buildingWidth / 2 + studDepth / 2, buildingHeight - studWidth, 0);
-          framingGroup.add(leftTopPlate);
+          if (!openConfig.isOpen || !openConfig.sideWallA) {
+            const leftTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
+            leftTopPlate.position.set(-buildingWidth / 2 + studDepth / 2, buildingHeight - studWidth, 0);
+            framingGroup.add(leftTopPlate);
+          }
 
-          const rightTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
-          rightTopPlate.position.set(buildingWidth / 2 - studDepth / 2, buildingHeight - studWidth, 0);
-          framingGroup.add(rightTopPlate);
+          if (!openConfig.isOpen || !openConfig.sideWallB) {
+            const rightTopPlate = new THREE.Mesh(topPlateGeo, woodMaterial);
+            rightTopPlate.position.set(buildingWidth / 2 - studDepth / 2, buildingHeight - studWidth, 0);
+            framingGroup.add(rightTopPlate);
+          }
 
           // 5. END WALLS - 4 POSTS (as shown in image)
           const numEndPosts = 4;
@@ -1346,7 +1457,14 @@ export default function Building3D({ design }: Building3DProps) {
           [1, -1].forEach(dir => {
             const z = (buildingLength / 2 - studWidth / 2) * dir;
 
+            const isFront = dir === 1;
+
             // Create 4 posts evenly spaced across end wall width
+            // Check visibility: Hide if End Wall is Open
+            const isEndWallOpen = isFront
+              ? (openConfig.isOpen && openConfig.endWallC)
+              : (openConfig.isOpen && openConfig.endWallD);
+
             for (let i = 0; i < numEndPosts; i++) {
               const x = -buildingWidth / 2 + i * endPostSpacing;
 
@@ -1375,22 +1493,26 @@ export default function Building3D({ design }: Building3DProps) {
               const y = endGirtStartHeight + (g * endGirtSpacing);
               if (y > buildingHeight - 0.5) continue;
 
-              const endGirt = new THREE.Mesh(endGirtGeo, woodMaterial);
-              endGirt.position.set(0, y, z);
-              framingGroup.add(endGirt);
+              if (isFront ? (!openConfig.isOpen || !openConfig.endWallC) : (!openConfig.isOpen || !openConfig.endWallD)) {
+                const endGirt = new THREE.Mesh(endGirtGeo, woodMaterial);
+                endGirt.position.set(0, y, z);
+                framingGroup.add(endGirt);
+              }
             }
 
             // 7. END WALL GRADE BOARD
-            const endGradeBoardGeo = new THREE.BoxGeometry(endWallWidth, gradeBoardHeight, gradeBoardDepth);
-            const endGradeBoard = new THREE.Mesh(endGradeBoardGeo, treatedWoodMaterial);
-            endGradeBoard.position.set(0, gradeBoardHeight / 2, z);
-            framingGroup.add(endGradeBoard);
+            if (!isEndWallOpen) {
+              const endGradeBoardGeo = new THREE.BoxGeometry(endWallWidth, gradeBoardHeight, gradeBoardDepth);
+              const endGradeBoard = new THREE.Mesh(endGradeBoardGeo, treatedWoodMaterial);
+              endGradeBoard.position.set(0, gradeBoardHeight / 2, z);
+              framingGroup.add(endGradeBoard);
 
-            // 8. END WALL TOP PLATE
-            const endTopPlateGeo = new THREE.BoxGeometry(endWallWidth, studWidth * 2, studDepth);
-            const endTopPlate = new THREE.Mesh(endTopPlateGeo, woodMaterial);
-            endTopPlate.position.set(0, buildingHeight - studWidth, z);
-            framingGroup.add(endTopPlate);
+              // 8. END WALL TOP PLATE
+              const endTopPlateGeo = new THREE.BoxGeometry(endWallWidth, studWidth * 2, studDepth);
+              const endTopPlate = new THREE.Mesh(endTopPlateGeo, woodMaterial);
+              endTopPlate.position.set(0, buildingHeight - studWidth, z);
+              framingGroup.add(endTopPlate);
+            }
           });
 
           // 9. ROOF TRUSSES (Simple truss for ladder frame)
