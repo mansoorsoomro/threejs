@@ -18,6 +18,7 @@ export default function Building3D({ design }: Building3DProps) {
   const [localWallColor, setLocalWallColor] = useState(design.wallColor || 'white');
   const [localRoofColor, setLocalRoofColor] = useState(design.roofColor || 'charcoal');
   const [localTrimColor, setLocalTrimColor] = useState(design.trimColor || 'white');
+  const [localSoffitColor, setLocalSoffitColor] = useState(design.soffitColor || 'white');
 
   // View options
   const [showFraming, setShowFraming] = useState(false);
@@ -41,6 +42,7 @@ export default function Building3D({ design }: Building3DProps) {
   const wallMeshRef = useRef<any>(null);
   const wallGroupRef = useRef<any>(null); // Reference to wall group
   const roofMeshRef = useRef<any>(null);
+  const soffitMeshRef = useRef<any>(null);
   const trimMeshesRef = useRef<any[]>([]);
   const framingGroupRef = useRef<any>(null);
   const backgroundGroupRef = useRef<any>(null);
@@ -60,14 +62,18 @@ export default function Building3D({ design }: Building3DProps) {
   useEffect(() => {
     setLocalWallColor(design.wallColor || 'white');
   }, [design.wallColor]);
-  
+
   useEffect(() => {
     setLocalRoofColor(design.roofColor || 'charcoal');
   }, [design.roofColor]);
-  
+
   useEffect(() => {
     setLocalTrimColor(design.trimColor || 'white');
   }, [design.trimColor]);
+
+  useEffect(() => {
+    setLocalSoffitColor(design.soffitColor || 'white');
+  }, [design.soffitColor]);
 
   // Update colors when local state changes
   useEffect(() => {
@@ -163,7 +169,7 @@ export default function Building3D({ design }: Building3DProps) {
           roofMeshRef.current.material.map.dispose();
         }
         const buildingLength = design.length || 30;
-        roofMeshRef.current.material.map = createCorrugatedTexture(roofColor, 512, 256, false, buildingLength / 2, 1);
+        roofMeshRef.current.material.map = createCorrugatedTexture(roofColor, 512, 256, true, 1, buildingLength / 2);
         roofMeshRef.current.material.needsUpdate = true;
       }
 
@@ -174,8 +180,20 @@ export default function Building3D({ design }: Building3DProps) {
           trimMesh.material.color.set(trimColorHex);
         }
       });
+
+      // Update soffit color
+      const soffitColorHex = trimColors.find(c => c.value === localSoffitColor)?.hex || '#FFFFFF';
+      if (soffitMeshRef.current) {
+        if (soffitMeshRef.current.isGroup) {
+          soffitMeshRef.current.traverse((child: any) => {
+            if (child.isMesh && child.material) child.material.color.set(soffitColorHex);
+          });
+        } else if (soffitMeshRef.current.material) {
+          soffitMeshRef.current.material.color.set(soffitColorHex);
+        }
+      }
     });
-  }, [localWallColor, localRoofColor, localTrimColor, design]);
+  }, [localWallColor, localRoofColor, localTrimColor, localSoffitColor, design]);
 
   // Update visibility when view options change
   useEffect(() => {
@@ -210,6 +228,9 @@ export default function Building3D({ design }: Building3DProps) {
     // Show only when frame is OFF and showRoof is ON
     if (roofMeshRef.current) {
       roofMeshRef.current.visible = showRoof && !showFraming;
+    }
+    if (soffitMeshRef.current) {
+      soffitMeshRef.current.visible = showRoof && !showFraming;
     }
 
     // Background visibility
@@ -1417,37 +1438,110 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Re-construct roof geometry to render *on top* of trusses
         try {
-          // Roof Geometry
-          const roofShape = new THREE.Shape();
-          // Profile matches top of trusses but offset upwards
-          const roofThick = 0.1;
-          const overhang = sidewallOverhang;
+          // --- NEW PLANAR ROOF GENERATION ---
+          // Using planes avoids the solid prism issue of ExtrudeGeometry and allows visible soffits
 
-          // Start left eave
-          roofShape.moveTo(-buildingWidth / 2 - overhang, buildingHeight + ROOF_OFFSET);
-          // Peak
-          roofShape.lineTo(0, peakHeight + ROOF_OFFSET);
-          // Right eave
-          roofShape.lineTo(buildingWidth / 2 + overhang, buildingHeight + ROOF_OFFSET);
-          // Thickness down (optional, or just single sheet)
+          const totalLen = buildingLength + (endWallOverhang * 2);
+          const slopeHeight = peakHeight - buildingHeight;
+          const halfWidth = buildingWidth / 2;
+          const run = halfWidth + sidewallOverhang;
+          // Calculate slope based on the run including overhang? 
+          // Slope ratio is constant. Rise/Run. 
+          // Height at edge = buildingHeight. Height at Peak = peakHeight.
+          // The pure triangle is (0, peak) to (halfWidth, buildingHeight).
+          // With overhang, the slope continues down.
+          // Slope Angle
+          const angle = Math.atan2(slopeHeight, halfWidth); // angle from horizontal
 
-          // We can use the created texture
-          const roofGeo = new THREE.ExtrudeGeometry(roofShape, {
-            depth: buildingLength + (endWallOverhang * 2), // Total length
-            bevelEnabled: false
+          // Length of the slope surface (Hypotenuse) from peak to eave (including overhang)
+          // The rise for the full run:
+          const fullRise = run * Math.tan(angle);
+          const slopeLength = Math.sqrt(Math.pow(run, 2) + Math.pow(fullRise, 2));
+
+          // Geometry for one side of the roof (Plane)
+          const roofPlaneGeo = new THREE.PlaneGeometry(slopeLength, totalLen);
+
+          // Groups to hold left/right panels
+          const roofGroup = new THREE.Group();
+          const soffitGroup = new THREE.Group();
+
+          // SIMPLEST:
+          // Create plane with (SlopeLength, TotalLength).
+          // X = SlopeLength, Y = TotalLength.
+          const simpleGeo = new THREE.PlaneGeometry(slopeLength, totalLen);
+
+          // Rotate X -90 to lay it flat on XZ plane.
+          // Now: X = SlopeLength, Z = TotalLength (actually -Y became Z).
+          simpleGeo.rotateX(-Math.PI / 2);
+
+          // Now we have a flat plane centered at (0,0,0).
+          // Width (X) is the slope direction. Depth (Z) is the building length.
+
+          const lMesh = new THREE.Mesh(simpleGeo, new THREE.MeshStandardMaterial({ color: roofColor3D, side: THREE.DoubleSide }));
+          // Left Side: Slopes UP from left-to-right.
+          // Pivot is center.
+          // Rotation Z: +angle tiles the right side up, left side down?
+          // Standard rotation Z+ is counter-clockwise.
+          // So right side goes UP. Correct.
+          lMesh.rotation.set(0, 0, angle);
+
+          // Position:
+          // X: Center of the left slope run.
+          // The run is 'run'. Center is at -run/2 from peak.
+          // Y: Center of the slope height.
+          // Top is at peakHeight + ROOF_OFFSET. Bottom is lower.
+          // Midpoint is peakHeight + ROOF_OFFSET - (fullRise / 2).
+          // Z: 0 (Centered on building).
+          lMesh.position.set(-run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
+
+          roofGroup.add(lMesh);
+
+          // Right Side
+          const rMesh = new THREE.Mesh(simpleGeo, new THREE.MeshStandardMaterial({ color: roofColor3D, side: THREE.DoubleSide }));
+          // Right Side: Slopes DOWN from left-to-right.
+          // Rotation Z: -angle.
+          rMesh.rotation.set(0, 0, -angle);
+          rMesh.position.set(run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
+          roofGroup.add(rMesh);
+
+
+          // --- SOFFITS ---
+          // Determine Soffit Material
+          const soffitMatBack = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, side: THREE.BackSide, roughness: 1.0 });
+          // We use the same geometry and positions, just BackSide material.
+
+          const lSoffit = new THREE.Mesh(simpleGeo, soffitMatBack);
+          lSoffit.rotation.copy(lMesh.rotation);
+          lSoffit.position.copy(lMesh.position);
+          // Move slightly down to avoid z-fighting with double-side roof?
+          lSoffit.position.y -= 0.01;
+          soffitGroup.add(lSoffit);
+
+          const rSoffit = new THREE.Mesh(simpleGeo, soffitMatBack);
+          rSoffit.rotation.copy(rMesh.rotation);
+          rSoffit.position.copy(rMesh.position);
+          rSoffit.position.y -= 0.01;
+          soffitGroup.add(rSoffit);
+
+          // Initialize Soffit Color
+          import('three').then((THREE) => {
+            const soffitHex = trimColors.find(c => c.value === localSoffitColor)?.hex || '#FFFFFF';
+            lSoffit.material.color.set(soffitHex);
+            rSoffit.material.color.set(soffitHex);
           });
 
-          // Original texture/material creation kept, just geometry updated
-          const roof = new THREE.Mesh(roofGeo, roofMeshRef.current?.material || new THREE.MeshStandardMaterial({ color: roofColor3D }));
+          scene.add(roofGroup);
+          scene.add(soffitGroup);
 
-          // Centering: ExtrudeGeometry starts at Z=0 and goes +Depth. 
-          // We want center at 0. So start at -TotalLength/2
-          const totalLen = buildingLength + (endWallOverhang * 2);
-          roof.position.z = -totalLen / 2;
+          roofMeshRef.current = roofGroup;
+          soffitMeshRef.current = soffitGroup;
 
-          scene.add(roof);
-          roofMeshRef.current = roof;
-          roof.visible = showRoof; // Independent of framing, but usually always shown unless hidden explicitly
+          const updateSoffitVis = () => {
+            const vis = showRoof && !showFraming;
+            roofGroup.visible = vis;
+            soffitGroup.visible = vis;
+          };
+          updateSoffitVis();
 
         } catch (e) { console.warn("RoofGen error", e); }
 
@@ -1527,7 +1621,17 @@ export default function Building3D({ design }: Building3DProps) {
         const roofSlopeLength = Math.sqrt(roofHeight * roofHeight + roofHalfWidth * roofHalfWidth);
         // roofAngle already calculated above
 
-        const rakeTrimWidth = 0.5; // Width of the trim on the face
+        const getFasciaHeight = () => {
+          switch (design.fasciaSize) {
+            case '4': return 4 / 12; // 0.33 ft
+            case '8': return 8 / 12; // 0.67 ft
+            case '6':
+            default: return 6 / 12; // 0.5 ft
+          }
+        };
+        const fasciaHeight = getFasciaHeight();
+
+        const rakeTrimWidth = fasciaHeight; // Width of the trim on the face
         const rakeTrimThickness = 0.15; // Thickness sticking out
 
         const rakeGeo = new THREE.BoxGeometry(roofSlopeLength + 0.5, rakeTrimWidth, rakeTrimThickness); // slight overhang
@@ -1562,7 +1666,7 @@ export default function Building3D({ design }: Building3DProps) {
         trimMeshesRef.current.push(brRake);
 
         // 3. EAVE TRIM - Runs along the side walls at the top
-        const eaveTrimGeo = new THREE.BoxGeometry(trimThickness, 0.4, buildingLength + (endWallOverhang * 2));
+        const eaveTrimGeo = new THREE.BoxGeometry(trimThickness, fasciaHeight, buildingLength + (endWallOverhang * 2));
 
         // Left Eave
         const leftEave = new THREE.Mesh(eaveTrimGeo, trimMaterial);

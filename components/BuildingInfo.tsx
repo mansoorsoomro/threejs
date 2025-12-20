@@ -112,7 +112,7 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
   const [showTrimColorModal, setShowTrimColorModal] = useState<boolean>(false);
   const [showSoffitColorModal, setShowSoffitColorModal] = useState<boolean>(false);
   const [selectedColorForModal, setSelectedColorForModal] = useState<string>('');
-  const [soffitColor, setSoffitColor] = useState<string>('white');
+
   const [fasciaSize, setFasciaSize] = useState<string>('4 in Fascia');
 
   const handleDesignChange = (partial: Partial<BuildingDesign>) => {
@@ -665,22 +665,22 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => {
-                            setSelectedColorForModal(soffitColor || '');
+                            setSelectedColorForModal(currentDesign.soffitColor || 'white');
                             setShowSoffitColorModal(true);
                           }}
-                          className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${soffitColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                          className={`flex-1 px-3 py-2 border rounded-md text-sm text-left ${currentDesign.soffitColor ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
-                          {trimColors.find(c => c.value === soffitColor)?.label || 'Select color'}
+                          {trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.label || 'Select color'}
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedColorForModal(soffitColor || '');
+                            setSelectedColorForModal(currentDesign.soffitColor || 'white');
                             setShowSoffitColorModal(true);
                           }}
                           className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
                           style={{
-                            backgroundColor: trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
+                            backgroundColor: trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.hex || '#808080'
                           }}
                         />
                       </div>
@@ -1362,7 +1362,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* 4" Fascia */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.fasciaSize === '4' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ fasciaSize: '4' })}
+                      >
                         <img
                           src="/assets/four-inch-fascia.jpg"
                           alt="4&quot; Fascia"
@@ -1376,7 +1380,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                       </div>
 
                       {/* 6" Fascia */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.fasciaSize === '6' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ fasciaSize: '6' })}
+                      >
                         <img
                           src="/assets/six-inch-fascia.jpg"
                           alt="6&quot; Fascia"
@@ -1401,7 +1409,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* Screws in the Flat */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.fastenerLocation === 'Wall & Roof' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ fastenerLocation: 'Wall & Roof' })}
+                      >
                         <img
                           src="/assets/fastenersV5-1.jpg"
                           alt="Fastener Placement - Screws in the flat"
@@ -1416,7 +1428,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                       </div>
 
                       {/* Screws through the Rib */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.fastenerLocation === 'Roof Only' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ fastenerLocation: 'Roof Only' })}
+                      >
                         <img
                           src="/assets/fastenersV5-2.jpg"
                           alt="Fastener Placement - Screws through the rib"
@@ -1439,7 +1455,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                     {/* Two images in one row with text below */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                       {/* Hard Copy and Email */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.miniPrintOption === 'Premium' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ miniPrintOption: 'Premium' })}
+                      >
                         <img
                           src="/assets/miniprintV4-1.jpg"
                           alt="Hard Copy and Email"
@@ -1453,7 +1473,11 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                       </div>
 
                       {/* Email */}
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-white">
+                      <div
+                        className={`border-2 rounded-lg p-3 bg-white cursor-pointer transition-all ${currentDesign.miniPrintOption === 'Standard' ? 'border-green-600 ring-2 ring-green-100' : 'border-gray-300 hover:border-gray-400'
+                          }`}
+                        onClick={() => handleDesignChange({ miniPrintOption: 'Standard' })}
+                      >
                         <img
                           src="/assets/miniprintV4-2.jpg"
                           alt="Email"
@@ -1507,7 +1531,15 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
                         selectedColorForModal === 'rough-sawn-natural-cedar' || selectedColorForModal === 'rough-sawn-gray-cedar'
                           ? (selectedColorForModal === 'rough-sawn-natural-cedar' ? 'tan' : 'ash-gray')
                           : selectedColorForModal)
-                      : currentDesign.trimColor
+                      : currentDesign.trimColor,
+                    // Use preview soffit color if modal is open and color is selected
+                    soffitColor: (showSoffitColorModal && selectedColorForModal)
+                      ? (selectedColorForModal === 'galvanized' ? 'ash-gray' :
+                        selectedColorForModal === 'rough-sawn-natural-cedar' || selectedColorForModal === 'rough-sawn-gray-cedar'
+                          ? (selectedColorForModal === 'rough-sawn-natural-cedar' ? 'tan' : 'ash-gray')
+                          : selectedColorForModal)
+                      : (currentDesign.soffitColor || 'white'),
+
                   }}
                 />
               </div>
@@ -2011,85 +2043,166 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
         {/* Soffit Color Selection Modal */}
         {
           showSoffitColorModal && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowSoffitColorModal(false)}>
-              <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="fixed left-0 top-0 h-full w-[350px] z-50 transform transition-transform duration-300 ease-in-out translate-x-0" onClick={(e) => e.stopPropagation()}>
+              <div className="bg-white h-full shadow-2xl border-r border-gray-200 flex flex-col relative" onClick={(e) => e.stopPropagation()}>
                 {/* Green Banner */}
-                <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+                <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
                   <h2 className="text-base font-bold">Choose soffit color</h2>
+                  <button
+                    onClick={() => {
+                      setShowSoffitColorModal(false);
+                      setSelectedColorForModal('');
+                    }}
+                    className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                    title="Close"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
 
-                <div className="p-4">
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    {/* Left Side - Color Sections */}
-                    <div className="lg:col-span-2 space-y-4">
-                      {/* Standard Colors */}
-                      <div>
-                        <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                        <div className="grid grid-cols-5 gap-3">
-                          {trimColors.map(color => (
+                {/* Current Selection Section - Fixed at top */}
+                <div className="p-4 border-b border-gray-300 shrink-0 bg-white">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+                  <p className="text-sm font-bold text-gray-900 mb-3">
+                    {selectedColorForModal
+                      ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
+                      : trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.label || 'Select a color'}
+                  </p>
+                  <div
+                    className="w-full h-24 rounded border-2 border-gray-300 mb-4"
+                    style={{
+                      backgroundImage: selectedColorForModal
+                        ? (getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || ''))
+                          ? `url(${getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || '')})`
+                          : undefined
+                        : (getColorImagePath(currentDesign.soffitColor || 'white', trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.label || 'White'))
+                          ? `url(${getColorImagePath(currentDesign.soffitColor || 'white', trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.label || 'White')})`
+                          : undefined,
+                      backgroundPosition: 'center center',
+                      backgroundSize: '100% 100%',
+                      backgroundOrigin: 'border-box',
+                      backgroundColor: selectedColorForModal
+                        ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#FFFFFF'
+                        : trimColors.find(c => c.value === (currentDesign.soffitColor || 'white'))?.hex || '#FFFFFF'
+                    }}
+                  />
+                  <button
+                    onClick={() => {
+                      if (selectedColorForModal) {
+                        if (selectedColorForModal === 'galvanized') {
+                          handleDesignChange({ soffitColor: 'ash-gray' });
+                        } else if (selectedColorForModal === 'rough-sawn-natural-cedar' || selectedColorForModal === 'rough-sawn-gray-cedar') {
+                          handleDesignChange({ soffitColor: selectedColorForModal === 'rough-sawn-natural-cedar' ? 'tan' : 'ash-gray' });
+                        } else {
+                          handleDesignChange({ soffitColor: selectedColorForModal });
+                        }
+                      } else {
+                        handleDesignChange({ soffitColor: currentDesign.soffitColor || 'white' });
+                      }
+                      setShowSoffitColorModal(false);
+                      setSelectedColorForModal('');
+                    }}
+                    className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold transition-colors"
+                  >
+                    Select
+                  </button>
+                </div>
+
+                {/* Scrollable Color Sections */}
+                <div className="flex-1 overflow-y-auto p-4">
+                  <div className="space-y-4">
+                    {/* Designer Colors */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
+                      <div className="flex gap-2 flex-wrap">
+                        {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                          const imagePath = getColorImagePath(color.value, color.label);
+                          return (
                             <button
                               key={color.value}
                               onClick={() => setSelectedColorForModal(color.value)}
-                              className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                              className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
                                 }`}
-                              style={{ backgroundColor: color.hex }}
+                              style={imagePath ? {
+                                backgroundImage: `url(${imagePath})`,
+                                backgroundPosition: 'center center',
+                                backgroundSize: '100% 100%',
+                                backgroundOrigin: 'border-box',
+                                backgroundColor: color.hex
+                              } : { backgroundColor: color.hex }}
                               title={color.label}
-                            />
-                          ))}
-                        </div>
+                            >
+                              &nbsp;
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* Right Side - Current Selection */}
-                    <div className="lg:col-span-1">
-                      <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                        <p className="text-sm font-bold text-gray-900 mb-3">
-                          {selectedColorForModal
-                            ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
-                            : trimColors.find(c => c.value === soffitColor)?.label || 'Select a color'}
-                        </p>
-                        <div
-                          className="w-full h-24 rounded border-2 border-gray-300 mb-3"
-                          style={{
-                            backgroundColor: selectedColorForModal
-                              ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#808080'
-                              : trimColors.find(c => c.value === soffitColor)?.hex || '#808080'
-                          }}
-                        />
-                        <button
-                          onClick={() => {
-                            if (selectedColorForModal) {
-                              setSoffitColor(selectedColorForModal);
-                            }
-                            setShowSoffitColorModal(false);
-                            setSelectedColorForModal('');
-                          }}
-                          className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
-                        >
-                          Select
-                        </button>
+                    {/* Standard Colors */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Standard Colors</h3>
+                      <div className="grid grid-cols-5 gap-2">
+                        {trimColors.filter(c => [
+                          'white', 'tan', 'brite-white', 'pinewood', 'ash-gray',
+                          'light-stone', 'ocean-blue', 'midnight-blue', 'emerald-green', 'beige',
+                          'bronze', 'burnished-slate', 'light-gray', 'charcoal-gray', 'midnight-gray',
+                          'charcoal-black', 'midnight-black', 'brite-red', 'red', 'colonial-red',
+                          'burgundy', 'brown', 'galvanized'
+                        ].includes(c.value)).map(color => {
+                          const imagePath = getColorImagePath(color.value, color.label);
+                          return (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-14 h-14 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                                }`}
+                              style={imagePath ? {
+                                backgroundImage: `url(${imagePath})`,
+                                backgroundPosition: 'center center',
+                                backgroundSize: '100% 100%',
+                                backgroundOrigin: 'border-box',
+                                backgroundColor: color.hex
+                              } : { backgroundColor: color.hex }}
+                              title={color.label}
+                            >
+                              &nbsp;
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Woodgrain Colors */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-3">Woodgrain Colors</h3>
+                      <div className="flex gap-2">
+                        {trimColors.filter(c => ['rough-sawn-natural-cedar', 'rough-sawn-gray-cedar'].includes(c.value)).map(color => {
+                          const imagePath = getColorImagePath(color.value, color.label);
+                          return (
+                            <button
+                              key={color.value}
+                              onClick={() => setSelectedColorForModal(color.value)}
+                              className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                                }`}
+                              style={imagePath ? {
+                                backgroundImage: `url(${imagePath})`,
+                                backgroundPosition: 'center center',
+                                backgroundSize: '100% 100%',
+                                backgroundOrigin: 'border-box',
+                                backgroundColor: color.hex
+                              } : { backgroundColor: color.hex }}
+                              title={color.label}
+                            >
+                              &nbsp;
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
-
-                  {/* Cancel Button */}
-                  <div className="mt-4 flex justify-center">
-                    <button
-                      onClick={() => {
-                        setShowSoffitColorModal(false);
-                        setSelectedColorForModal('');
-                      }}
-                      className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-
-                  {/* Disclaimer */}
-                  <p className="mt-4 text-xs text-gray-600 text-center">
-                    Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-                  </p>
                 </div>
               </div>
             </div>
