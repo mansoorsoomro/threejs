@@ -132,21 +132,25 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
   const [gableAccentColor, setGableAccentColor] = useState<string>(design.gableAccentColor || 'white');
   const [showGableAccentColorModal, setShowGableAccentColorModal] = useState<boolean>(false);
   const [selectedColorForModal, setSelectedColorForModal] = useState<string>('');
-  const [wainscot, setWainscot] = useState<string>('No');
-  const [wainscotSideWallA, setWainscotSideWallA] = useState<string>('No');
-  const [wainscotSideWallB, setWainscotSideWallB] = useState<string>('No');
-  const [wainscotEndWallC, setWainscotEndWallC] = useState<string>('No');
-  const [wainscotEndWallD, setWainscotEndWallD] = useState<string>('No');
-  const [wainscotSize, setWainscotSize] = useState<string>('36 in');
-  const [wainscotColor, setWainscotColor] = useState<string>('white');
+  const [wainscot, setWainscot] = useState<string>(design.wainscot ? 'Yes' : 'No');
+  const [wainscotSideWallA, setWainscotSideWallA] = useState<string>(design.wainscotSideWallA ? 'Yes' : 'No');
+  const [wainscotSideWallB, setWainscotSideWallB] = useState<string>(design.wainscotSideWallB ? 'Yes' : 'No');
+  const [wainscotEndWallC, setWainscotEndWallC] = useState<string>(design.wainscotEndWallC ? 'Yes' : 'No');
+  const [wainscotEndWallD, setWainscotEndWallD] = useState<string>(design.wainscotEndWallD ? 'Yes' : 'No');
+  const [wainscotSize, setWainscotSize] = useState<string>(design.wainscotHeight || '36 in');
+  const [wainscotColor, setWainscotColor] = useState<string>(design.wainscotColor || 'white');
   const [showWainscotColorModal, setShowWainscotColorModal] = useState<boolean>(false);
   const [wallInsulation, setWallInsulation] = useState<string>('None');
   const [wallCondensation, setWallCondensation] = useState<string>('None');
-  const [interiorWallLiner, setInteriorWallLiner] = useState<string>('None');
-  const [roofCondensation, setRoofCondensation] = useState<string>('None');
-  const [ceilingInsulation, setCeilingInsulation] = useState<string>('None');
-  const [ceilingLiner, setCeilingLiner] = useState<string>('None');
-  const [ridgeOptions, setRidgeOptions] = useState<string>('Universal Ridge Cap');
+  const [interiorWallLiner, setInteriorWallLiner] = useState<string>(design.interiorWallLiner || 'None');
+  const [interiorWallLinerColor, setInteriorWallLinerColor] = useState<string>(design.interiorWallLinerColor || 'white');
+  const [showInteriorWallLinerColorModal, setShowInteriorWallLinerColorModal] = useState(false);
+  const [roofCondensation, setRoofCondensation] = useState<string>(design.roofCondensation || 'None');
+  const [ceilingInsulation, setCeilingInsulation] = useState<string>(design.ceilingInsulation || 'None');
+  const [ceilingLiner, setCeilingLiner] = useState<string>(design.ceilingLiner || 'None');
+  const [ceilingLinerColor, setCeilingLinerColor] = useState<string>(design.ceilingLinerColor || 'white');
+  const [showCeilingLinerColorModal, setShowCeilingLinerColorModal] = useState(false);
+  const [ridgeOptions, setRidgeOptions] = useState<string>(design.ridgeOptions || 'Universal Ridge Cap');
   const [outsideClosure, setOutsideClosure] = useState<string>('Standard Non-Vented');
   const [ridgeVentilation, setRidgeVentilation] = useState<string>('None');
   const [gableVents, setGableVents] = useState<string>('None');
@@ -465,7 +469,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <span className="text-xs text-gray-700 block mb-2">Add wainscoting</span>
                     <select
                       value={wainscot}
-                      onChange={e => setWainscot(e.target.value)}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setWainscot(val);
+                        handleDesignChange({ wainscot: val === 'Yes' });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${wainscot ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
@@ -481,7 +489,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Side Wall A</span>
                         <select
                           value={wainscotSideWallA}
-                          onChange={e => setWainscotSideWallA(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setWainscotSideWallA(val);
+                            handleDesignChange({ wainscotSideWallA: val === 'Yes' });
+                          }}
                           className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSideWallA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
@@ -493,7 +505,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Side Wall B</span>
                         <select
                           value={wainscotSideWallB}
-                          onChange={e => setWainscotSideWallB(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setWainscotSideWallB(val);
+                            handleDesignChange({ wainscotSideWallB: val === 'Yes' });
+                          }}
                           className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSideWallB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
@@ -505,7 +521,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">End Wall C</span>
                         <select
                           value={wainscotEndWallC}
-                          onChange={e => setWainscotEndWallC(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setWainscotEndWallC(val);
+                            handleDesignChange({ wainscotEndWallC: val === 'Yes' });
+                          }}
                           className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotEndWallC ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
@@ -517,7 +537,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">End Wall D</span>
                         <select
                           value={wainscotEndWallD}
-                          onChange={e => setWainscotEndWallD(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setWainscotEndWallD(val);
+                            handleDesignChange({ wainscotEndWallD: val === 'Yes' });
+                          }}
                           className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotEndWallD ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
@@ -529,7 +553,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                         <span className="text-xs text-gray-700 block mb-2">Choose wainscot size</span>
                         <select
                           value={wainscotSize}
-                          onChange={e => setWainscotSize(e.target.value)}
+                          onChange={e => {
+                            const val = e.target.value;
+                            setWainscotSize(val);
+                            handleDesignChange({ wainscotHeight: val });
+                          }}
                           className={`w-full px-3 py-2 border rounded-md text-sm ${wainscotSize ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                             }`}
                         >
@@ -638,8 +666,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Select type of wall liner</p>
                     <select
                       value={interiorWallLiner}
-                      onChange={e => setInteriorWallLiner(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${interiorWallLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      onChange={e => {
+                        setInteriorWallLiner(e.target.value);
+                        handleDesignChange({ interiorWallLiner: e.target.value });
+                      }}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${interiorWallLiner && interiorWallLiner !== 'None' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
                       <option value="None">None</option>
@@ -647,6 +678,36 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       <option value="Dura Panel">Dura Panel</option>
                       <option value="Acoustical Liner">Acoustical Liner</option>
                     </select>
+
+                    {interiorWallLiner && interiorWallLiner !== 'None' && (
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-700 mb-1">Select liner color</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(interiorWallLinerColor || '');
+                              setShowInteriorWallLinerColorModal(true);
+                            }}
+                            className="flex-1 px-3 py-2 text-left border rounded-md text-sm bg-white hover:bg-gray-50 flex items-center justify-between group"
+                          >
+                            <span>
+                              {trimColors.find(c => c.value === interiorWallLinerColor)?.label || 'Select color'}
+                            </span>
+                            <span className="text-gray-400 group-hover:text-gray-600">▼</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(interiorWallLinerColor || '');
+                              setShowInteriorWallLinerColorModal(true);
+                            }}
+                            className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                            style={{
+                              backgroundColor: trimColors.find(c => c.value === interiorWallLinerColor)?.hex || '#FFFFFF'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -727,8 +788,11 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Select type of ceiling liner</p>
                     <select
                       value={ceilingLiner}
-                      onChange={e => setCeilingLiner(e.target.value)}
-                      className={`w-full px-3 py-2 border rounded-md text-sm ${ceilingLiner ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
+                      onChange={e => {
+                        setCeilingLiner(e.target.value);
+                        handleDesignChange({ ceilingLiner: e.target.value });
+                      }}
+                      className={`w-full px-3 py-2 border rounded-md text-sm ${ceilingLiner && ceilingLiner !== 'None' ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
                       <option value="None">None</option>
@@ -736,6 +800,36 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       <option value="Dura Panel">Dura Panel</option>
                       <option value="Acoustical Liner">Acoustical Liner</option>
                     </select>
+
+                    {ceilingLiner && ceilingLiner !== 'None' && (
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-700 mb-1">Select liner color</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(ceilingLinerColor || '');
+                              setShowCeilingLinerColorModal(true);
+                            }}
+                            className="flex-1 px-3 py-2 text-left border rounded-md text-sm bg-white hover:bg-gray-50 flex items-center justify-between group"
+                          >
+                            <span>
+                              {trimColors.find(c => c.value === ceilingLinerColor)?.label || 'Select color'}
+                            </span>
+                            <span className="text-gray-400 group-hover:text-gray-600">▼</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(ceilingLinerColor || '');
+                              setShowCeilingLinerColorModal(true);
+                            }}
+                            className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                            style={{
+                              backgroundColor: trimColors.find(c => c.value === ceilingLinerColor)?.hex || '#FFFFFF'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1901,106 +1995,434 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
         </div>
       )}
 
-      {/* Wainscot Color Selection Modal */}
+      {/* Wainscot Color Selection Modal - Slides in from left */}
       {showWainscotColorModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowWainscotColorModal(false)}>
-          <div className="bg-white rounded-lg max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed left-0 top-0 h-full w-[350px] z-50 transform transition-transform duration-300 ease-in-out translate-x-0" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white h-full shadow-2xl border-r border-gray-200 flex flex-col relative" onClick={(e) => e.stopPropagation()}>
             {/* Green Banner */}
-            <div className="bg-green-600 text-white px-4 py-3 rounded-t-lg">
+            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
               <h2 className="text-base font-bold">Choose wainscot color</h2>
+              <button
+                onClick={() => {
+                  setShowWainscotColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                title="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
-            <div className="p-4">
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                {/* Left Side - Color Sections */}
-                <div className="lg:col-span-2 space-y-4">
-                  {/* Standard Colors */}
-                  <div>
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">Standard Colors</h3>
-                    <div className="grid grid-cols-5 gap-3">
-                      {trimColors.map(color => (
+            {/* Current Selection Section - Fixed at top */}
+            <div className="p-4 border-b border-gray-300 shrink-0 bg-white">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+              <p className="text-sm font-bold text-gray-900 mb-3">
+                {selectedColorForModal
+                  ? trimColors.find(c => c.value === selectedColorForModal)?.label ||
+                  (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
+                  : trimColors.find(c => c.value === wainscotColor)?.label || 'Select a color'}
+              </p>
+              <div
+                className="w-full h-24 rounded border-2 border-gray-300 mb-4"
+                style={{
+                  backgroundImage: selectedColorForModal
+                    ? (getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || ''))
+                      ? `url(${getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || '')})`
+                      : undefined
+                    : (getColorImagePath(wainscotColor || 'white', trimColors.find(c => c.value === wainscotColor)?.label || 'White'))
+                      ? `url(${getColorImagePath(wainscotColor || 'white', trimColors.find(c => c.value === wainscotColor)?.label || 'White')})`
+                      : undefined,
+                  backgroundPosition: 'center center',
+                  backgroundSize: '100% 100%',
+                  backgroundOrigin: 'border-box',
+                  backgroundColor: selectedColorForModal
+                    ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#FFFFFF'
+                    : trimColors.find(c => c.value === wainscotColor)?.hex || '#FFFFFF'
+                }}
+              />
+              <button
+                onClick={() => {
+                  if (selectedColorForModal) {
+                    // Handle special cases
+                    let colorToSave = selectedColorForModal;
+                    if (selectedColorForModal === 'galvanized') {
+                      colorToSave = 'gray'; // Use gray as fallback for galvanized
+                    }
+
+                    setWainscotColor(colorToSave);
+                    handleDesignChange({ wainscotColor: colorToSave });
+                  }
+                  setShowWainscotColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold transition-colors"
+              >
+                Select
+              </button>
+            </div>
+
+            {/* Scrollable Color Sections */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {/* Designer Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
+                  <div className="flex gap-2 flex-wrap">
+                    {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
                         <button
                           key={color.value}
                           onClick={() => setSelectedColorForModal(color.value)}
-                          className={`w-32 h-32 rounded-lg border-4 ${selectedColorForModal === color.value ? 'border-green-600' : 'border-gray-400'
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
                             }`}
-                          style={{ backgroundColor: color.hex }}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
                           title={color.label}
-                        />
-                      ))}
-                      {/* Galvanized option */}
-                      <button
-                        onClick={() => setSelectedColorForModal('galvanized')}
-                        className={`w-32 h-32 rounded-lg border-4 bg-gradient-to-br from-gray-300 to-gray-500 ${selectedColorForModal === 'galvanized' ? 'border-green-600' : 'border-gray-400'
-                          }`}
-                        title="Galvanized"
-                      />
-                    </div>
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Right Side - Current Selection */}
-                <div className="lg:col-span-1">
-                  <div className="border-2 border-gray-300 rounded-lg p-3 bg-gray-50">
-                    <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
-                    <p className="text-sm font-bold text-gray-900 mb-3">
-                      {selectedColorForModal
-                        ? trimColors.find(c => c.value === selectedColorForModal)?.label ||
-                        (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
-                        : trimColors.find(c => c.value === wainscotColor)?.label || 'Select a color'}
-                    </p>
-                    <div
-                      className="w-full h-24 rounded border-2 border-gray-300 mb-3"
-                      style={{
-                        backgroundColor: selectedColorForModal
-                          ? trimColors.find(c => c.value === selectedColorForModal)?.hex ||
-                          (selectedColorForModal === 'galvanized' ? '#C0C0C0' : '#808080')
-                          : trimColors.find(c => c.value === wainscotColor)?.hex || '#808080'
-                      }}
-                    />
-                    <button
-                      onClick={() => {
-                        if (selectedColorForModal) {
-                          // Handle special cases
-                          if (selectedColorForModal === 'galvanized') {
-                            setWainscotColor('gray'); // Use gray as fallback for galvanized
-                          } else {
-                            setWainscotColor(selectedColorForModal);
-                          }
-                        }
-                        setShowWainscotColorModal(false);
-                        setSelectedColorForModal('');
-                      }}
-                      className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold"
-                    >
-                      Select
-                    </button>
+                {/* Standard Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Standard Colors</h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {trimColors.filter(c => [
+                      'white', 'tan', 'brite-white', 'pinewood', 'ash-gray',
+                      'light-stone', 'ocean-blue', 'midnight-blue', 'emerald-green', 'beige',
+                      'bronze', 'burnished-slate', 'light-gray', 'charcoal-gray', 'midnight-gray',
+                      'charcoal-black', 'midnight-black', 'brite-red', 'red', 'colonial-red',
+                      'burgundy', 'brown', 'galvanized'
+                    ].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-14 h-14 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Woodgrain Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Woodgrain Colors</h3>
+                  <div className="flex gap-2">
+                    {trimColors.filter(c => ['rough-sawn-natural-cedar', 'rough-sawn-gray-cedar'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
-
-              {/* Cancel Button */}
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={() => {
-                    setShowWainscotColorModal(false);
-                    setSelectedColorForModal('');
-                  }}
-                  className="px-6 py-2 bg-red-700 text-white rounded-md hover:bg-red-800 font-semibold"
-                >
-                  Cancel
-                </button>
-              </div>
-
-              {/* Disclaimer */}
-              <p className="mt-4 text-xs text-gray-600 text-center">
-                Color chips show approximate tone. Color of actual product may vary. Final color approval should be made with actual material. Samples are available to order on Menards.com
-              </p>
             </div>
           </div>
         </div>
       )}
-    </div>
+      {/* Interior Wall Liner Color Selection Modal - Slides in from left */}
+      {showInteriorWallLinerColorModal && (
+        <div className="fixed left-0 top-0 h-full w-[350px] z-50 transform transition-transform duration-300 ease-in-out translate-x-0" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white h-full shadow-2xl border-r border-gray-200 flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+            {/* Green Banner */}
+            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
+              <h2 className="text-base font-bold">Choose liner color</h2>
+              <button
+                onClick={() => {
+                  setShowInteriorWallLinerColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                title="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Current Selection Section - Fixed at top */}
+            <div className="p-4 border-b border-gray-300 shrink-0 bg-white">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+              <p className="text-sm font-bold text-gray-900 mb-3">
+                {selectedColorForModal
+                  ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
+                  : trimColors.find(c => c.value === interiorWallLinerColor)?.label || 'Select a color'}
+              </p>
+              <div
+                className="w-full h-24 rounded border-2 border-gray-300 mb-4"
+                style={{
+                  backgroundImage: selectedColorForModal
+                    ? (getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || ''))
+                      ? `url(${getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || '')})`
+                      : undefined
+                    : (getColorImagePath(interiorWallLinerColor || 'white', trimColors.find(c => c.value === interiorWallLinerColor)?.label || 'White'))
+                      ? `url(${getColorImagePath(interiorWallLinerColor || 'white', trimColors.find(c => c.value === interiorWallLinerColor)?.label || 'White')})`
+                      : undefined,
+                  backgroundPosition: 'center center',
+                  backgroundSize: '100% 100%',
+                  backgroundOrigin: 'border-box',
+                  backgroundColor: selectedColorForModal
+                    ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#FFFFFF'
+                    : trimColors.find(c => c.value === interiorWallLinerColor)?.hex || '#FFFFFF'
+                }}
+              />
+              <button
+                onClick={() => {
+                  if (selectedColorForModal) {
+                    setInteriorWallLinerColor(selectedColorForModal);
+                    handleDesignChange({ interiorWallLinerColor: selectedColorForModal });
+                  }
+                  setShowInteriorWallLinerColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold transition-colors"
+              >
+                Select
+              </button>
+            </div>
+
+            {/* Scrollable Color Sections */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {/* Standard Colors (Same as Wainscot/Trim) */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Standard Colors</h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {trimColors.filter(c => [
+                      'white', 'tan', 'brite-white', 'pinewood', 'ash-gray',
+                      'light-stone', 'ocean-blue', 'midnight-blue', 'emerald-green', 'beige',
+                      'bronze', 'burnished-slate', 'light-gray', 'charcoal-gray', 'midnight-gray',
+                      'charcoal-black', 'midnight-black', 'brite-red', 'red', 'colonial-red',
+                      'burgundy', 'brown', 'galvanized'
+                    ].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-14 h-14 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Designer Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
+                  <div className="flex gap-2 flex-wrap">
+                    {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Ceiling Liner Color Selection Modal - Slides in from left */}
+      {showCeilingLinerColorModal && (
+        <div className="fixed left-0 top-0 h-full w-[350px] z-50 transform transition-transform duration-300 ease-in-out translate-x-0" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white h-full shadow-2xl border-r border-gray-200 flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+            {/* Green Banner */}
+            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
+              <h2 className="text-base font-bold">Choose ceiling liner color</h2>
+              <button
+                onClick={() => {
+                  setShowCeilingLinerColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                title="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Current Selection Section - Fixed at top */}
+            <div className="p-4 border-b border-gray-300 shrink-0 bg-white">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+              <p className="text-sm font-bold text-gray-900 mb-3">
+                {selectedColorForModal
+                  ? trimColors.find(c => c.value === selectedColorForModal)?.label || 'Select a color'
+                  : trimColors.find(c => c.value === ceilingLinerColor)?.label || 'Select a color'}
+              </p>
+              <div
+                className="w-full h-24 rounded border-2 border-gray-300 mb-4"
+                style={{
+                  backgroundImage: selectedColorForModal
+                    ? (getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || ''))
+                      ? `url(${getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || '')})`
+                      : undefined
+                    : (getColorImagePath(ceilingLinerColor || 'white', trimColors.find(c => c.value === ceilingLinerColor)?.label || 'White'))
+                      ? `url(${getColorImagePath(ceilingLinerColor || 'white', trimColors.find(c => c.value === ceilingLinerColor)?.label || 'White')})`
+                      : undefined,
+                  backgroundPosition: 'center center',
+                  backgroundSize: '100% 100%',
+                  backgroundOrigin: 'border-box',
+                  backgroundColor: selectedColorForModal
+                    ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#FFFFFF'
+                    : trimColors.find(c => c.value === ceilingLinerColor)?.hex || '#FFFFFF'
+                }}
+              />
+              <button
+                onClick={() => {
+                  if (selectedColorForModal) {
+                    setCeilingLinerColor(selectedColorForModal);
+                    handleDesignChange({ ceilingLinerColor: selectedColorForModal });
+                  }
+                  setShowCeilingLinerColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold transition-colors"
+              >
+                Select
+              </button>
+            </div>
+
+            {/* Scrollable Color Sections */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {/* Standard Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Standard Colors</h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {trimColors.filter(c => [
+                      'white', 'tan', 'brite-white', 'pinewood', 'ash-gray',
+                      'light-stone', 'ocean-blue', 'midnight-blue', 'emerald-green', 'beige',
+                      'bronze', 'burnished-slate', 'light-gray', 'charcoal-gray', 'midnight-gray',
+                      'charcoal-black', 'midnight-black', 'brite-red', 'red', 'colonial-red',
+                      'burgundy', 'brown', 'galvanized'
+                    ].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-14 h-14 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Designer Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
+                  <div className="flex gap-2 flex-wrap">
+                    {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div >
   );
 }
-

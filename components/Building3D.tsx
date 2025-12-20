@@ -614,6 +614,153 @@ export default function Building3D({ design }: Building3DProps) {
           wallGroup.add(backWall);
         }
 
+        // --- WAINSCOT ---
+        if (design.wainscot) {
+          const wainscotHeightVal = design.wainscotHeight ? parseInt(design.wainscotHeight) / 12 : 3;
+          const wainscotOffset = 0.05; // Slightly offset from wall to avoid z-fighting
+
+          const sideWainscotGeo = new THREE.PlaneGeometry(outerWallLength, wainscotHeightVal);
+          const endWainscotGeo = new THREE.PlaneGeometry(outerWallWidth, wainscotHeightVal);
+
+          const wainscotColorHex = trimColors.find(c => c.value === design.wainscotColor)?.hex || '#FFFFFF';
+          const wainscotColor3D = new THREE.Color(wainscotColorHex);
+          // Reuse corrugated texture logic but scaled for wainscot height
+          const wainscotTexture = createCorrugatedTexture(wainscotColor3D, 256, 256, true, 1, wainscotHeightVal);
+
+          const wainscotMaterial = new THREE.MeshStandardMaterial({
+            map: wainscotTexture,
+            color: wainscotColor3D,
+            roughness: 0.7,
+            metalness: 0.3,
+            side: THREE.DoubleSide
+          });
+
+          // Side Wall A (Left) - check local flag AND open config
+          if (design.wainscotSideWallA && (!openConfig.isOpen || !openConfig.sideWallA)) {
+            const leftWainscot = new THREE.Mesh(sideWainscotGeo, wainscotMaterial);
+            leftWainscot.position.set(-outerWallWidth / 2 - wainscotOffset, wainscotHeightVal / 2, 0);
+            leftWainscot.rotation.y = -Math.PI / 2;
+            leftWainscot.name = 'Wainscot_Left';
+            wallGroup.add(leftWainscot);
+          }
+
+          // Side Wall B (Right)
+          if (design.wainscotSideWallB && (!openConfig.isOpen || !openConfig.sideWallB)) {
+            const rightWainscot = new THREE.Mesh(sideWainscotGeo, wainscotMaterial);
+            rightWainscot.position.set(outerWallWidth / 2 + wainscotOffset, wainscotHeightVal / 2, 0);
+            rightWainscot.rotation.y = Math.PI / 2;
+            rightWainscot.name = 'Wainscot_Right';
+            wallGroup.add(rightWainscot);
+          }
+
+          // End Wall C (Front)
+          if (design.wainscotEndWallC && (!openConfig.isOpen || !openConfig.endWallC)) {
+            const frontWainscot = new THREE.Mesh(endWainscotGeo, wainscotMaterial);
+            frontWainscot.position.set(0, wainscotHeightVal / 2, outerWallLength / 2 + wainscotOffset);
+            frontWainscot.name = 'Wainscot_Front';
+            wallGroup.add(frontWainscot);
+          }
+
+          // End Wall D (Back)
+          if (design.wainscotEndWallD && (!openConfig.isOpen || !openConfig.endWallD)) {
+            const backWainscot = new THREE.Mesh(endWainscotGeo, wainscotMaterial);
+            backWainscot.position.set(0, wainscotHeightVal / 2, -outerWallLength / 2 - wainscotOffset);
+            backWainscot.rotation.y = Math.PI;
+            backWainscot.name = 'Wainscot_Back';
+            wallGroup.add(backWainscot);
+          }
+        }
+
+        // --- INTERIOR WALL LINER ---
+        if (design.interiorWallLiner && design.interiorWallLiner !== 'None') {
+          const linerOffset = 0.2; // Offset inside the wall (approx 2.4 inches)
+
+          const sideLinerGeo = new THREE.PlaneGeometry(outerWallLength, buildingHeight);
+          const endLinerGeo = new THREE.PlaneGeometry(outerWallWidth, buildingHeight);
+
+          const linerColorHex = trimColors.find(c => c.value === design.interiorWallLinerColor)?.hex || '#FFFFFF';
+          const linerColor3D = new THREE.Color(linerColorHex);
+          // Reuse corrugated texture logic
+          const linerTexture = createCorrugatedTexture(linerColor3D, 256, 256, true, 4, 4);
+
+          const linerMaterial = new THREE.MeshStandardMaterial({
+            map: linerTexture,
+            color: linerColor3D,
+            roughness: 0.7,
+            metalness: 0.1,
+            side: THREE.FrontSide // Only visible from inside
+          });
+
+          // Side Wall A (Left)
+          if (!openConfig.isOpen || !openConfig.sideWallA) {
+            const leftLiner = new THREE.Mesh(sideLinerGeo, linerMaterial);
+            // Wall is at -outerWallWidth/2. Liner should be at -outerWallWidth/2 + linerOffset
+            leftLiner.position.set(-outerWallWidth / 2 + linerOffset, buildingHeight / 2, 0);
+            leftLiner.rotation.y = Math.PI / 2; // Face roughly +X (inwards)
+            leftLiner.name = 'Liner_Left';
+            wallGroup.add(leftLiner);
+          }
+
+          // Side Wall B (Right)
+          if (!openConfig.isOpen || !openConfig.sideWallB) {
+            const rightLiner = new THREE.Mesh(sideLinerGeo, linerMaterial);
+            // Wall is at outerWallWidth/2. Liner should be at outerWallWidth/2 - linerOffset
+            rightLiner.position.set(outerWallWidth / 2 - linerOffset, buildingHeight / 2, 0);
+            rightLiner.rotation.y = -Math.PI / 2; // Face roughly -X (inwards)
+            rightLiner.name = 'Liner_Right';
+            wallGroup.add(rightLiner);
+          }
+
+          // End Wall C (Front)
+          if (!openConfig.isOpen || !openConfig.endWallC) {
+            const frontLiner = new THREE.Mesh(endLinerGeo, linerMaterial);
+            // Wall at +Z (outerWallLength/2). Liner at +Z - offset
+            frontLiner.position.set(0, buildingHeight / 2, outerWallLength / 2 - linerOffset);
+            frontLiner.rotation.y = Math.PI; // Face -Z (inwards)
+            frontLiner.name = 'Liner_Front';
+            wallGroup.add(frontLiner);
+          }
+
+          // End Wall D (Back)
+          if (!openConfig.isOpen || !openConfig.endWallD) {
+            const backLiner = new THREE.Mesh(endLinerGeo, linerMaterial);
+            // Wall at -Z. Liner at -Z + offset
+            backLiner.position.set(0, buildingHeight / 2, -outerWallLength / 2 + linerOffset);
+            // Default rotation is looking at +Z (inwards for back wall)
+            backLiner.name = 'Liner_Back';
+            wallGroup.add(backLiner);
+          }
+        }
+
+        // --- CEILING LINER ---
+        if (design.ceilingLiner && design.ceilingLiner !== 'None') {
+          const linerColorHex = trimColors.find(c => c.value === design.ceilingLinerColor)?.hex || '#FFFFFF';
+          const linerColor3D = new THREE.Color(linerColorHex);
+
+          // Use similar corrugated texture logic
+          const ceilingTexture = createCorrugatedTexture(linerColor3D, 256, 256, true, 4, 1);
+
+          const ceilingMaterial = new THREE.MeshStandardMaterial({
+            map: ceilingTexture,
+            color: linerColor3D,
+            roughness: 0.8,
+            metalness: 0.1,
+            side: THREE.DoubleSide
+          });
+
+          const ceilingGeo = new THREE.PlaneGeometry(outerWallLength, outerWallWidth);
+          const ceiling = new THREE.Mesh(ceilingGeo, ceilingMaterial);
+
+          // Position at building height (eaves)
+          // If buildingHeight is eaves height, this creates a flat ceiling.
+          // Rotate to be flat (xz plane)
+          ceiling.rotation.x = -Math.PI / 2;
+          ceiling.rotation.z = Math.PI / 2; // Orient corrugation along length
+          ceiling.position.set(0, buildingHeight - 0.05, 0); // Slightly below top to avoid z-fighting with roof if flat
+          ceiling.name = 'CeilingLiner';
+          wallGroup.add(ceiling);
+        }
+
         scene.add(wallGroup);
         wallMeshRef.current = wallGroup;
         // Walls hidden when frame is shown (opposite of frame)

@@ -39,6 +39,15 @@ export interface BuildingDesign {
     endwallD: number;
   };
   wallColor: string;
+  interiorWallLiner?: string;
+  interiorWallLinerColor?: string;
+  roofCondensation?: string;
+  ceilingInsulation?: string;
+  ceilingLiner?: string;
+  ceilingLinerColor?: string;
+  ridgeOptions?: string;
+
+  // Wainscot
   trimColor: string;
   roofColor: string;
   soffitColor?: string;
@@ -63,6 +72,13 @@ export interface BuildingDesign {
   gableAccentColor?: string;
   gableAccentEndWallC?: boolean;
   gableAccentEndWallD?: boolean;
+  wainscot?: boolean;
+  wainscotColor?: string;
+  wainscotHeight?: string;
+  wainscotSideWallA?: boolean;
+  wainscotSideWallB?: boolean;
+  wainscotEndWallC?: boolean;
+  wainscotEndWallD?: boolean;
 }
 
 export interface Opening {
