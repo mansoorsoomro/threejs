@@ -59,6 +59,10 @@ export interface BuildingDesign {
     endWallD: boolean;
     removeEveryOtherPost: boolean;
   };
+  gableAccent?: boolean;
+  gableAccentColor?: string;
+  gableAccentEndWallC?: boolean;
+  gableAccentEndWallD?: boolean;
 }
 
 export interface Opening {
