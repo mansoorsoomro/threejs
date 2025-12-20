@@ -253,7 +253,7 @@ export default function Building3D({ design }: Building3DProps) {
     // Hide any backWall or other wall meshes in the scene when frame is shown
     if (sceneRef.current) {
       sceneRef.current.traverse((object: any) => {
-        if (object.name && (object.name.includes('wall') || object.name.includes('Wall'))) {
+        if (object.name && (object.name.includes('wall') || object.name.includes('Wall') || object.name === 'gables')) {
           if (object !== framingGroupRef.current) {
             object.visible = !showFraming;
           }
@@ -589,6 +589,40 @@ export default function Building3D({ design }: Building3DProps) {
             roofAngle = Math.atan2(extraHeight, halfSpan);
           }
         }
+
+        // --- GABLE ENDS (Triangular Wall Sections) ---
+        // Fill the gap between the top of the wall and the roof peak
+        const gableHeight = peakHeight - buildingHeight;
+        const gableShape = new THREE.Shape();
+        gableShape.moveTo(-outerWallWidth / 2, 0); // Bottom-left
+        gableShape.lineTo(outerWallWidth / 2, 0);  // Bottom-right
+        gableShape.lineTo(0, gableHeight);         // Top-peak
+        gableShape.lineTo(-outerWallWidth / 2, 0); // Close
+
+        const gableGeo = new THREE.ExtrudeGeometry(gableShape, {
+          depth: 0.1, // Match simplistic wall thickness or kept thin
+          bevelEnabled: false
+        });
+
+        const gables = new THREE.Group();
+        gables.name = 'gables';
+
+        // Front Gable
+        const frontGable = new THREE.Mesh(gableGeo, wallMaterial);
+        // BoxGeometry centers at 0. Front face is at +outerWallLength/2.
+        // Extrude creates Z: 0 -> depth.
+        // We want frontGable to end at outerWallLength/2.
+        frontGable.position.set(0, buildingHeight, outerWallLength / 2 - 0.1);
+        gables.add(frontGable);
+
+        // Back Gable
+        const backGable = new THREE.Mesh(gableGeo, wallMaterial);
+        // We want backGable to start at -outerWallLength/2.
+        backGable.position.set(0, buildingHeight, -outerWallLength / 2);
+        gables.add(backGable);
+
+        gables.visible = !showFraming; // Match wall visibility
+        scene.add(gables);
 
         // Add framing structure (posts, girts, trusses) - visible in both views
         if (framingType === 'post-frame-construction') {
