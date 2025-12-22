@@ -152,15 +152,18 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
   const [showCeilingLinerColorModal, setShowCeilingLinerColorModal] = useState(false);
   const [ridgeOptions, setRidgeOptions] = useState<string>(design.ridgeOptions || 'Universal Ridge Cap');
   const [outsideClosure, setOutsideClosure] = useState<string>('Standard Non-Vented');
-  const [ridgeVentilation, setRidgeVentilation] = useState<string>('None');
-  const [gableVents, setGableVents] = useState<string>('None');
-  const [endCaps, setEndCaps] = useState<string>('No');
-  const [snowGuards, setSnowGuards] = useState<string>('No');
-  const [skylights, setSkylights] = useState<string>('None');
-  const [eaveLightA, setEaveLightA] = useState<string>('None');
-  const [eaveLightB, setEaveLightB] = useState<string>('None');
-  const [gutters, setGutters] = useState<string>('No');
-  const [cupolas, setCupolas] = useState<string>('None');
+  const [ridgeVentilation, setRidgeVentilation] = useState<string>(design.ridgeVentilation || 'None');
+  const [gableVents, setGableVents] = useState<string>(design.gableVents || 'None');
+  const [endCaps, setEndCaps] = useState<string>(design.endCaps || 'No');
+  const [snowGuards, setSnowGuards] = useState<string>(design.snowGuards || 'No');
+  const [skylights, setSkylights] = useState<string>(design.skylights || 'None');
+  const [skylightQuantity, setSkylightQuantity] = useState<number>(design.skylightQuantity || 1);
+  const [eaveLightA, setEaveLightA] = useState<string>(design.eaveLightA || 'None');
+  const [eaveLightB, setEaveLightB] = useState<string>(design.eaveLightB || 'None');
+  const [gutters, setGutters] = useState<string>(design.gutters || 'No');
+  const [gutterColor, setGutterColor] = useState<string>(design.gutterColor || 'White');
+  const [showGutterColorModal, setShowGutterColorModal] = useState(false);
+  const [cupolas, setCupolas] = useState<string>(design.cupolas || 'None');
 
   const handleDesignChange = (partial: Partial<BuildingDesign>) => {
     setCurrentDesign(prev => {
@@ -224,6 +227,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
       endCaps,
       snowGuards,
       skylights,
+      skylightQuantity,
       cupolas,
       roofCondensation,
       outsideClosure,
@@ -245,6 +249,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
     endCaps,
     snowGuards,
     skylights,
+    skylightQuantity,
     cupolas,
     roofCondensation,
     outsideClosure,
@@ -848,12 +853,16 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Select the type of ridge cap</p>
                     <select
                       value={ridgeOptions}
-                      onChange={e => setRidgeOptions(e.target.value)}
+                      onChange={e => {
+                        setRidgeOptions(e.target.value);
+                        handleDesignChange({ ridgeOptions: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${ridgeOptions ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
                       <option value="Universal Ridge Cap">Universal Ridge Cap</option>
                       <option value="Pro-Sky Ridge Cap">Pro-Sky Ridge Cap</option>
+                      <option value="Clear Polycarbonate Ridge Cap">Clear Polycarbonate Ridge Cap</option>
                     </select>
                   </div>
                 </div>
@@ -896,13 +905,17 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                 <div className={`px-4 py-4 ${activeSection === 'ridgeVentilation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-gray-900 mb-2">Ridge Ventilation</p>
-                    <p className="text-xs text-gray-600 mb-2 italic">This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
+                    <p className={`text-xs mb-2 italic ${currentDesign.roofColor === 'galvanized' ? 'text-red-600' : 'text-gray-600'}`}>This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
                     <p className="text-xs text-gray-700 mb-3">Select quantity of ridge vents</p>
                     <select
                       value={ridgeVentilation}
-                      onChange={e => setRidgeVentilation(e.target.value)}
+                      onChange={e => {
+                        setRidgeVentilation(e.target.value);
+                        handleDesignChange({ ridgeVentilation: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${ridgeVentilation ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
+                      disabled={currentDesign.roofColor === 'galvanized'}
                     >
                       <option value="None">None</option>
                       <option value="1">1</option>
@@ -924,13 +937,17 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                 <div className={`px-4 py-4 ${activeSection === 'gableVents' ? 'bg-yellow-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-gray-900 mb-2">Gable Vents</p>
-                    <p className="text-xs text-gray-600 mb-2 italic">This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
+                    <p className={`text-xs mb-2 italic ${currentDesign.roofColor === 'galvanized' ? 'text-red-600' : 'text-gray-600'}`}>This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
                     <p className="text-xs text-gray-700 mb-3">Select type of gable vents</p>
                     <select
                       value={gableVents}
-                      onChange={e => setGableVents(e.target.value)}
+                      onChange={e => {
+                        setGableVents(e.target.value);
+                        handleDesignChange({ gableVents: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${gableVents ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
+                      disabled={currentDesign.roofColor === 'galvanized'}
                     >
                       <option value="None">None</option>
                       <option value="Standard">Standard</option>
@@ -954,7 +971,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Add end caps</p>
                     <select
                       value={endCaps}
-                      onChange={e => setEndCaps(e.target.value)}
+                      onChange={e => {
+                        setEndCaps(e.target.value);
+                        handleDesignChange({ endCaps: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${endCaps ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
@@ -979,7 +999,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Add snow guards</p>
                     <select
                       value={snowGuards}
-                      onChange={e => setSnowGuards(e.target.value)}
+                      onChange={e => {
+                        setSnowGuards(e.target.value);
+                        handleDesignChange({ snowGuards: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${snowGuards ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
@@ -1004,7 +1027,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Skylight size</p>
                     <select
                       value={skylights}
-                      onChange={e => setSkylights(e.target.value)}
+                      onChange={e => {
+                        setSkylights(e.target.value);
+                        handleDesignChange({ skylights: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${skylights ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
@@ -1013,6 +1039,25 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       <option value="9 ft">9 ft</option>
                       <option value="11 ft">11 ft</option>
                     </select>
+
+                    {skylights !== 'None' && (
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-700 mb-1">Select quantity</p>
+                        <select
+                          value={skylightQuantity}
+                          onChange={e => {
+                            const val = parseInt(e.target.value);
+                            setSkylightQuantity(val);
+                            handleDesignChange({ skylightQuantity: val });
+                          }}
+                          className="w-full px-3 py-2 border border-blue-500 bg-blue-50 rounded-md text-sm"
+                        >
+                          {[1, 2, 3, 4, 5, 6].map(num => (
+                            <option key={num} value={num}>{num}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1034,28 +1079,34 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <span className="text-xs text-gray-700 block mb-2">Sidewall A eavelight</span>
                     <select
                       value={eaveLightA}
-                      onChange={e => setEaveLightA(e.target.value)}
+                      onChange={e => {
+                        setEaveLightA(e.target.value);
+                        handleDesignChange({ eaveLightA: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${eaveLightA ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
                       <option value="None">None</option>
-                      <option value="Small">Small</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Large">Large</option>
+                      <option value="2ft">2ft</option>
+                      <option value="3ft">3ft</option>
+                      <option value="4ft">4ft</option>
                     </select>
                   </div>
                   <div>
                     <span className="text-xs text-gray-700 block mb-2">Sidewall B eavelight</span>
                     <select
                       value={eaveLightB}
-                      onChange={e => setEaveLightB(e.target.value)}
+                      onChange={e => {
+                        setEaveLightB(e.target.value);
+                        handleDesignChange({ eaveLightB: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${eaveLightB ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
                       <option value="None">None</option>
-                      <option value="Small">Small</option>
-                      <option value="Medium">Medium</option>
-                      <option value="Large">Large</option>
+                      <option value="2ft">2ft</option>
+                      <option value="3ft">3ft</option>
+                      <option value="4ft">4ft</option>
                     </select>
                   </div>
                 </div>
@@ -1076,7 +1127,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Add gutters</p>
                     <select
                       value={gutters}
-                      onChange={e => setGutters(e.target.value)}
+                      onChange={e => {
+                        setGutters(e.target.value);
+                        handleDesignChange({ gutters: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${gutters ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                       disabled={currentDesign.endWallOverhang === '0' && currentDesign.sidewallOverhang === '0'}
@@ -1084,6 +1138,36 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                       <option value="No">No</option>
                       <option value="Yes">Yes</option>
                     </select>
+
+                    {gutters === 'Yes' && (
+                      <div className="mt-3">
+                        <p className="text-xs text-gray-700 mb-1">Select gutter color</p>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(gutterColor || '');
+                              setShowGutterColorModal(true);
+                            }}
+                            className="flex-1 px-3 py-2 text-left border rounded-md text-sm bg-white hover:bg-gray-50 flex items-center justify-between group"
+                          >
+                            <span>
+                              {trimColors.find(c => c.value === gutterColor)?.label || 'Select color'}
+                            </span>
+                            <span className="text-gray-400 group-hover:text-gray-600">▼</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setSelectedColorForModal(gutterColor || '');
+                              setShowGutterColorModal(true);
+                            }}
+                            className="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                            style={{
+                              backgroundColor: trimColors.find(c => c.value === gutterColor)?.hex || '#FFFFFF'
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -1103,7 +1187,10 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                     <p className="text-xs text-gray-700 mb-3">Select the size of cupolas</p>
                     <select
                       value={cupolas}
-                      onChange={e => setCupolas(e.target.value)}
+                      onChange={e => {
+                        setCupolas(e.target.value);
+                        handleDesignChange({ cupolas: e.target.value });
+                      }}
                       className={`w-full px-3 py-2 border rounded-md text-sm ${cupolas ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'
                         }`}
                     >
@@ -2396,6 +2483,172 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
                   <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
                   <div className="flex gap-2 flex-wrap">
                     {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Gutter Color Selection Modal - Slides in from left */}
+      {showGutterColorModal && (
+        <div className="fixed left-0 top-0 h-full w-[350px] z-50 transform transition-transform duration-300 ease-in-out translate-x-0" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white h-full shadow-2xl border-r border-gray-200 flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+            {/* Green Banner */}
+            <div className="bg-green-600 text-white px-4 py-3 flex items-center justify-between shrink-0">
+              <h2 className="text-base font-bold">Choose gutter color</h2>
+              <button
+                onClick={() => {
+                  setShowGutterColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-6 h-6 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
+                title="Close"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Current Selection Section - Fixed at top */}
+            <div className="p-4 border-b border-gray-300 shrink-0 bg-white">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Current Selection:</h3>
+              <p className="text-sm font-bold text-gray-900 mb-3">
+                {selectedColorForModal
+                  ? trimColors.find(c => c.value === selectedColorForModal)?.label ||
+                  (selectedColorForModal === 'galvanized' ? 'Galvanized' : 'Select a color')
+                  : trimColors.find(c => c.value === gutterColor)?.label || 'Select a color'}
+              </p>
+              <div
+                className="w-full h-24 rounded border-2 border-gray-300 mb-4"
+                style={{
+                  backgroundImage: selectedColorForModal
+                    ? (getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || ''))
+                      ? `url(${getColorImagePath(selectedColorForModal, trimColors.find(c => c.value === selectedColorForModal)?.label || '')})`
+                      : undefined
+                    : (getColorImagePath(gutterColor || 'white', trimColors.find(c => c.value === gutterColor)?.label || 'White'))
+                      ? `url(${getColorImagePath(gutterColor || 'white', trimColors.find(c => c.value === gutterColor)?.label || 'White')})`
+                      : undefined,
+                  backgroundPosition: 'center center',
+                  backgroundSize: '100% 100%',
+                  backgroundOrigin: 'border-box',
+                  backgroundColor: selectedColorForModal
+                    ? trimColors.find(c => c.value === selectedColorForModal)?.hex || '#FFFFFF'
+                    : trimColors.find(c => c.value === gutterColor)?.hex || '#FFFFFF'
+                }}
+              />
+              <button
+                onClick={() => {
+                  if (selectedColorForModal) {
+                    // Handle special cases
+                    let colorToSave = selectedColorForModal;
+                    if (selectedColorForModal === 'galvanized') {
+                      colorToSave = 'gray'; // Use gray as fallback for galvanized
+                    }
+
+                    setGutterColor(colorToSave);
+                    handleDesignChange({ gutterColor: colorToSave });
+                  }
+                  setShowGutterColorModal(false);
+                  setSelectedColorForModal('');
+                }}
+                className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 font-semibold transition-colors"
+              >
+                Select
+              </button>
+            </div>
+
+            {/* Scrollable Color Sections */}
+            <div className="flex-1 overflow-y-auto p-4">
+              <div className="space-y-4">
+                {/* Designer Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Designer Colors</h3>
+                  <div className="flex gap-2 flex-wrap">
+                    {trimColors.filter(c => ['dover-gray', 'knights-armor', 'smoky-sable', 'sandy-clay'].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-20 h-20 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Standard Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Standard Colors</h3>
+                  <div className="grid grid-cols-5 gap-2">
+                    {trimColors.filter(c => [
+                      'white', 'tan', 'brite-white', 'pinewood', 'ash-gray',
+                      'light-stone', 'ocean-blue', 'midnight-blue', 'emerald-green', 'beige',
+                      'bronze', 'burnished-slate', 'light-gray', 'charcoal-gray', 'midnight-gray',
+                      'charcoal-black', 'midnight-black', 'brite-red', 'red', 'colonial-red',
+                      'burgundy', 'brown', 'galvanized'
+                    ].includes(c.value)).map(color => {
+                      const imagePath = getColorImagePath(color.value, color.label);
+                      return (
+                        <button
+                          key={color.value}
+                          onClick={() => setSelectedColorForModal(color.value)}
+                          className={`w-14 h-14 rounded border-2 transition-all ${selectedColorForModal === color.value ? 'border-green-600 ring-2 ring-green-300' : 'border-gray-400 hover:border-gray-500'
+                            }`}
+                          style={imagePath ? {
+                            backgroundImage: `url(${imagePath})`,
+                            backgroundPosition: 'center center',
+                            backgroundSize: '100% 100%',
+                            backgroundOrigin: 'border-box',
+                            backgroundColor: color.hex
+                          } : { backgroundColor: color.hex }}
+                          title={color.label}
+                        >
+                          &nbsp;
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Woodgrain Colors */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Woodgrain Colors</h3>
+                  <div className="flex gap-2">
+                    {trimColors.filter(c => ['rough-sawn-natural-cedar', 'rough-sawn-gray-cedar'].includes(c.value)).map(color => {
                       const imagePath = getColorImagePath(color.value, color.label);
                       return (
                         <button

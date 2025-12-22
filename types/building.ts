@@ -46,6 +46,17 @@ export interface BuildingDesign {
   ceilingLiner?: string;
   ceilingLinerColor?: string;
   ridgeOptions?: string;
+  ridgeVentilation?: string;
+  gableVents?: string;
+  endCaps?: string;
+  snowGuards?: string;
+  skylights?: string;
+  eaveLightA?: string;
+  eaveLightB?: string;
+  gutters?: string;
+  gutterColor?: string;
+  cupolas?: string;
+  skylightQuantity?: number;
 
   // Wainscot
   trimColor: string;

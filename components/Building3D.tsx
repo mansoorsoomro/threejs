@@ -578,10 +578,29 @@ export default function Building3D({ design }: Building3DProps) {
         const sideWallGeo = new THREE.PlaneGeometry(outerWallLength, buildingHeight);
         const endWallGeo = new THREE.PlaneGeometry(outerWallWidth, buildingHeight);
 
+        // Helper to get eave light height
+        const getEaveLightHeight = (val?: string) => {
+          if (!val || val === 'None') return 0;
+          if (val === '2ft') return 2.0;
+          if (val === '3ft') return 3.0;
+          if (val === '4ft') return 4.0;
+          if (val === 'Small') return 1.0;
+          if (val === 'Medium') return 2.0;
+          if (val === 'Large') return 3.0;
+          return 0;
+        };
+
+        const eaveH_A = getEaveLightHeight(design.eaveLightA);
+        const eaveH_B = getEaveLightHeight(design.eaveLightB);
+
         // Side Wall A (Left, -X)
         if (!openConfig.isOpen || !openConfig.sideWallA) {
-          const leftWall = new THREE.Mesh(sideWallGeo, wallMaterial);
-          leftWall.position.set(-outerWallWidth / 2, buildingHeight / 2, 0);
+          const h = buildingHeight - eaveH_A;
+          const geo = new THREE.PlaneGeometry(outerWallLength, h);
+          const leftWall = new THREE.Mesh(geo, wallMaterial);
+          // Position Y: Center of the wall, so it sits on ground (0)
+          // Y center = h / 2
+          leftWall.position.set(-outerWallWidth / 2, h / 2, 0);
           leftWall.rotation.y = -Math.PI / 2;
           leftWall.name = 'Wall_Left';
           wallGroup.add(leftWall);
@@ -589,8 +608,10 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Side Wall B (Right, +X)
         if (!openConfig.isOpen || !openConfig.sideWallB) {
-          const rightWall = new THREE.Mesh(sideWallGeo, wallMaterial);
-          rightWall.position.set(outerWallWidth / 2, buildingHeight / 2, 0);
+          const h = buildingHeight - eaveH_B;
+          const geo = new THREE.PlaneGeometry(outerWallLength, h);
+          const rightWall = new THREE.Mesh(geo, wallMaterial);
+          rightWall.position.set(outerWallWidth / 2, h / 2, 0);
           rightWall.rotation.y = Math.PI / 2;
           rightWall.name = 'Wall_Right';
           wallGroup.add(rightWall);
@@ -1814,35 +1835,357 @@ export default function Building3D({ design }: Building3DProps) {
           // Now we have a flat plane centered at (0,0,0).
           // Width (X) is the slope direction. Depth (Z) is the building length.
 
-          const lMesh = new THREE.Mesh(simpleGeo, new THREE.MeshStandardMaterial({ color: roofColor3D, side: THREE.DoubleSide }));
-          // Left Side: Slopes UP from left-to-right.
-          // Pivot is center.
-          // Rotation Z: +angle tiles the right side up, left side down?
-          // Standard rotation Z+ is counter-clockwise.
-          // So right side goes UP. Correct.
+          // Helper to generate Alpha Map for Roof Cutouts
+          const generateRoofAlphaMap = (slopeLen: number, totalLen: number, skylightLen: number, qty: number) => {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 1024;
+            const ctx = canvas.getContext('2d')!;
+
+            // Fill white (Opaque)
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, 1024, 1024);
+
+            if (qty > 0 && skylightLen > 0) {
+              ctx.fillStyle = '#000000'; // Black (Transparent)
+
+              const skylightWidth = 3.0; // 3ft fixed width
+
+              // Convert physical dimensions to normalized UV space
+              const uWidth = skylightLen / slopeLen; // "Length" of skylight is actually along the slope? 
+              // Wait, User says "Skylight size 7ft". Is that along the ridge or up the slope?
+              // Standard panels usually run up the slope. 
+              // Previous code: `new PlaneGeometry(len, width)`. `len` was X, `width` was Y (3.0).
+              // `skyPanel.rotateX(-Math.PI / 2)`.
+              // So `len` was along X (slope direction?). `width` (3.0) along Z (length direction)?
+              // Let's assume typical: 3ft wide panel, Length (7,9,11) runs up the slope.
+              // So `skylightLen` is dimension along Slope (X).
+              // `skylightWidth` (3.0) is dimension along Building Length (Z).
+
+              const uLen = skylightLen / slopeLen; // Normalized length along slope (X axis of plane)
+              const vWidth = 3.0 / totalLen; // Normalized width along building length (Z axis of plane)
+
+              // Center on slope (X axis)
+              // X range is [-slopeLen/2, slopeLen/2] -> UV [0, 1].
+              // Center is 0 -> UV 0.5.
+              // Start U = 0.5 - uLen/2.
+
+              const uStart = 0.5 - uLen / 2;
+
+              // Distribute along Length (Z axis)
+              // Z range is [-totalLen/2, totalLen/2] -> UV [0, 1] (or [1, 0] depending on rotation).
+              // Let's assume standard UV layout aligns Y with V.
+
+              for (let i = 0; i < qty; i++) {
+                let vCenter = 0.5;
+                if (qty > 1) {
+                  // Distribute evenly
+                  const segment = 1.0 / qty;
+                  vCenter = (i * segment) + (segment / 2);
+                }
+
+                // We need to match ThreeJS UV mapping coordinates.
+                // PlaneGeometry: (0,1) top-left, (1,0) bottom-right? 
+                // Actually (0,0) bottom-left, (1,1) top-right.
+                // When rotated -90 X:
+                // Local X (+Slope) is U.
+                // Local Y (now -Z) is V.
+                // Building Length runs along Z. Local Y is -Z.
+                // So V=0 is Z_max (+totalLen/2), V=1 is Z_min (-totalLen/2).
+                // Or vice versa.
+                // Let's just draw at vCenter and Flip Y if needed.
+
+                const vStart = vCenter - vWidth / 2;
+
+                // Note: Canvas coordinates (0,0) is Top-Left. 
+                // ctx.fillRect(x, y, w, h).
+                // x maps to U. y maps to (1-V).
+
+                // Draw hole
+                ctx.fillRect(
+                  uStart * 1024,
+                  (1.0 - (vStart + vWidth)) * 1024, // Top-left Y in canvas
+                  uLen * 1024,
+                  vWidth * 1024
+                );
+              }
+            }
+
+            return new THREE.CanvasTexture(canvas);
+          };
+
+          // Calculate Skylight params
+          const skylightLen = (design.skylights && design.skylights !== 'None') ? (parseFloat(design.skylights.split(' ')[0]) || 0) : 0;
+          const totalSkylightQty = (design.skylightQuantity || 1);
+
+          // Split quantity between left and right
+          // If 1 -> Left: 1, Right: 0 (or vice versa)
+          // If 4 -> Left: 2, Right: 2
+          const leftSkyQty = Math.ceil(totalSkylightQty / 2);
+          const rightSkyQty = Math.floor(totalSkylightQty / 2);
+
+          // Prepare Materials for Left and Right Logic
+          let leftRoofAlphaMap = null;
+          let leftRoofMatProps: any = { color: roofColor3D, side: THREE.DoubleSide };
+
+          if (skylightLen > 0 && leftSkyQty > 0) {
+            leftRoofAlphaMap = generateRoofAlphaMap(slopeLength, totalLen, skylightLen, leftSkyQty);
+            leftRoofMatProps.alphaMap = leftRoofAlphaMap;
+            leftRoofMatProps.alphaTest = 0.5;
+            leftRoofMatProps.transparent = false;
+          }
+          const leftRoofMaterial = new THREE.MeshStandardMaterial(leftRoofMatProps);
+
+          let rightRoofAlphaMap = null;
+          let rightRoofMatProps: any = { color: roofColor3D, side: THREE.DoubleSide };
+
+          if (skylightLen > 0 && rightSkyQty > 0) {
+            rightRoofAlphaMap = generateRoofAlphaMap(slopeLength, totalLen, skylightLen, rightSkyQty);
+            rightRoofMatProps.alphaMap = rightRoofAlphaMap;
+            rightRoofMatProps.alphaTest = 0.5;
+            rightRoofMatProps.transparent = false;
+          }
+          const rightRoofMaterial = new THREE.MeshStandardMaterial(rightRoofMatProps);
+
+          // Left Side Mesh
+          const lMesh = new THREE.Mesh(simpleGeo, leftRoofMaterial);
           lMesh.rotation.set(0, 0, angle);
-
-          // Position:
-          // X: Center of the left slope run.
-          // The run is 'run'. Center is at -run/2 from peak.
-          // Y: Center of the slope height.
-          // Top is at peakHeight + ROOF_OFFSET. Bottom is lower.
-          // Midpoint is peakHeight + ROOF_OFFSET - (fullRise / 2).
-          // Z: 0 (Centered on building).
           lMesh.position.set(-run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
-
           roofGroup.add(lMesh);
 
-          // Right Side
-          const rMesh = new THREE.Mesh(simpleGeo, new THREE.MeshStandardMaterial({ color: roofColor3D, side: THREE.DoubleSide }));
+          // Right Side Mesh
+          const rMesh = new THREE.Mesh(simpleGeo, rightRoofMaterial);
           // Right Side: Slopes DOWN from left-to-right.
           // Rotation Z: -angle.
           rMesh.rotation.set(0, 0, -angle);
           rMesh.position.set(run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
+
+          // --- RIDGE CAP ---
+          if (design.ridgeOptions && design.ridgeOptions !== 'None') {
+            const ridgeCapLength = totalLen;
+            const ridgeCapWidth = 0.5; // Width of the cap on one side of the slope
+
+            // Material Selection
+            let ridgeMat;
+            if (design.ridgeOptions === 'Clear Polycarbonate Ridge Cap') {
+              // Transparent / White-ish polycarbonate
+              ridgeMat = new THREE.MeshStandardMaterial({
+                color: 0xffffff,
+                transparent: true,
+                opacity: 0.5, // Semi-transparent, visible but clear
+                roughness: 0.1, // Glossy
+                metalness: 0.1,
+                side: THREE.DoubleSide
+              });
+            } else if (design.ridgeOptions === 'Universal Ridge Cap') {
+              // Universal Ridge Cap - Matches ROOF color to blend in (as per user image)
+              ridgeMat = new THREE.MeshStandardMaterial({
+                color: roofColor3D,
+                roughness: 0.6,
+                side: THREE.DoubleSide
+              });
+            } else {
+              // Standard Metal Trim (Pro-Sky, etc.) - Uses contrasting TRIM color
+              ridgeMat = new THREE.MeshStandardMaterial({
+                color: trimColor3D,
+                roughness: 0.6,
+                side: THREE.DoubleSide
+              });
+            }
+
+            // Left piece:
+            const ridgeGeo = new THREE.PlaneGeometry(ridgeCapWidth, ridgeCapLength);
+            ridgeGeo.rotateX(-Math.PI / 2); // Bake the rotation so local Z matches Global Z axis for tilt
+
+            const lCap = new THREE.Mesh(ridgeGeo.clone(), ridgeMat);
+            lCap.rotation.z = angle; // Matches left slope logic (positive angle tiles up-right?)
+            // Wait, previous code was -angle for lCap?
+            // Roof logic:
+            // Left Mesh: rotation.z = angle. (Tiles Right-Up).
+            // Right Mesh: rotation.z = -angle. (Tiles Right-Down).
+            // Let's stick to Roof Logic.
+            lCap.rotation.z = angle;
+
+            // Anchor correction:
+            // Position: Center of left slope peak edge?
+            // Roof lMesh pos: -run/2
+            // We want ridge cap at 0 (Peak).
+            // Offset for width:
+            // lCap should be on the LEFT slope.
+            // Center of lCap is at x = -ridgeCapWidth/2 * cos(angle).
+            lCap.position.set(-ridgeCapWidth / 2 * Math.cos(angle), peakHeight + 0.08, 0);
+
+            // Right piece
+            const rCap = new THREE.Mesh(ridgeGeo.clone(), ridgeMat);
+            rCap.rotation.z = -angle; // Matches right slope logic
+            rCap.position.set(ridgeCapWidth / 2 * Math.cos(angle), peakHeight + 0.08, 0);
+
+            roofGroup.add(lCap);
+            roofGroup.add(rCap);
+
+            // --- END CAPS (Dynamic) ---
+            if (design.endCaps === 'Yes') {
+              // Create a closure shape for the end of the ridge
+              // The ridge is formed by 2 planes of width `ridgeCapWidth` tilted at `angle`
+              // We need a triangle that fills the gap under the ridge cap.
+              // Center Top is at peak.
+              // Vertices relative to center (0, peakHeight):
+              // 0, 0 (Top Peak)
+              // -width * cos(angle), -width * sin(angle) (Bottom Left)
+              // width * cos(angle), -width * sin(angle) (Bottom Right)
+
+              const shape = new THREE.Shape();
+              const w = ridgeCapWidth * Math.cos(angle);
+              const hDrop = ridgeCapWidth * Math.sin(angle);
+
+              shape.moveTo(0, 0); // Peak
+              shape.lineTo(-w, -hDrop); // Left
+              shape.lineTo(w, -hDrop); // Right
+              shape.lineTo(0, 0); // Close
+
+              const extrudeSettings = { depth: 0.02, bevelEnabled: false };
+              const capGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+
+              // Front Cap (+Z end)
+              const fCap = new THREE.Mesh(capGeo, ridgeMat);
+              fCap.position.set(0, peakHeight + 0.08, totalLen / 2);
+              // Extrude creates volume in +Z. We want it at the end.
+              roofGroup.add(fCap);
+
+              // Back Cap (-Z end)
+              const bCap = new THREE.Mesh(capGeo, ridgeMat);
+              // For back, we want to rotate or just place it?
+              // Shape is symmetric X.
+              // We want flat face out.
+              // Front Cap: Z=totalLen/2. Extrude is from 0 to +depth.
+              // So Front Cap is from totalLen/2 to totalLen/2 + 0.02. That's outside. Good.
+
+              // Back Cap: Z=-totalLen/2. We want it facing -Z?
+              // If we just place at -totalLen/2 - depth, and face it back?
+              // Extrude is +Z.
+              // Rotate Y 180 (Math.PI).
+              bCap.rotation.y = Math.PI;
+              bCap.position.set(0, peakHeight + 0.08, -totalLen / 2);
+              roofGroup.add(bCap);
+            }
+          }
+
+          roofGroup.add(lMesh);
           roofGroup.add(rMesh);
 
+          // --- SNOW GUARDS ---
+          if (design.snowGuards === 'Yes') {
+            const sgMat = new THREE.MeshStandardMaterial({ color: roofColor3D, roughness: 0.5, metalness: 0.5 });
+            const sgGeo = new THREE.BoxGeometry(0.1, 0.1, 0.2);
+            // Add rows every 2ft along length, 1ft up from eave of lMesh and rMesh
+            const numGuards = Math.floor(buildingLength / 2.0);
+
+            // X position on mesh: Eave is at -slopeLength/2. +1.0 moves up 1ft.
+            const xPos = -slopeLength / 2 + 1.0;
+
+            for (let i = 0; i < numGuards; i++) {
+              const zPos = -buildingLength / 2 + 1 + i * 2;
+
+              const sgL = new THREE.Mesh(sgGeo, sgMat);
+              sgL.position.set(xPos, 0.05, zPos);
+              lMesh.add(sgL);
+
+              const sgR = new THREE.Mesh(sgGeo, sgMat);
+              sgR.position.set(xPos, 0.05, zPos);
+              rMesh.add(sgR);
+            }
+          }
+
+          // --- SKYLIGHTS ---
+          if (skylightLen > 0) {
+            const skyMat = new THREE.MeshStandardMaterial({
+              color: 0x88ccff,
+              transparent: true,
+              opacity: 0.6,
+              roughness: 0.2,
+              side: THREE.DoubleSide
+            });
+            const width = 3.0; // Fixed 3ft width along building length
+            const skyPanel = new THREE.PlaneGeometry(skylightLen, width);
+            skyPanel.rotateX(-Math.PI / 2);
+
+            // Helper to place skylights on a specific side
+            const placeSkylights = (mesh: THREE.Mesh, qty: number) => {
+              for (let i = 0; i < qty; i++) {
+                let zPos = 0;
+                if (qty > 1) {
+                  const segment = 1.0 / qty;
+                  const vCenter = (i * segment) + (segment / 2);
+                  zPos = -totalLen / 2 + (vCenter * totalLen);
+                }
+                const skyMesh = new THREE.Mesh(skyPanel, skyMat);
+                skyMesh.position.set(0, 0.02, zPos);
+                mesh.add(skyMesh);
+              }
+            };
+
+            // Place on Left Side
+            if (leftSkyQty > 0) {
+              placeSkylights(lMesh, leftSkyQty);
+            }
+
+            // Place on Right Side
+            if (rightSkyQty > 0) {
+              placeSkylights(rMesh, rightSkyQty);
+            }
+          }
+
+          // --- CUPOLAS ---
+          if (design.cupolas && design.cupolas !== 'None') {
+            let size = 2.0;
+            if (design.cupolas === 'Medium') size = 3.0;
+            if (design.cupolas === 'Large') size = 4.0;
+
+            const cupolaBaseGeo = new THREE.BoxGeometry(size, size, size);
+            const cupolaMat = new THREE.MeshStandardMaterial({ color: trimColor3D }); // Match trim
+            const cupolaBase = new THREE.Mesh(cupolaBaseGeo, cupolaMat);
+            cupolaBase.position.set(0, peakHeight + size / 2, 0);
+            roofGroup.add(cupolaBase);
+
+            // Roof on cupola
+            const cupolaRoofGeo = new THREE.ConeGeometry(size * 0.8, size / 2, 4);
+            const cupolaRoofMat = new THREE.MeshStandardMaterial({ color: roofColor3D });
+            const cupolaRoof = new THREE.Mesh(cupolaRoofGeo, cupolaRoofMat);
+            cupolaRoof.position.set(0, peakHeight + size + size / 4, 0);
+            cupolaRoof.rotation.y = Math.PI / 4; // Align square
+            roofGroup.add(cupolaRoof);
+          }
+
+          // --- GUTTERS ---
+          if (design.gutters === 'Yes') {
+            const gutterColorHex = design.gutterColor
+              ? (trimColors.find(c => c.value === design.gutterColor)?.hex || '#FFFFFF')
+              : '#FFFFFF';
+            const gutterMat = new THREE.MeshStandardMaterial({ color: gutterColorHex });
+            const gutterGeo = new THREE.BoxGeometry(0.5, 0.5, totalLen);
+
+            const eaveX = run; // Center of rMesh projected? No.
+            // run = halfWidth + sidewallOverhang.
+            // Peak to Eave horizontal dist.
+            // Left Eave X = -run.
+            // Right Eave X = run.
+            // Eave Y = peakHeight - fullRise.
+
+            const eaveY = peakHeight - fullRise;
+
+            // Left Gutter
+            const lGutter = new THREE.Mesh(gutterGeo, gutterMat);
+            lGutter.position.set(-run - 0.25, eaveY, 0); // Outside edge
+            roofGroup.add(lGutter);
+
+            // Right Gutter
+            const rGutter = new THREE.Mesh(gutterGeo, gutterMat);
+            rGutter.position.set(run + 0.25, eaveY, 0);
+            roofGroup.add(rGutter);
+          }
 
           // --- SOFFITS ---
+
           // Determine Soffit Material
           const soffitMatBack = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, side: THREE.BackSide, roughness: 1.0 });
           // We use the same geometry and positions, just BackSide material.
@@ -2016,6 +2359,47 @@ export default function Building3D({ design }: Building3DProps) {
         rightEave.position.set(buildingWidth / 2 + trimThickness / 2, buildingHeight - 0.2, 0);
         scene.add(rightEave);
         trimMeshesRef.current.push(rightEave);
+
+        // --- EAVE LIGHTS ---
+        if (design.eaveLightA && design.eaveLightA !== 'None') {
+          // Sidewall A (Left)
+          let h = 2.0;
+          if (design.eaveLightA === '2ft') h = 2.0;
+          if (design.eaveLightA === '3ft') h = 3.0;
+          if (design.eaveLightA === '4ft') h = 4.0;
+
+          const elGeo = new THREE.PlaneGeometry(buildingLength, h);
+          const elMat = new THREE.MeshStandardMaterial({
+            color: 0xccffff,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+          });
+          const el = new THREE.Mesh(elGeo, elMat);
+          el.rotation.y = Math.PI / 2;
+          el.position.set(-buildingWidth / 2 - 0.05, buildingHeight - h / 2, 0);
+          scene.add(el);
+        }
+
+        if (design.eaveLightB && design.eaveLightB !== 'None') {
+          // Sidewall B (Right)
+          let h = 2.0;
+          if (design.eaveLightB === '2ft') h = 2.0;
+          if (design.eaveLightB === '3ft') h = 3.0;
+          if (design.eaveLightB === '4ft') h = 4.0;
+
+          const elGeo = new THREE.PlaneGeometry(buildingLength, h);
+          const elMat = new THREE.MeshStandardMaterial({
+            color: 0xccffff,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+          });
+          const el = new THREE.Mesh(elGeo, elMat);
+          el.rotation.y = Math.PI / 2;
+          el.position.set(buildingWidth / 2 + 0.05, buildingHeight - h / 2, 0);
+          scene.add(el);
+        }
 
         // 4. BASE TRIM (Wainscot top/bottom or just base) - Optional but good for detail
         // Front Base

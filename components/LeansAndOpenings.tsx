@@ -179,8 +179,8 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
     currentDesign.buildingUse === 'agricultural'
       ? 'Post Frame Design'
       : currentDesign.buildingUse === 'residential'
-      ? 'Residential Design'
-      : 'Building Design';
+        ? 'Residential Design'
+        : 'Building Design';
 
   // Get wall dimensions for viewport
   const getWallDimensions = () => {
@@ -228,11 +228,10 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                   onClick={() => {
                     setSelectedOpeningType(type.id);
                   }}
-                  className={`p-3 border-2 rounded-lg transition-all ${
-                    selectedOpeningType === type.id
-                      ? 'border-green-600 bg-green-50 ring-2 ring-green-300'
-                      : 'border-gray-300 bg-white hover:border-gray-400'
-                  }`}
+                  className={`p-3 border-2 rounded-lg transition-all ${selectedOpeningType === type.id
+                    ? 'border-green-600 bg-green-50 ring-2 ring-green-300'
+                    : 'border-gray-300 bg-white hover:border-gray-400'
+                    }`}
                 >
                   <div className="mb-2 flex items-center justify-center">
                     <img
@@ -289,21 +288,19 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
               <div className="flex space-x-2 border-b">
                 <button
                   onClick={() => setViewMode('top')}
-                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${
-                    viewMode === 'top'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${viewMode === 'top'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                   Top View
                 </button>
                 <button
                   onClick={() => setViewMode('3d')}
-                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${
-                    viewMode === '3d'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${viewMode === '3d'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
                 >
                   3D View
                 </button>
@@ -320,11 +317,10 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                       <button
                         key={wall.id}
                         onClick={() => setSelectedWall(wall.value)}
-                        className={`px-3 py-1 text-sm font-semibold rounded transition-colors ${
-                          selectedWall === wall.value
-                            ? 'bg-red-600 text-white border-b-2 border-red-800'
-                            : 'bg-white text-gray-700 hover:bg-gray-100'
-                        }`}
+                        className={`px-3 py-1 text-sm font-semibold rounded transition-colors ${selectedWall === wall.value
+                          ? 'bg-red-600 text-white border-b-2 border-red-800'
+                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                          }`}
                       >
                         {wall.label}
                       </button>
