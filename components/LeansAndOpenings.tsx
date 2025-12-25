@@ -594,13 +594,25 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                         const height = opening.height * 20;
                         const isSelected = selectedOpeningId === opening.id;
 
+                        // Fix Y position for DOORS to be at bottom:
+                        const isWindow = opening.type.includes('window') || opening.type.includes('framed');
+                        // If door, we want bottom to be at wall bottom.
+                        // Container is 20px per ft.
+                        // normal Top = y - height/2 (centered)
+                        // But for doors we just want bottom = 100%.
+                        // style top = wallDims.height*20 - height.
+
+                        const styleTop = isWindow
+                          ? `${y - height / 2}px`
+                          : `${(wallDims.height * 20) - height}px`;
+
                         return (
                           <div
                             key={opening.id}
                             className={`absolute cursor-pointer transition-all duration-75`}
                             style={{
                               left: `${x - width / 2}px`,
-                              top: `${y - height / 2}px`,
+                              top: styleTop,
                               width: `${width}px`,
                               height: `${height}px`,
                             }}
@@ -609,17 +621,67 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                               setSelectedOpeningId(of => (of === opening.id ? null : opening.id));
                             }}
                           >
-                            {/* Realistic Opening Look */}
-                            <div className={`w-full h-full bg-gray-700 border-[3px] box-border relative shadow-inner ${isSelected ? 'border-green-500 ring-2 ring-green-300' : 'border-gray-500 hover:border-gray-400'}`}>
-                              {/* Inner glass/fill */}
-                              <div className="absolute inset-1 bg-blue-900/20 backdrop-blur-sm"></div>
-                              {/* Frame lines (simple cross) */}
-                              {opening.type === 'window' && (
-                                <>
-                                  <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-600"></div>
-                                  <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-600"></div>
-                                </>
+                            {/* Realistic Opening Look based on Type */}
+                            <div className={`w-full h-full border-[2px] box-border relative shadow-inner overflow-hidden ${isSelected ? 'border-green-500 ring-2 ring-green-300' : 'border-gray-500 hover:border-gray-400'} ${opening.id.includes('framed-opening') ? 'bg-transparent' : 'bg-white'}`}>
+
+                              {/* Common Glass/Fill for Windows */}
+                              {opening.id.includes('window') && (
+                                <div className="absolute inset-0 bg-blue-200/50 backdrop-blur-sm">
+                                  {/* Window Mullions (Plus shape) */}
+                                  <div className="absolute top-1/2 left-0 right-0 h-[1px] bg-gray-600"></div>
+                                  <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-gray-600"></div>
+                                </div>
                               )}
+
+                              {/* Overhead Door - Horizontal Slats */}
+                              {opening.id.includes('overhead-door') && (
+                                <div className="absolute inset-0 bg-white flex flex-col justify-between py-[2px]">
+                                  {/* Create multiple slat lines */}
+                                  {[...Array(6)].map((_, i) => (
+                                    <div key={i} className="w-full h-[1px] bg-gray-300"></div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Sliding Door - Vertical Slats & Split */}
+                              {opening.id.includes('sliding-door') && (
+                                <div className="absolute inset-0 bg-white">
+                                  {/* Vertical Slats Pattern */}
+                                  <div className="absolute inset-0 opacity-20"
+                                    style={{ backgroundImage: 'repeating-linear-gradient(90deg, #000, #000 1px, transparent 1px, transparent 8px)' }}>
+                                  </div>
+                                  {/* Center Vertical Split */}
+                                  <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-500 -translate-x-1/2"></div>
+                                </div>
+                              )}
+
+                              {/* Framed Opening - just 'X' or Open */}
+                              {opening.id.includes('framed-opening') && (
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  {/* X mark to denote opening */}
+                                  <svg viewBox="0 0 100 100" className="w-full h-full text-gray-400 opacity-50 p-1">
+                                    <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="2" />
+                                    <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="2" />
+                                  </svg>
+                                </div>
+                              )}
+
+                              {/* Man/Walk Doors (Service, Dutch, etc) */}
+                              {(opening.id.includes('service-door') || opening.id.includes('dutch') || opening.id.includes('double')) && (
+                                <div className="absolute inset-0 bg-white">
+                                  {/* Door Handle */}
+                                  <div className={`absolute top-1/2 right-[10%] w-[15%] h-[15%] rounded-full bg-gray-400 ${opening.id.includes('double') ? 'hidden' : ''}`}></div>
+                                  {/* Double Door Split */}
+                                  {opening.id.includes('double') && (
+                                    <div className="absolute left-1/2 top-0 bottom-0 w-[1px] bg-gray-800"></div>
+                                  )}
+                                  {/* Dutch Window split (top half glass) */}
+                                  {opening.id.includes('dutch') && (
+                                    <div className="absolute top-0 w-full h-1/2 bg-blue-100/30 border-b border-gray-400"></div>
+                                  )}
+                                </div>
+                              )}
+
                             </div>
 
                             {/* Selection indicator / Label */}

@@ -847,7 +847,7 @@ export default function Building3D({ design }: Building3DProps) {
 
         // --- OPENING FRAMES & DOORS ---
         if (design.openings) {
-          const createFrame = (w: number, h: number, type: string) => {
+          const createFrame = (w: number, h: number, openingData: any) => {
             const frameGroup = new THREE.Group();
             const frameW = 0.5; // Width of the frame board (visible face width)
             const frameD = 0.1; // Thickness sticking out
@@ -856,16 +856,28 @@ export default function Building3D({ design }: Building3DProps) {
               color: trimColor3D,
               roughness: 0.5
             });
+            const whiteMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 });
+            const glassMat = new THREE.MeshStandardMaterial({
+              color: 0x88ccff, transparent: true, opacity: 0.3, roughness: 0.1, metalness: 0.9, side: THREE.DoubleSide
+            });
+            const stripeMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.8 });
 
-            // Top
+            const openingId = openingData.id || '';
+            const isSliding = openingId.includes('sliding-door');
+
+            // Top (Skip for Sliding Doors to create gap for rail)
             const topGeo = new THREE.BoxGeometry(w + frameW * 2, frameW, frameD);
-            const top = new THREE.Mesh(topGeo, frameMat);
-            top.position.set(0, h / 2 + frameW / 2, frameD / 2);
-            frameGroup.add(top);
+            if (!isSliding) {
+              const top = new THREE.Mesh(topGeo, frameMat);
+              top.position.set(0, h / 2 + frameW / 2, frameD / 2);
+              frameGroup.add(top);
+            }
 
             // Bottom (only for windows usually, but let's add for all framed for now, or skip for doors?)
             // Doors usually don't have bottom frame sticking up.
-            const isWindow = type === 'window';
+            const isWindow = openingId.includes('window');
+
+            // Bottom (for windows)
             if (isWindow) {
               const bot = new THREE.Mesh(topGeo, frameMat);
               bot.position.set(0, -h / 2 - frameW / 2, frameD / 2);
@@ -887,29 +899,89 @@ export default function Building3D({ design }: Building3DProps) {
             right.position.set(w / 2 + frameW / 2, 0, frameD / 2);
             frameGroup.add(right);
 
-            // Door/Window Panel
-            if (type !== 'framed-opening') {
-              if (type === 'window') {
+            // --- INFILL / PANEL ---
+            const typeId = openingData.id;
+
+            if (!openingId.includes('framed-opening')) {
+
+              if (isWindow) {
+                // Glass
                 const glassGeo = new THREE.PlaneGeometry(w, h);
-                const glassMat = new THREE.MeshStandardMaterial({
-                  color: 0x88ccff,
-                  transparent: true,
-                  opacity: 0.3,
-                  roughness: 0.1,
-                  metalness: 0.9,
-                  side: THREE.DoubleSide
-                });
                 const glass = new THREE.Mesh(glassGeo, glassMat);
                 frameGroup.add(glass);
+
+                // Mullions (Cross)
+                const mullionW = 0.1;
+                const vMullion = new THREE.Mesh(new THREE.BoxGeometry(mullionW, h, 0.05), frameMat);
+                frameGroup.add(vMullion);
+                const hMullion = new THREE.Mesh(new THREE.BoxGeometry(w, mullionW, 0.05), frameMat);
+                frameGroup.add(hMullion);
+
+              } else if (typeId.includes('overhead-door')) {
+                // Overhead Door with Slats
+                const panelCount = 6;
+                const panelH = h / panelCount;
+                const doorBevel = 0.02; // gap between slats
+
+                for (let i = 0; i < panelCount; i++) {
+                  const slatH = panelH - doorBevel;
+                  const slat = new THREE.Mesh(new THREE.BoxGeometry(w, slatH, 0.05), whiteMat);
+                  // Center is 0. Top is h/2. Bottom is -h/2.
+                  const yPos = (h / 2) - (panelH * i) - (panelH / 2);
+                  slat.position.set(0, yPos, 0);
+                  frameGroup.add(slat);
+                }
+
+              } else if (typeId.includes('sliding-door')) {
+                // Sliding Door - Solid Panels + Pinstripes
+
+                // 1. Solid Backing Panels (Left and Right)
+                const panelW = (w / 2) - 0.01; // Slight gap at center
+                const panelGeo = new THREE.BoxGeometry(panelW, h, 0.04);
+
+                const leftPanel = new THREE.Mesh(panelGeo, whiteMat);
+                leftPanel.position.set(-w / 4, 0, 0);
+                frameGroup.add(leftPanel);
+
+                const rightPanel = new THREE.Mesh(panelGeo, whiteMat);
+                rightPanel.position.set(w / 4, 0, 0);
+                frameGroup.add(rightPanel);
+
+                // 2. Vertical Pinstripes (Overlay)
+                const stripeCount = Math.floor(w * 2); // 2 stripes per unit (approx every 6 inches)
+                const step = w / stripeCount;
+
+                for (let i = 0; i <= stripeCount; i++) {
+                  // Avoid edges and center
+                  const xPos = (-w / 2) + (i * step);
+                  if (Math.abs(xPos) < 0.1 || Math.abs(xPos - w / 2) < 0.1 || Math.abs(xPos + w / 2) < 0.1) continue;
+
+                  const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.03, h, 0.05), stripeMat);
+                  stripe.position.set(xPos, 0, 0.005); // Protrude slightly
+                  frameGroup.add(stripe);
+                }
+
+                // 3. Center Split (Thick)
+                const split = new THREE.Mesh(new THREE.BoxGeometry(0.08, h, 0.06), frameMat);
+                split.position.set(0, 0, 0.02);
+                frameGroup.add(split);
+
+                // 4. Top Rail
+                const railGeo = new THREE.BoxGeometry(w + 1, 0.3, 0.15);
+                const rail = new THREE.Mesh(railGeo, frameMat);
+                rail.position.set(0, h / 2 + 0.3, 0.1);
+                frameGroup.add(rail);
+
               } else {
-                // Door Panel
+                // Standard Door (Man Door)
                 const doorGeo = new THREE.BoxGeometry(w, h, 0.05);
-                const doorMat = new THREE.MeshStandardMaterial({
-                  color: 0xffffff, // White door default
-                  roughness: 0.4
-                });
-                const door = new THREE.Mesh(doorGeo, doorMat);
+                const door = new THREE.Mesh(doorGeo, whiteMat);
                 frameGroup.add(door);
+
+                // Knob
+                const knob = new THREE.Mesh(new THREE.SphereGeometry(0.15), new THREE.MeshStandardMaterial({ color: 0x333333 }));
+                knob.position.set(w / 2 - 0.5, 0, 0.05);
+                frameGroup.add(knob);
               }
             }
 
@@ -939,11 +1011,27 @@ export default function Building3D({ design }: Building3DProps) {
             else if (opening.wall === 'left') { wallW = outerWallWidth; wallH = buildingHeight; }
             else if (opening.wall === 'right') { wallW = outerWallWidth; wallH = buildingHeight; }
 
-            const frame = createFrame(opening.width, opening.height, opening.type);
+            const frame = createFrame(opening.width, opening.height, opening);
 
             // Calculate Position
             const centerX = (opening.x / 100) * wallW - (wallW / 2);
-            const centerY = wallH - (opening.y / 100) * wallH; // Y=0 is bottom
+
+            // Y Position:
+            // For Windows: User defined Y (percentage from top usually, or bottom? need to check)
+            // For Doors: ALWAYS on ground. Ground is Y=0. Center is height/2.
+            let centerY = 0;
+            const isWindow = opening.type.includes('window');
+            if (isWindow || opening.type.includes('framed')) {
+              // Framed opening could be a window or door.. assume user places it.
+              // Existing logic: y is % from top? or bottom?
+              // If logic was: centerY = wallH - (opening.y/100)*wallH
+              // Let's stick to existing for windows.
+              centerY = wallH - (opening.y / 100) * wallH;
+            } else {
+              // Doors: overhead, sliding, service, etc.
+              // Force to ground.
+              centerY = opening.height / 2;
+            }
 
             frame.position.set(centerX, centerY, 0);
 
