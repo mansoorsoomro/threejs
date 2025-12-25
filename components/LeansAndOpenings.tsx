@@ -89,12 +89,13 @@ const openingTypes = [
 
 const walls = [
   { id: 'sidewallA', label: 'Sidewall A', value: 'front' as const },
+  { id: 'sidewallB', label: 'Sidewall B', value: 'back' as const },
   { id: 'endwallC', label: 'Endwall C', value: 'left' as const },
   { id: 'endwallD', label: 'Endwall D', value: 'right' as const },
-  { id: 'sidewallB', label: 'Sidewall B', value: 'back' as const },
 ];
 
 export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndOpeningsProps) {
+  const [selectedOpeningId, setSelectedOpeningId] = useState<string | null>(null);
   const [selectedOpeningType, setSelectedOpeningType] = useState<string | null>(null);
   const [selectedWall, setSelectedWall] = useState<'front' | 'back' | 'left' | 'right'>('back');
   const [viewMode, setViewMode] = useState<'top' | '3d'>('top');
@@ -105,12 +106,42 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
 
   const currentDesign = design;
 
-  const handleAddOpening = (openingType: typeof openingTypes[0]) => {
+  // Get wall dimensions for viewport
+  const getWallDimensions = (wall: string) => {
+    const height = parseFloat(currentDesign.clearHeight) || 12;
+    if (wall === 'front' || wall === 'back') {
+      // Sidewalls (A/B) typically correspond to the building Length
+      return { width: design.length, height };
+    } else {
+      // Endwalls (C/D) typically correspond to the building Width
+      return { width: design.width, height };
+    }
+  };
+
+  // Helper to add opening immediately
+  const handleImmediateAddOpening = (openingType: typeof openingTypes[0]) => {
+    const newId = `${openingType.id}-${Date.now()}`;
+    const wallDims = getWallDimensions(selectedWall);
+
+    // Calculate defaults
+    let defaultY = 50; // Center default (for windows)
+
+    // If it's a door, place it at the bottom (floor level)
+    if (openingType.type === 'door') {
+      // y is center position in %. 
+      // We want bottom of opening to be at 100% of wall.
+      // Bottom = y + (height/2 converted to %)
+      // 100 = y + (openingHeight/2 / wallHeight * 100)
+      // y = 100 - (openingHeight/2 / wallHeight * 100)
+      const halfHeightPercent = (openingType.defaultHeight / 2 / wallDims.height) * 100;
+      defaultY = 100 - halfHeightPercent;
+    }
+
     const newOpening: Opening = {
-      id: `${openingType.id}-${Date.now()}`,
+      id: newId,
       type: openingType.type,
-      x: 50, // Default center position
-      y: 50,
+      x: 50, // Center X
+      y: Math.max(0, Math.min(100, defaultY)),
       width: openingType.defaultWidth,
       height: openingType.defaultHeight,
       name: openingType.name,
@@ -119,21 +150,92 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
     };
     const currentOpenings = design.openings || [];
     onSubmit({ ...design, openings: [...currentOpenings, newOpening] });
+    setSelectedOpeningId(newId);
+    setSelectedOpeningType(openingType.id);
+    setViewMode('top'); // Auto-switch to 2D view logic
+  };
+
+  const handleUpdateOpening = (id: string, updates: Partial<Opening>) => {
+    const currentOpenings = design.openings || [];
+    const openingIndex = currentOpenings.findIndex(o => o.id === id);
+    if (openingIndex === -1) return;
+
+    const oldOpening = currentOpenings[openingIndex];
+    // Merge updates to check potentially new dimensions
+    const newOpening = { ...oldOpening, ...updates };
+
+    // Get wall dimensions for this opening's wall
+    const wallDims = getWallDimensions(newOpening.wall);
+
+    // 1. Clamp dimensions to wall size
+    const constrainedWidth = Math.min(newOpening.width, wallDims.width);
+    const constrainedHeight = Math.min(newOpening.height, wallDims.height);
+
+    // 2. Calculate constraints (percentage based)
+    // X axis (Center position)
+    const halfWidthPercent = (constrainedWidth / 2 / wallDims.width) * 100;
+    const minX = halfWidthPercent;
+    const maxX = 100 - halfWidthPercent;
+
+    // Y axis (Center position, 0 is top)
+    const halfHeightPercent = (constrainedHeight / 2 / wallDims.height) * 100;
+    const minY = halfHeightPercent;
+    const maxY = 100 - halfHeightPercent;
+
+    // 3. Apply constraints if x or y or dimensions are changing
+    // We re-calculate and clamp based on the "intended" new values
+    let constrainedX = newOpening.x;
+    let constrainedY = newOpening.y;
+
+    // Check if X is likely changing or if dimensions changed which necessitates a check
+    // We just clamp regardless to be safe
+    // If minX > maxX (shouldn't happen due to width clamp), handle gracefully
+    if (minX > maxX) {
+      constrainedX = 50;
+    } else {
+      constrainedX = Math.max(minX, Math.min(maxX, constrainedX));
+    }
+
+    if (minY > maxY) {
+      constrainedY = 50;
+    } else {
+      constrainedY = Math.max(minY, Math.min(maxY, constrainedY));
+    }
+
+    // Prepare final object
+    const finalOpening = {
+      ...newOpening,
+      width: constrainedWidth,
+      height: constrainedHeight,
+      x: constrainedX,
+      y: constrainedY
+    };
+
+    const newOpenings = [...currentOpenings];
+    newOpenings[openingIndex] = finalOpening;
+
+    onSubmit({
+      ...design,
+      openings: newOpenings,
+    });
   };
 
   const handleRemoveOpening = (id: string) => {
     const currentOpenings = design.openings || [];
     onSubmit({ ...design, openings: currentOpenings.filter(o => o.id !== id) });
+    if (selectedOpeningId === id) setSelectedOpeningId(null);
   };
 
-  const handlePositionChange = (id: string, x: number, y: number) => {
+  const handleCopyOpening = (opening: Opening) => {
+    const newId = `${opening.type}-${Date.now()}`;
+    const newOpening = { ...opening, id: newId, x: opening.x + 5, y: opening.y + 5 }; // Offset slightly
     const currentOpenings = design.openings || [];
-    onSubmit({
-      ...design,
-      openings: currentOpenings.map(o =>
-        o.id === id ? { ...o, x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) } : o
-      ),
-    });
+    onSubmit({ ...design, openings: [...currentOpenings, newOpening] });
+    setSelectedOpeningId(newId);
+  };
+
+  const handleCenterOpening = (id: string) => {
+    handleUpdateOpening(id, { x: 50 });
   };
 
   const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 0.2, 3));
@@ -182,17 +284,11 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
         ? 'Residential Design'
         : 'Building Design';
 
-  // Get wall dimensions for viewport
-  const getWallDimensions = () => {
-    if (selectedWall === 'front' || selectedWall === 'back') {
-      return { width: design.width, height: design.length };
-    } else {
-      return { width: design.length, height: design.width };
-    }
-  };
-
-  const wallDims = getWallDimensions();
+  const wallDims = getWallDimensions(selectedWall);
   const wallOpenings = (design.openings || []).filter(o => o.wall === selectedWall);
+
+  // Find currently selected opening object
+  const selectedOpening = (design.openings || []).find(o => o.id === selectedOpeningId);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -215,8 +311,8 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                 <p className="font-semibold mb-2">How to add openings:</p>
                 <ol className="list-decimal list-inside space-y-1">
                   <li>Select a wall using the tabs above the viewport</li>
-                  <li>Click on an opening type below</li>
-                  <li>Click on the wall in the viewport to place it</li>
+                  <li>Click on an opening type below to add it to the center of the wall</li>
+                  <li>Use the controls to position and resize the selected opening</li>
                 </ol>
               </div>
             )}
@@ -225,9 +321,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
               {openingTypes.map(type => (
                 <button
                   key={type.id}
-                  onClick={() => {
-                    setSelectedOpeningType(type.id);
-                  }}
+                  onClick={() => handleImmediateAddOpening(type)}
                   className={`p-3 border-2 rounded-lg transition-all ${selectedOpeningType === type.id
                     ? 'border-green-600 bg-green-50 ring-2 ring-green-300'
                     : 'border-gray-300 bg-white hover:border-gray-400'
@@ -241,9 +335,6 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                     />
                   </div>
                   <div className="text-xs font-semibold text-gray-900 text-center leading-tight">{type.name}</div>
-                  {selectedOpeningType === type.id && (
-                    <div className="text-xs text-green-600 font-semibold mt-1 text-center">Click on wall to place</div>
-                  )}
                 </button>
               ))}
             </div>
@@ -283,41 +374,134 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
               </div>
             )}
 
-            {/* View Tabs */}
-            <div className="mb-4">
-              <div className="flex space-x-2 border-b">
-                <button
-                  onClick={() => setViewMode('top')}
-                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${viewMode === 'top'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                >
-                  Top View
-                </button>
-                <button
-                  onClick={() => setViewMode('3d')}
-                  className={`px-4 py-2 font-semibold rounded-t transition-colors ${viewMode === '3d'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                >
-                  3D View
-                </button>
+            {/* Edit Panel - Only visible when an opening is selected */}
+            {selectedOpening && (
+              <div className="mb-4 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
+                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
+                  <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                    <span>✏️</span> Edit Selected {selectedOpening.name}
+                  </h3>
+                  <button
+                    onClick={() => setSelectedOpeningId(null)}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+
+                  {/* Dimensions */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Dimensions (W x H)</label>
+                    <select
+                      value={`${selectedOpening.width}x${selectedOpening.height}`}
+                      onChange={(e) => {
+                        const [w, h] = e.target.value.split('x').map(Number);
+                        handleUpdateOpening(selectedOpening.id, { width: w, height: h });
+                      }}
+                      className="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 py-2"
+                    >
+                      <option value={`${selectedOpening.width}x${selectedOpening.height}`}>{selectedOpening.width}&apos; x {selectedOpening.height}&apos;</option>
+                      <option value="3x3">3&apos; x 3&apos;</option>
+                      <option value="4x4">4&apos; x 4&apos;</option>
+                      <option value="6x7">6&apos; x 7&apos;</option>
+                      <option value="8x7">8&apos; x 7&apos;</option>
+                      <option value="9x7">9&apos; x 7&apos;</option>
+                      <option value="10x8">10&apos; x 8&apos;</option>
+                      <option value="10x10">10&apos; x 10&apos;</option>
+                      <option value="12x12">12&apos; x 12&apos;</option>
+                      <option value="16x14">16&apos; x 14&apos;</option>
+                    </select>
+                  </div>
+
+                  {/* Position */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Position From Left</label>
+                    <div className="flex items-center gap-2">
+                      <div className="relative flex-1">
+                        <input
+                          type="number"
+                          value={Math.round((selectedOpening.x / 100) * wallDims.width)}
+                          onChange={(e) => {
+                            const feet = parseInt(e.target.value) || 0;
+                            const newX = (feet / wallDims.width) * 100;
+                            handleUpdateOpening(selectedOpening.id, { x: Math.max(0, Math.min(100, newX)) });
+                          }}
+                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 py-2 pl-3 pr-8"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">ft</span>
+                      </div>
+                      <div className="relative w-24">
+                        <input
+                          type="number"
+                          value={0}
+                          disabled
+                          className="w-full bg-gray-100 border-gray-300 rounded-md py-2 px-2 text-gray-500 pr-8"
+                        />
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">in</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="md:col-span-2 flex gap-2 mt-2">
+                    <button
+                      onClick={() => handleCopyOpening(selectedOpening)}
+                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors"
+                    >
+                      Copy
+                    </button>
+                    <button
+                      onClick={() => handleCenterOpening(selectedOpening.id)}
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors"
+                    >
+                      Center
+                    </button>
+                    <button
+                      onClick={() => handleRemoveOpening(selectedOpening.id)}
+                      className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
               </div>
+            )}
+
+            {/* View Mode Tabs (2D vs 3D) */}
+            <div className="mb-0 flex gap-1 z-10 w-fit rounded-t-lg overflow-hidden border-t border-l border-r border-gray-300 bg-gray-100 border-b-0">
+              <button
+                onClick={() => setViewMode('top')}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${viewMode === 'top'
+                  ? 'bg-white text-gray-900 border-b-2 border-green-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-b border-gray-300'}`}
+              >
+                2D Sidewall View
+              </button>
+              <button
+                onClick={() => setViewMode('3d')}
+                className={`px-4 py-2 text-sm font-semibold transition-colors ${viewMode === '3d'
+                  ? 'bg-white text-gray-900 border-b-2 border-green-600'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-b border-gray-300'}`}
+              >
+                3D Preview
+              </button>
             </div>
 
-            {/* Main Viewport */}
-            <div className="flex-1 border-2 border-gray-300 rounded-lg relative overflow-hidden bg-gray-100">
-              {viewMode === 'top' ? (
-                <div className="relative w-full h-full" style={{ minHeight: '400px' }}>
+            {/* Combined Viewport Area */}
+            <div className="flex-1 flex flex-col gap-4 border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-0 bg-white overflow-hidden mt-[-1px]">
+
+              {/* 2D View (Elevation) */}
+              {viewMode === 'top' && (
+                <div className="relative w-full h-[500px] bg-gray-100 group animate-in fade-in">
+
                   {/* Sidewall Navigation */}
                   <div className="absolute top-4 right-4 flex gap-2 z-10">
                     {walls.map(wall => (
                       <button
                         key={wall.id}
                         onClick={() => setSelectedWall(wall.value)}
-                        className={`px-3 py-1 text-sm font-semibold rounded transition-colors ${selectedWall === wall.value
+                        className={`px-3 py-1 text-sm font-semibold rounded transition-colors shadow-sm ${selectedWall === wall.value
                           ? 'bg-red-600 text-white border-b-2 border-red-800'
                           : 'bg-white text-gray-700 hover:bg-gray-100'
                           }`}
@@ -329,44 +513,78 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
 
                   {/* Wall Viewport */}
                   <div
-                    className="absolute inset-0 flex items-center justify-center cursor-crosshair"
+                    className="absolute inset-0 flex items-center justify-center cursor-crosshair overflow-hidden"
                     style={{
                       transform: `scale(${zoomLevel}) translate(${panX}px, ${panY}px)`,
                       transformOrigin: 'center center',
                     }}
-                    onClick={(e) => {
-                      if (selectedOpeningType) {
-                        const rect = e.currentTarget.getBoundingClientRect();
-                        const x = ((e.clientX - rect.left - panX) / zoomLevel - (wallDims.width * 20) / 2) / (wallDims.width * 20) * 100 + 50;
-                        const y = ((e.clientY - rect.top - panY) / zoomLevel - (wallDims.height * 20) / 2) / (wallDims.height * 20) * 100 + 50;
-                        const openingType = openingTypes.find(t => t.id === selectedOpeningType);
-                        if (openingType) {
-                          const newOpening: Opening = {
-                            id: `${openingType.id}-${Date.now()}`,
-                            type: openingType.type,
-                            x: Math.max(0, Math.min(100, x)),
-                            y: Math.max(0, Math.min(100, y)),
-                            width: openingType.defaultWidth,
-                            height: openingType.defaultHeight,
-                            name: openingType.name,
-                            price: openingType.price,
-                            wall: selectedWall,
-                          };
-                          const currentOpenings = design.openings || [];
-                          onSubmit({ ...design, openings: [...currentOpenings, newOpening] });
-                          setSelectedOpeningType(null);
-                        }
+                    onMouseDown={(e) => {
+                      if (e.target === e.currentTarget) {
+                        // Background click logic if needed
                       }
                     }}
                   >
-                    <div className="relative" style={{ width: `${wallDims.width * 20}px`, height: `${wallDims.height * 20}px` }}>
-                      {/* Wall representation */}
-                      <div className="absolute inset-0 bg-gradient-to-b from-gray-600 to-gray-400 rounded border-2 border-gray-800">
-                        {/* Top section (darker) */}
-                        <div className="absolute top-0 left-0 right-0 h-1/3 bg-gray-700 rounded-t"></div>
-                        {/* Bottom section (lighter) */}
-                        <div className="absolute bottom-0 left-0 right-0 h-2/3 bg-gray-400 rounded-b"></div>
-                      </div>
+                    <div className="relative shadow-2xl" style={{ width: `${wallDims.width * 20}px`, height: `${wallDims.height * 20}px` }}>
+                      {/* Wall representation - Conditional Styles */}
+                      {/* Sidewall (A/B) - Two Tone */}
+                      {(selectedWall === 'front' || selectedWall === 'back') && (
+                        <div className="absolute inset-0 border-2 border-black box-border z-0"
+                          style={{
+                            background: 'linear-gradient(to bottom, #595959 30%, #e5e7eb 30%)'
+                          }}
+                        >
+                          {/* Siding Texture Hint */}
+                          <div className="absolute inset-0 opacity-10"
+                            style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 19px, #000 20px)' }}
+                          ></div>
+                          <div className="absolute bottom-0 left-0 right-0 h-[5px] bg-gray-400 opacity-50"></div>
+                        </div>
+                      )}
+
+                      {/* Endwall (C/D) - Gabled */}
+                      {(selectedWall === 'left' || selectedWall === 'right') && (() => {
+                        // Calculate Gable Height
+                        const pitchParts = (currentDesign.roofPitch || '4/12').split('/');
+                        const rise = parseFloat(pitchParts[0]) || 4;
+                        const run = parseFloat(pitchParts[1]) || 12;
+                        const roofRatio = rise / run;
+                        const extraHeightFt = (wallDims.width / 2) * roofRatio;
+                        const extraHeightPx = extraHeightFt * 20;
+
+                        return (
+                          <>
+                            {/* Gable Triangle on Top */}
+                            <div
+                              className="absolute left-0 right-0 z-0"
+                              style={{
+                                bottom: '100%',
+                                height: `${extraHeightPx}px`,
+                                // Create triangle using clip-path or transparent borders
+                                // Clip path is easier for texturing
+                                width: '100%',
+                                backgroundColor: '#e5e7eb',
+                                clipPath: 'polygon(0% 100%, 50% 0%, 100% 100%)',
+                                borderBottom: '2px solid #000'
+                              }}
+                            >
+                              <div className="absolute inset-0 opacity-10"
+                                style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 19px, #000 20px)' }}
+                              ></div>
+                              {/* Roof Border (manual svg line maybe?) - Clip path clips border too. */}
+                              {/* Let's just use the shape for fill and add a border container if needed? */}
+                              {/* For simple 2D view, just the shape is fine. */}
+                            </div>
+
+                            {/* Main Wall Body */}
+                            <div className="absolute inset-0 bg-gray-200 border-2 border-black border-t-0 box-border z-0" style={{ backgroundColor: '#e5e7eb' }}>
+                              <div className="absolute inset-0 opacity-10"
+                                style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 19px, #000 20px)' }}
+                              ></div>
+                            </div>
+                          </>
+                        );
+                      })()}
+
 
                       {/* Openings on this wall */}
                       {wallOpenings.map(opening => {
@@ -374,31 +592,54 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                         const y = (opening.y / 100) * wallDims.height * 20;
                         const width = opening.width * 20;
                         const height = opening.height * 20;
+                        const isSelected = selectedOpeningId === opening.id;
 
                         return (
                           <div
                             key={opening.id}
-                            className="absolute border-2 border-blue-600 bg-blue-200 bg-opacity-50 rounded cursor-move"
+                            className={`absolute cursor-pointer transition-all duration-75`}
                             style={{
                               left: `${x - width / 2}px`,
                               top: `${y - height / 2}px`,
                               width: `${width}px`,
                               height: `${height}px`,
                             }}
-                            title={opening.name}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedOpeningId(of => (of === opening.id ? null : opening.id));
+                            }}
                           >
-                            <div className="absolute inset-0 flex items-center justify-center text-xs font-bold text-blue-900">
-                              {opening.name.split(' ')[0]}
+                            {/* Realistic Opening Look */}
+                            <div className={`w-full h-full bg-gray-700 border-[3px] box-border relative shadow-inner ${isSelected ? 'border-green-500 ring-2 ring-green-300' : 'border-gray-500 hover:border-gray-400'}`}>
+                              {/* Inner glass/fill */}
+                              <div className="absolute inset-1 bg-blue-900/20 backdrop-blur-sm"></div>
+                              {/* Frame lines (simple cross) */}
+                              {opening.type === 'window' && (
+                                <>
+                                  <div className="absolute top-1/2 left-0 right-0 h-[2px] bg-gray-600"></div>
+                                  <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-600"></div>
+                                </>
+                              )}
                             </div>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRemoveOpening(opening.id);
-                              }}
-                              className="absolute -top-2 -right-2 w-5 h-5 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700"
-                            >
-                              ×
-                            </button>
+
+                            {/* Selection indicator / Label */}
+                            <div className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold px-1 rounded ${isSelected ? 'bg-green-600 text-white' : 'bg-white/80 text-gray-900 border border-gray-300'}`}>
+                              {opening.name}
+                            </div>
+
+                            {/* Quick Remove (only if selected) */}
+                            {isSelected && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveOpening(opening.id);
+                                }}
+                                className="absolute -top-3 -right-3 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-700 shadow-md z-50"
+                                title="Remove"
+                              >
+                                ✕
+                              </button>
+                            )}
                           </div>
                         );
                       })}
@@ -406,35 +647,39 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                   </div>
 
                   {/* Dimension label */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-3 py-1 rounded border border-gray-300 text-sm font-semibold">
-                    {wallDims.width}&apos; 0&quot;
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur px-3 py-1 rounded shadow-sm border border-gray-300 text-sm font-semibold z-10">
+                    {wallDims.width}&apos; Width x {wallDims.height}&apos; Height
                   </div>
 
                   {/* Viewport Controls */}
-                  <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-10">
-                    <button
-                      onClick={() => setShowInfo(!showInfo)}
-                      className="px-3 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded flex items-center gap-1"
-                    >
-                      <span>ℹ️</span> Information
-                    </button>
+                  <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-10 transition-opacity hover:opacity-100 opacity-80">
                     <button
                       onClick={handleZoomIn}
                       className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
+                      title="Zoom In"
                     >
-                      <span>🔍+</span> Zoom In
+                      <span>➕</span>
                     </button>
                     <button
                       onClick={handleZoomOut}
                       className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
+                      title="Zoom Out"
                     >
-                      <span>🔍-</span> Zoom Out
+                      <span>➖</span>
                     </button>
                     <button
                       onClick={handleResetView}
                       className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
+                      title="Reset View"
                     >
-                      <span>↻</span> Reset View
+                      <span>↺</span>
+                    </button>
+                    <div className="w-[1px] h-full bg-gray-300 mx-1"></div>
+                    <button
+                      onClick={() => setShowInfo(!showInfo)}
+                      className="px-3 py-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 rounded flex items-center gap-1"
+                    >
+                      <span>ℹ️</span> Info
                     </button>
                   </div>
 
@@ -445,9 +690,9 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                       const prevIndex = (currentIndex - 1 + walls.length) % walls.length;
                       setSelectedWall(walls[prevIndex].value);
                     }}
-                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg hover:bg-white z-10 transition-all hover:scale-110"
                   >
-                    <span className="text-2xl">‹</span>
+                    <span className="text-2xl font-bold text-gray-700">‹</span>
                   </button>
                   <button
                     onClick={() => {
@@ -455,14 +700,23 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                       const nextIndex = (currentIndex + 1) % walls.length;
                       setSelectedWall(walls[nextIndex].value);
                     }}
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 z-10"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg hover:bg-white z-10 transition-all hover:scale-110"
                   >
-                    <span className="text-2xl">›</span>
+                    <span className="text-2xl font-bold text-gray-700">›</span>
                   </button>
                 </div>
-              ) : (
-                <div className="w-full h-full" style={{ minHeight: '400px' }}>
-                  <Building3D design={currentDesign} />
+              )}
+
+              {/* 3D View */}
+              {viewMode === '3d' && (
+                <div className="relative w-full h-[500px] bg-gray-900 group animate-in fade-in">
+                  <div className="w-full h-full">
+                    <Building3D design={currentDesign} />
+                  </div>
+                  {/* Overlay info/controls for 3d could go here */}
+                  <div className="absolute bottom-4 right-4 bg-white/10 backdrop-blur px-3 py-1 rounded text-white text-xs">
+                    Interact to Rotate / Scroll to Zoom
+                  </div>
                 </div>
               )}
             </div>
@@ -477,7 +731,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
                       onNext();
                     }
                   }}
-                  className="px-6 py-2 rounded-md font-semibold text-white transition-colors bg-green-600 hover:bg-green-700"
+                  className="px-6 py-2 rounded-md font-semibold text-white transition-colors bg-green-600 hover:bg-green-700 shadow-md"
                 >
                   Next: Summary
                 </button>

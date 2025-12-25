@@ -553,6 +553,62 @@ export default function Building3D({ design }: Building3DProps) {
           metalness: 0.1
         });
 
+        // Helper to create wall with openings
+        const createWallWithOpenings = (width: number, height: number, wallType: 'front' | 'back' | 'left' | 'right') => {
+          const shape = new THREE.Shape();
+          shape.moveTo(-width / 2, 0);
+          shape.lineTo(width / 2, 0);
+          shape.lineTo(width / 2, height);
+          shape.lineTo(-width / 2, height);
+          shape.lineTo(-width / 2, 0);
+
+          const wallOpenings = (design.openings || []).filter(o => o.wall === wallType);
+
+          wallOpenings.forEach(opening => {
+            const holePath = new THREE.Path();
+
+            // Convert percentage positions to local coordinates
+            const centerX = (opening.x / 100) * width - (width / 2);
+            // In 2D view Y=100 is bottom, Y=0 is top. In 3D we want Y=0 at bottom.
+            const centerY = height - (opening.y / 100) * height;
+
+            const halfW = opening.width / 2;
+            const halfH = opening.height / 2;
+
+            const minX = centerX - halfW;
+            const maxX = centerX + halfW;
+            const minY = centerY - halfH;
+            const maxY = centerY + halfH;
+
+            // Create hole
+            holePath.moveTo(minX, minY);
+            holePath.lineTo(maxX, minY);
+            holePath.lineTo(maxX, maxY);
+            holePath.lineTo(minX, maxY);
+            holePath.lineTo(minX, minY);
+
+            shape.holes.push(holePath);
+          });
+
+          const geometry = new THREE.ShapeGeometry(shape);
+
+          // Fix UV mapping for texture
+          const posAttribute = geometry.attributes.position;
+          const uvAttribute = geometry.attributes.uv;
+
+          for (let i = 0; i < posAttribute.count; i++) {
+            const x = posAttribute.getX(i);
+            const y = posAttribute.getY(i);
+
+            const u = (x + width / 2) / width;
+            const v = y / height;
+
+            uvAttribute.setXY(i, u, v);
+          }
+
+          return geometry;
+        };
+
         // Create walls - transparent in interior view, solid in exterior
         // Create walls - Solid and OFF-SET from frame
         // Create walls - separate planes to allow for "Open Wall" configuration
@@ -593,43 +649,44 @@ export default function Building3D({ design }: Building3DProps) {
         const eaveH_A = getEaveLightHeight(design.eaveLightA);
         const eaveH_B = getEaveLightHeight(design.eaveLightB);
 
-        // Side Wall A (Left, -X)
+        // Side Wall A (Left, -X) - "front" in design
         if (!openConfig.isOpen || !openConfig.sideWallA) {
           const h = buildingHeight - eaveH_A;
-          const geo = new THREE.PlaneGeometry(outerWallLength, h);
-          const leftWall = new THREE.Mesh(geo, wallMaterial);
-          // Position Y: Center of the wall, so it sits on ground (0)
-          // Y center = h / 2
-          leftWall.position.set(-outerWallWidth / 2, h / 2, 0);
+          const leftWallGeo = createWallWithOpenings(outerWallLength, h, 'front');
+          const leftWall = new THREE.Mesh(leftWallGeo, wallMaterial);
+          // Shape defines Y from 0 to h. Position at Y=0 so it sits on ground.
+          leftWall.position.set(-outerWallWidth / 2, 0, 0);
           leftWall.rotation.y = -Math.PI / 2;
           leftWall.name = 'Wall_Left';
           wallGroup.add(leftWall);
         }
 
-        // Side Wall B (Right, +X)
+        // Side Wall B (Right, +X) - "back" in design
         if (!openConfig.isOpen || !openConfig.sideWallB) {
           const h = buildingHeight - eaveH_B;
-          const geo = new THREE.PlaneGeometry(outerWallLength, h);
-          const rightWall = new THREE.Mesh(geo, wallMaterial);
-          rightWall.position.set(outerWallWidth / 2, h / 2, 0);
+          const rightWallGeo = createWallWithOpenings(outerWallLength, h, 'back');
+          const rightWall = new THREE.Mesh(rightWallGeo, wallMaterial);
+          rightWall.position.set(outerWallWidth / 2, 0, 0);
           rightWall.rotation.y = Math.PI / 2;
           rightWall.name = 'Wall_Right';
           wallGroup.add(rightWall);
         }
 
-        // End Wall C (Front, +Z)
+        // End Wall C (Front, +Z) - "left" in design
         if (!openConfig.isOpen || !openConfig.endWallC) {
-          const frontWall = new THREE.Mesh(endWallGeo, wallMaterial);
-          frontWall.position.set(0, buildingHeight / 2, outerWallLength / 2);
+          const frontWallGeo = createWallWithOpenings(outerWallWidth, buildingHeight, 'left');
+          const frontWall = new THREE.Mesh(frontWallGeo, wallMaterial);
+          frontWall.position.set(0, 0, outerWallLength / 2);
           // Faces +Z by default
           frontWall.name = 'Wall_Front';
           wallGroup.add(frontWall);
         }
 
-        // End Wall D (Back, -Z)
+        // End Wall D (Back, -Z) - "right" in design
         if (!openConfig.isOpen || !openConfig.endWallD) {
-          const backWall = new THREE.Mesh(endWallGeo, wallMaterial);
-          backWall.position.set(0, buildingHeight / 2, -outerWallLength / 2);
+          const backWallGeo = createWallWithOpenings(outerWallWidth, buildingHeight, 'right');
+          const backWall = new THREE.Mesh(backWallGeo, wallMaterial);
+          backWall.position.set(0, 0, -outerWallLength / 2);
           backWall.rotation.y = Math.PI; // Face -Z
           backWall.name = 'Wall_Back';
           wallGroup.add(backWall);
@@ -787,6 +844,116 @@ export default function Building3D({ design }: Building3DProps) {
         // Walls hidden when frame is shown (opposite of frame)
         // When frame is ON, walls are OFF. When frame is OFF, walls are ON
         wallGroup.visible = !showFraming;
+
+        // --- OPENING FRAMES & DOORS ---
+        if (design.openings) {
+          const createFrame = (w: number, h: number, type: string) => {
+            const frameGroup = new THREE.Group();
+            const frameW = 0.5; // Width of the frame board (visible face width)
+            const frameD = 0.1; // Thickness sticking out
+
+            const frameMat = new THREE.MeshStandardMaterial({
+              color: trimColor3D,
+              roughness: 0.5
+            });
+
+            // Top
+            const topGeo = new THREE.BoxGeometry(w + frameW * 2, frameW, frameD);
+            const top = new THREE.Mesh(topGeo, frameMat);
+            top.position.set(0, h / 2 + frameW / 2, frameD / 2);
+            frameGroup.add(top);
+
+            // Bottom (only for windows usually, but let's add for all framed for now, or skip for doors?)
+            // Doors usually don't have bottom frame sticking up.
+            const isWindow = type === 'window';
+            if (isWindow) {
+              const bot = new THREE.Mesh(topGeo, frameMat);
+              bot.position.set(0, -h / 2 - frameW / 2, frameD / 2);
+              frameGroup.add(bot);
+            }
+
+            // Left
+            // Height depends on if bottom exists
+            const sideH = isWindow ? h : h + frameW / 2; // For door, goes to bottom?
+            // Actually simpler: Left/Right just span the height.
+            // If door, span full height. If window, span full height.
+            const sideGeo = new THREE.BoxGeometry(frameW, h, frameD);
+
+            const left = new THREE.Mesh(sideGeo, frameMat);
+            left.position.set(-w / 2 - frameW / 2, 0, frameD / 2);
+            frameGroup.add(left);
+
+            const right = new THREE.Mesh(sideGeo, frameMat);
+            right.position.set(w / 2 + frameW / 2, 0, frameD / 2);
+            frameGroup.add(right);
+
+            // Door/Window Panel
+            if (type !== 'framed-opening') {
+              if (type === 'window') {
+                const glassGeo = new THREE.PlaneGeometry(w, h);
+                const glassMat = new THREE.MeshStandardMaterial({
+                  color: 0x88ccff,
+                  transparent: true,
+                  opacity: 0.3,
+                  roughness: 0.1,
+                  metalness: 0.9,
+                  side: THREE.DoubleSide
+                });
+                const glass = new THREE.Mesh(glassGeo, glassMat);
+                frameGroup.add(glass);
+              } else {
+                // Door Panel
+                const doorGeo = new THREE.BoxGeometry(w, h, 0.05);
+                const doorMat = new THREE.MeshStandardMaterial({
+                  color: 0xffffff, // White door default
+                  roughness: 0.4
+                });
+                const door = new THREE.Mesh(doorGeo, doorMat);
+                frameGroup.add(door);
+              }
+            }
+
+            return frameGroup;
+          };
+
+          const wallMap: Record<string, string> = {
+            front: 'Wall_Left',
+            back: 'Wall_Right',
+            left: 'Wall_Front',
+            right: 'Wall_Back'
+          };
+
+          design.openings.forEach(opening => {
+            const wallName = wallMap[opening.wall];
+            if (!wallName) return;
+
+            const wallMesh = wallGroup.children.find(c => c.name === wallName) as THREE.Mesh;
+            if (!wallMesh) return;
+
+            // Determine wall dimensions for positioning
+            let wallW = 0;
+            let wallH = 0;
+
+            if (opening.wall === 'front') { wallW = outerWallLength; wallH = buildingHeight - eaveH_A; }
+            else if (opening.wall === 'back') { wallW = outerWallLength; wallH = buildingHeight - eaveH_B; }
+            else if (opening.wall === 'left') { wallW = outerWallWidth; wallH = buildingHeight; }
+            else if (opening.wall === 'right') { wallW = outerWallWidth; wallH = buildingHeight; }
+
+            const frame = createFrame(opening.width, opening.height, opening.type);
+
+            // Calculate Position
+            const centerX = (opening.x / 100) * wallW - (wallW / 2);
+            const centerY = wallH - (opening.y / 100) * wallH; // Y=0 is bottom
+
+            frame.position.set(centerX, centerY, 0);
+
+            // Add Z offset to be slightly in front of wall?
+            // Wall is at Z=0 (local). Frame depth is frameD.
+            // Frame is centered on frameD/2. So it sticks out by frameD. Good.
+
+            wallMesh.add(frame);
+          });
+        }
 
         // OFFSET CONSTANTS for layering "Inside -> Out"
         // 0. Frame (Base)

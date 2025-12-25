@@ -75,7 +75,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
     const formatFeetInches = (totalInches: number): string => {
       const feet = Math.floor(totalInches / 12);
       const inches = totalInches % 12;
-      
+
       if (inches === 0) {
         return `${feet}'`;
       } else if (feet === 0) {
@@ -108,7 +108,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
           else if (Math.abs(fraction - 0.625) < 0.01) fractionStr = '5/8';
           else if (Math.abs(fraction - 0.875) < 0.01) fractionStr = '7/8';
           else fractionStr = `${Math.round(fraction * 16)}/16`;
-          
+
           if (wholeInches === 0) {
             return `${feet}' ${fractionStr}"`;
           } else {
@@ -122,21 +122,21 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
     // Standard post spacing: posts are typically 1.5" (0.125 ft) from edges
     const postOffset = 0.125; // 1.5 inches in feet
     const postWidth = 0.125; // Post width in feet (1.5 inches)
-    
+
     // Calculate segments for top/bottom walls (sidewalls) - for dimension labels
     const calculateSidewallSegments = () => {
       const segments: Array<{ start: number; end: number; length: number }> = [];
-      
+
       // First edge segment (typically 1.5" = 0.125 ft)
       if (postOffset > 0) {
         segments.push({ start: 0, end: postOffset, length: postOffset });
       }
-      
+
       // Calculate how many full truss spacing segments fit
       const remainingWidth = width - (postOffset * 2);
       const fullSegments = Math.floor(remainingWidth / trussSpacing);
       let currentPos = postOffset;
-      
+
       // Add full truss spacing segments
       for (let i = 0; i < fullSegments; i++) {
         const segmentStart = currentPos;
@@ -144,36 +144,36 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
         segments.push({ start: segmentStart, end: segmentEnd, length: trussSpacing });
         currentPos = segmentEnd;
       }
-      
+
       // Last edge segment
       if (currentPos < width - postOffset) {
         const lastLength = width - postOffset - currentPos;
         segments.push({ start: currentPos, end: width - postOffset, length: lastLength });
       }
-      
+
       // Add final edge segment
       if (postOffset > 0 && segments.length > 0) {
         segments[segments.length - 1].end = width;
         segments[segments.length - 1].length = width - segments[segments.length - 1].start;
       }
-      
+
       return segments;
     };
-    
+
     // Calculate segments for left/right walls (endwalls) - for dimension labels
     const calculateEndwallSegments = () => {
       const segments: Array<{ start: number; end: number; length: number }> = [];
-      
+
       // First edge segment (typically 1.5" = 0.125 ft)
       if (postOffset > 0) {
         segments.push({ start: 0, end: postOffset, length: postOffset });
       }
-      
+
       // Calculate how many full truss spacing segments fit
       const remainingLength = length - (postOffset * 2);
       const fullSegments = Math.floor(remainingLength / trussSpacing);
       let currentPos = postOffset;
-      
+
       // Add full truss spacing segments
       for (let i = 0; i < fullSegments; i++) {
         const segmentStart = currentPos;
@@ -181,19 +181,19 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
         segments.push({ start: segmentStart, end: segmentEnd, length: trussSpacing });
         currentPos = segmentEnd;
       }
-      
+
       // Last edge segment
       if (currentPos < length - postOffset) {
         const lastLength = length - postOffset - currentPos;
         segments.push({ start: currentPos, end: length - postOffset, length: lastLength });
       }
-      
+
       // Add final edge segment
       if (postOffset > 0 && segments.length > 0) {
         segments[segments.length - 1].end = length;
         segments[segments.length - 1].length = length - segments[segments.length - 1].start;
       }
-      
+
       return segments;
     };
 
@@ -209,7 +209,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
         buildingWidth,
       ]),
     ).sort((a, b) => a - b);
-    
+
     const endwallXPositions = Array.from(
       new Set([
         0,
@@ -342,7 +342,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
       const segmentWidth = x2 - x1;
       const segmentFeet = segment.length;
       const segmentInches = segmentFeet * 12;
-      
+
       if (segmentFeet > 0) {
         const labelText = formatFeetInches(segmentInches);
         const label = $(
@@ -365,7 +365,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
       const segmentWidth = x2 - x1;
       const segmentFeet = segment.length;
       const segmentInches = segmentFeet * 12;
-      
+
       if (segmentFeet > 0) {
         const labelText = formatFeetInches(segmentInches);
         const label = $(
@@ -388,7 +388,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
       const segmentHeight = y2 - y1;
       const segmentFeet = segment.length;
       const segmentInches = segmentFeet * 12;
-      
+
       if (segmentFeet > 0) {
         const labelText = formatFeetInches(segmentInches);
         const label = $(
@@ -412,7 +412,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
       const segmentHeight = y2 - y1;
       const segmentFeet = segment.length;
       const segmentInches = segmentFeet * 12;
-      
+
       if (segmentFeet > 0) {
         const labelText = formatFeetInches(segmentInches);
         const label = $(
@@ -615,7 +615,6 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
         const openingPart = $(
           go.Part,
           {
-            key: opening.id,
             selectable: false,
             layerName: 'Foreground',
           },

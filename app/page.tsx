@@ -51,8 +51,7 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFormSubmit = (data: BuildingDesign) => {
-    // Preserve existing openings when form updates
-    setDesign(prev => ({ ...data, openings: prev.openings || [] }));
+    setDesign(data);
   };
 
   const handleOpeningsChange = (openings: BuildingDesign['openings']) => {
