@@ -1,150 +1,163 @@
 'use client';
 
-import { useState } from 'react';
-import OpeningPlacement from '@/components/OpeningPlacement';
-import StepNavigation from '@/components/StepNavigation';
+import React, { useState } from 'react';
+import Landing from '@/components/Landing';
 import StoreSelect from '@/components/StoreSelect';
 import BuildingSize from '@/components/BuildingSize';
 import BuildingInfo from '@/components/BuildingInfo';
 import BuildingAccessories from '@/components/BuildingAccessories';
 import LeansAndOpenings from '@/components/LeansAndOpenings';
 import BuildingSummary from '@/components/BuildingSummary';
+import StepNavigation from '@/components/StepNavigation';
 import { BuildingDesign, Store } from '@/types/building';
 
+type Step = 'landing' | 0 | 1 | 2 | 3 | 4 | 5;
+
 const STEPS = [
-  'Store Select',
-  'Building Size',
-  'Building Info',
-  'Accessories',
-  'Leans & Openings',
-  'Summary',
-  'Delivery',
+    'Store Selection',
+    'Size',
+    'Information',
+    'Accessories',
+    'Openings',
+    'Summary'
 ];
 
 export default function Home() {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [design, setDesign] = useState<BuildingDesign>({
-    buildingZipCode: '',
-    clientName: '',
-    clientAddress: '',
-    buildingUse: 'residential',
-    width: 24,
-    length: 30,
-    trussSpacing: '6',
-    floorFinish: 'dirt-gravel',
-    thickenedEdgeSlab: false,
-    postConstructionSlab: false,
-    sitePreparation: false,
-    sidewallPosts: '4x6',
-    clearHeight: '12',
-    girtType: 'flat',
-    girtSize: '2x4',
-    gradeBoard: '2x6',
-    wallColor: 'white',
-    trimColor: 'white',
-    roofColor: 'gray',
-    endWallOverhang: '0',
-    sidewallOverhang: '0',
-    openings: [],
-  });
+    const [currentStep, setCurrentStep] = useState<Step>('landing');
+    const [design, setDesign] = useState<BuildingDesign>({
+        clientName: '',
+        clientAddress: '',
+        buildingUse: 'storage',
+        width: 24,
+        length: 30,
+        trussSpacing: '6',
+        framingType: 'post-frame-construction',
+        roofPitch: '4/12',
+        floorFinish: 'dirt-gravel',
+        thickenedEdgeSlab: false,
+        postConstructionSlab: false,
+        sitePreparation: false,
+        sidewallPosts: '4x6',
+        clearHeight: '12',
+        gradeBoard: '2x6',
+        girtType: 'flat',
+        girtSize: '2x4',
+        wallColor: 'white',
+        trimColor: 'white',
+        roofColor: 'charcoal',
+        endWallOverhang: '0',
+        sidewallOverhang: '0',
+        openings: [],
+        buildingZipCode: '',
+    });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+    const handleNext = () => {
+        if (currentStep === 'landing') {
+            setCurrentStep(0);
+        } else if (typeof currentStep === 'number' && currentStep < STEPS.length - 1) {
+            setCurrentStep((currentStep + 1) as Step);
+        }
+    };
 
-  const handleFormSubmit = (data: BuildingDesign) => {
-    setDesign(data);
-  };
+    const handleBack = () => {
+        if (typeof currentStep === 'number') {
+            if (currentStep === 0) {
+                setCurrentStep('landing');
+            } else {
+                setCurrentStep((currentStep - 1) as Step);
+            }
+        }
+    };
 
-  const handleOpeningsChange = (openings: BuildingDesign['openings']) => {
-    setDesign(prev => ({ ...prev, openings }));
-  };
+    const updateDesign = (updates: Partial<BuildingDesign>) => {
+        setDesign((prev) => ({ ...prev, ...updates }));
+    };
 
-  const handleZipCodeChange = (zipCode: string) => {
-    setDesign(prev => ({ ...prev, buildingZipCode: zipCode }));
-  };
+    const handleStoreSelect = (store: Store) => {
+        updateDesign({
+            selectedStore: store,
+            buildingZipCode: store.zipCode
+        });
+        handleNext();
+    };
 
-  const handleStoreSelect = (store: Store) => {
-    setDesign(prev => ({ ...prev, selectedStore: store }));
-    // Automatically move to next step when store is selected
-    setTimeout(() => {
-      setCurrentStep(2);
-    }, 500);
-  };
+    const handleZipCodeChange = (zipCode: string) => {
+        updateDesign({ buildingZipCode: zipCode });
+    };
 
-  const handleSubmitQuote = async () => {
-    setIsSubmitting(true);
-    try {
-      const response = await fetch('/api/submit-quote', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(design),
-      });
+    const renderCurrentStep = () => {
+        if (currentStep === 'landing') {
+            return <Landing onStartDesigning={handleNext} />;
+        }
 
-      if (response.ok) {
-        alert('Quote submitted successfully! A PDF will be emailed to sales@coupebuildingco.com');
-      } else {
-        throw new Error('Failed to submit quote');
-      }
-    } catch (error) {
-      console.error('Error submitting quote:', error);
-      alert('Error submitting quote. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
         return (
-          <StoreSelect
-            buildingZipCode={design.buildingZipCode}
-            selectedStore={design.selectedStore}
-            onZipCodeChange={handleZipCodeChange}
-            onStoreSelect={handleStoreSelect}
-          />
-        );
-      case 2:
-        return (
-          <BuildingSize
-            zipCode={design.buildingZipCode || ''}
-            onNext={() => setCurrentStep(3)}
-          />
-        );
-      case 3:
-        return <BuildingInfo design={design} onSubmit={handleFormSubmit} onNext={() => setCurrentStep(4)} />;
-      case 4:
-        return <BuildingAccessories design={design} onSubmit={handleFormSubmit} onNext={() => setCurrentStep(5)} />;
-      case 5:
-        return <LeansAndOpenings design={design} onSubmit={handleFormSubmit} onNext={() => setCurrentStep(6)} />;
-      case 6:
-        return <BuildingSummary design={design} onNext={() => setCurrentStep(7)} />;
-      case 7:
-        // Placeholder content for Delivery step – can be built out later
-        return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold mb-2">{STEPS[currentStep - 1]}</h2>
-              <p className="text-gray-600">
-                This step is not configured yet. You can add Delivery content here later.
-              </p>
+            <div className="flex flex-col min-h-screen bg-gray-50">
+                <StepNavigation currentStep={currentStep + 1} steps={STEPS} />
+
+                <main className="flex-1 overflow-auto relative">
+                    {currentStep === 0 && (
+                        <div className="max-w-4xl mx-auto py-8 px-4">
+                            <StoreSelect
+                                buildingZipCode={design.buildingZipCode}
+                                selectedStore={design.selectedStore}
+                                onZipCodeChange={handleZipCodeChange}
+                                onStoreSelect={handleStoreSelect}
+                            />
+                        </div>
+                    )}
+
+                    {currentStep === 1 && (
+                        <BuildingSize
+                            zipCode={design.buildingZipCode || ''}
+                            onNext={handleNext}
+                            design={design}
+                            onSubmit={updateDesign}
+                        />
+                    )}
+
+                    {currentStep === 2 && (
+                        <BuildingInfo
+                            design={design}
+                            onSubmit={updateDesign}
+                            onNext={handleNext}
+                        />
+                    )}
+
+                    {currentStep === 3 && (
+                        <BuildingAccessories
+                            design={design}
+                            onSubmit={updateDesign}
+                            onNext={handleNext}
+                        />
+                    )}
+
+                    {currentStep === 4 && (
+                        <LeansAndOpenings
+                            design={design}
+                            onSubmit={updateDesign}
+                            onNext={handleNext}
+                        />
+                    )}
+
+                    {currentStep === 5 && (
+                        <BuildingSummary
+                            design={design}
+                        />
+                    )}
+
+                    {/* Global Back button for steps >= 0 */}
+                    <div className="fixed bottom-6 left-6 z-50">
+                        <button
+                            onClick={handleBack}
+                            className="bg-gray-800 hover:bg-black text-white px-8 py-2.5 rounded-full shadow-2xl font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+                        >
+                            <span className="text-xl">←</span> Back
+                        </button>
+                    </div>
+                </main>
             </div>
-          </div>
         );
-      default:
-        return null;
-    }
-  };
+    };
 
-  return (
-    <div className="min-h-screen bg-white">
-      {/* Step Navigation */}
-      <StepNavigation currentStep={currentStep} steps={STEPS} />
-
-      {/* Step Content */}
-      {renderStepContent()}
-    </div>
-  );
+    return renderCurrentStep();
 }
-

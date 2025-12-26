@@ -57,6 +57,9 @@ export interface BuildingDesign {
   gutterColor?: string;
   cupolas?: string;
   skylightQuantity?: number;
+  wallInsulation?: string;
+  wallCondensation?: string;
+  outsideClosure?: string;
 
   // Wainscot
   trimColor: string;

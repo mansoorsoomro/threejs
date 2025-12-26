@@ -32,22 +32,8 @@ interface Accessories {
 }
 
 export default function BuildingSummary({ design, onNext }: BuildingSummaryProps) {
-  // Get accessories from localStorage (saved by BuildingAccessories component)
-  const getAccessories = (): Accessories => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('buildingAccessories');
-      if (stored) {
-        try {
-          return JSON.parse(stored);
-        } catch {
-          return {};
-        }
-      }
-    }
-    return {};
-  };
-
-  const accessories = getAccessories();
+  // use design prop instead of localStorage
+  const accessories = design;
 
   const totalPrice = calculatePrice({
     width: design.width,
@@ -84,8 +70,8 @@ export default function BuildingSummary({ design, onNext }: BuildingSummaryProps
     design.buildingUse === 'agricultural'
       ? 'Post Frame Design'
       : design.buildingUse === 'residential'
-      ? 'Residential Design'
-      : 'Building Design';
+        ? 'Residential Design'
+        : 'Building Design';
 
   const getWallColorLabel = () => {
     const color = wallColors.find(c => c.value === design.wallColor);
@@ -662,7 +648,7 @@ export default function BuildingSummary({ design, onNext }: BuildingSummaryProps
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-700">Gable Accent:</span>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-900">{accessories.gableAccent || 'No'}</span>
+                      <span className="text-sm font-semibold text-gray-900">{accessories.gableAccent ? 'Yes' : 'No'}</span>
                       <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                         <path
                           fillRule="evenodd"

@@ -140,8 +140,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
   const [wainscotSize, setWainscotSize] = useState<string>(design.wainscotHeight || '36 in');
   const [wainscotColor, setWainscotColor] = useState<string>(design.wainscotColor || 'white');
   const [showWainscotColorModal, setShowWainscotColorModal] = useState<boolean>(false);
-  const [wallInsulation, setWallInsulation] = useState<string>('None');
-  const [wallCondensation, setWallCondensation] = useState<string>('None');
+  const [wallInsulation, setWallInsulation] = useState<string>(design.wallInsulation || 'None');
+  const [wallCondensation, setWallCondensation] = useState<string>(design.wallCondensation || 'None');
   const [interiorWallLiner, setInteriorWallLiner] = useState<string>(design.interiorWallLiner || 'None');
   const [interiorWallLinerColor, setInteriorWallLinerColor] = useState<string>(design.interiorWallLinerColor || 'white');
   const [showInteriorWallLinerColorModal, setShowInteriorWallLinerColorModal] = useState(false);
@@ -151,7 +151,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
   const [ceilingLinerColor, setCeilingLinerColor] = useState<string>(design.ceilingLinerColor || 'white');
   const [showCeilingLinerColorModal, setShowCeilingLinerColorModal] = useState(false);
   const [ridgeOptions, setRidgeOptions] = useState<string>(design.ridgeOptions || 'Universal Ridge Cap');
-  const [outsideClosure, setOutsideClosure] = useState<string>('Standard Non-Vented');
+  const [outsideClosure, setOutsideClosure] = useState<string>(design.outsideClosure || 'Standard Non-Vented');
   const [ridgeVentilation, setRidgeVentilation] = useState<string>(design.ridgeVentilation || 'None');
   const [gableVents, setGableVents] = useState<string>(design.gableVents || 'None');
   const [endCaps, setEndCaps] = useState<string>(design.endCaps || 'No');
@@ -235,6 +235,13 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
       gableAccent,
     };
     localStorage.setItem('buildingAccessories', JSON.stringify(accessories));
+
+    // Update global design state
+    onSubmit({
+      ...currentDesign,
+      ...accessories,
+      gableAccent: accessories.gableAccent === 'Yes'
+    } as BuildingDesign);
   }, [
     eaveLightA,
     eaveLightB,
