@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { BuildingDesign, Opening } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
 import Building3D from '@/components/Building3D';
+import Footer from './Footer';
 
 interface LeansAndOpeningsProps {
   design: BuildingDesign;
   onSubmit: (data: BuildingDesign) => void;
   onNext?: () => void;
+  onBack?: () => void;
 }
 
 // Opening types with images (from public/assets)
@@ -94,7 +96,7 @@ const walls = [
   { id: 'endwallD', label: 'Endwall D', value: 'right' as const },
 ];
 
-export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndOpeningsProps) {
+export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: LeansAndOpeningsProps) {
   const [selectedOpeningId, setSelectedOpeningId] = useState<string | null>(null);
   const [selectedOpeningType, setSelectedOpeningType] = useState<string | null>(null);
   const [selectedWall, setSelectedWall] = useState<'front' | 'back' | 'left' | 'right'>('back');
@@ -783,22 +785,13 @@ export default function LeansAndOpenings({ design, onSubmit, onNext }: LeansAndO
               )}
             </div>
 
-            {/* Bottom actions (Next button) */}
-            {onNext && (
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onNext) {
-                      onNext();
-                    }
-                  }}
-                  className="px-6 py-2 rounded-md font-semibold text-white transition-colors bg-green-600 hover:bg-green-700 shadow-md"
-                >
-                  Next: Summary
-                </button>
-              </div>
-            )}
+            {/* Footer with Back and Next actions */}
+            <Footer
+              onBack={onBack}
+              onContinue={onNext}
+              isContinueDisabled={!onNext}
+              continueLabel="Next: Summary"
+            />
           </div>
         </div>
       </div>

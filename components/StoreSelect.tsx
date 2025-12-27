@@ -5,12 +5,14 @@ import { Store } from '@/types/building';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
 import { fetchStores, fetchMoreStores, clearStores } from '@/lib/store/slices/storesSlice';
 import { fetchAllBuildingData } from '@/lib/store/slices/buildingDataSlice';
+import Footer from './Footer';
 
 interface StoreSelectProps {
   buildingZipCode?: string;
   selectedStore?: Store;
   onZipCodeChange: (zipCode: string) => void;
   onStoreSelect: (store: Store) => void;
+  onBack?: () => void;
 }
 
 export default function StoreSelect({
@@ -18,7 +20,9 @@ export default function StoreSelect({
   selectedStore,
   onZipCodeChange,
   onStoreSelect,
+  onBack,
 }: StoreSelectProps) {
+  // ... existing state ...
   const [zipCode, setZipCode] = useState(buildingZipCode);
   const [showStoreList, setShowStoreList] = useState(false);
 
@@ -44,7 +48,7 @@ export default function StoreSelect({
     const value = e.target.value.replace(/\D/g, '').slice(0, 5);
     setZipCode(value);
     onZipCodeChange(value);
-    
+
     if (value.length === 5) {
       dispatch(fetchStores(value));
       setShowStoreList(true);
@@ -57,11 +61,11 @@ export default function StoreSelect({
   const handleStoreSelect = async (store: Store) => {
     // Call parent handler first
     onStoreSelect(store);
-    
+
     // Fetch building data APIs when store is selected
     // Use the zip code from the selected store or building zip code
     const zipCodeToUse = store.zipCode || buildingZipCode;
-    
+
     if (zipCodeToUse && zipCodeToUse.length === 5) {
       try {
         // Fetch all three APIs: getSceneQuestions, getOpenings, and getLoadings
@@ -90,17 +94,17 @@ export default function StoreSelect({
   };
 
   return (
-    <div className="bg-white">
-      <div className="max-w-5xl mx-auto px-4 py-4">
+    <div className="bg-white pb-0">
+      <div className="w-full px-10 py-0">
         <h1 className="text-xl font-bold text-gray-900 mb-2">
           Let&apos;s get started planning your dream today!
         </h1>
-        
-        <p className="text-gray-700 mb-4 text-sm">
+
+        <p className="text-gray-700 mb-2 text-sm">
           Please enter the zip code you will be building in.
         </p>
-        
-        <div className="mb-4">
+
+        <div className="mb-2">
           <label className="block text-sm font-bold text-gray-900 mb-1">
             Building Zip Code:
           </label>
@@ -123,59 +127,59 @@ export default function StoreSelect({
         )}
 
         {showStoreList && stores.length > 0 && (
-          <div className="mt-4">
+          <div className="mt-2">
             <p className="text-gray-700 mb-2 text-sm">
               For proper pricing service, and plant production, please tell us which store you would like to facilitate your purchase (including delivery to if applicable).
             </p>
-            {/* <p className="text-gray-700 mb-6 text-base">
-              If you would like to search for stores using a different zip code other than the one above,{' '}
-              <button
-                onClick={handleSearchDifferentZip}
-                className="text-blue-600 underline hover:text-blue-800"
-              >
-                click here
-              </button>
-            </p> */}
 
-            <div className="overflow-x-auto mt-4">
+            <div
+              className="overflow-x-auto mt-2 max-h-[40vh] overflow-y-auto border border-gray-200"
+              onScroll={(e) => {
+                const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop === e.currentTarget.clientHeight;
+                // Add a small threshold for better UX (e.g., load when within 50px of bottom)
+                const nearBottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 50;
+
+                if (nearBottom && hasMore && !loadingMore) {
+                  handleLoadMore();
+                }
+              }}
+            >
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-gray-200">
-                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-900 text-sm">Store</th>
-                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-900 text-sm">Address</th>
-                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-900 text-sm">Distance</th>
-                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-900 text-sm">Phone</th>
-                    <th className="border border-gray-300 px-2 py-2 text-left font-semibold text-gray-900 text-sm">Action</th>
+                  <tr className="bg-gray-200 sticky top-0 z-10">
+                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Store</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Address</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Distance</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Phone</th>
+                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stores.map((store, index) => (
                     <tr
                       key={store.id}
-                      className={`${
-                        index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                      } ${selectedStore?.id === store.id ? 'bg-blue-50' : ''}`}
+                      className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
+                        } ${selectedStore?.id === store.id ? 'bg-blue-50' : ''}`}
                     >
-                      <td className="border border-gray-300 px-2 py-2 font-semibold text-gray-900 text-sm">
+                      <td className="border border-gray-300 px-2 py-1 font-semibold text-gray-900 text-sm">
                         {store.name}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 text-gray-700 text-sm">
+                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
                         {store.address}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 text-gray-700 text-sm">
+                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
                         {store.distance.toFixed(1)} miles
                       </td>
-                      <td className="border border-gray-300 px-2 py-2 text-gray-700 text-sm">
+                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
                         {store.phone}
                       </td>
-                      <td className="border border-gray-300 px-2 py-2">
+                      <td className="border border-gray-300 px-2 py-1">
                         <button
                           onClick={() => handleStoreSelect(store)}
-                          className={`px-3 py-1.5 rounded text-sm ${
-                            selectedStore?.id === store.id
-                              ? 'bg-green-600 text-white'
-                              : 'bg-blue-600 text-white hover:bg-blue-700'
-                          }`}
+                          className={`px-3 py-1.5 rounded text-sm ${selectedStore?.id === store.id
+                            ? 'bg-green-600 text-white'
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                            }`}
                         >
                           {selectedStore?.id === store.id ? 'Selected' : 'Select This Store'}
                         </button>
@@ -186,21 +190,8 @@ export default function StoreSelect({
               </table>
             </div>
 
-            {/* Load More Button - Show as soon as stores are loaded */}
-            {stores.length > 0 && hasMore && (
-              <div className="mt-4 flex justify-center">
-                <button
-                  onClick={handleLoadMore}
-                  disabled={loadingMore}
-                  className={`px-6 py-2 rounded text-sm font-semibold ${
-                    loadingMore
-                      ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
-                  }`}
-                >
-                  {loadingMore ? 'Loading...' : 'Load More'}
-                </button>
-              </div>
+            {loadingMore && (
+              <div className="text-center py-2 text-sm text-blue-600">Loading more stores...</div>
             )}
           </div>
         )}
@@ -212,15 +203,14 @@ export default function StoreSelect({
         )}
 
         {/* Disclaimer */}
-        <div className="mt-4">
+        <div className="mt-2">
           <p className="text-green-700 italic text-xs leading-relaxed">
             The estimates from this program are for code exempt buildings. Menards can provide estimates for engineered buildings. If your building official requires an engineered building, please design your building and then chat with a post frame specialist, or visit your local Menards store for more information. All building designs should be verified by local building officials prior to starting your project.
-            {/* <a href="#" className="text-blue-600 underline hover:text-blue-800">
-              More Info.
-            </a> */}
           </p>
         </div>
       </div>
+
+      <Footer onBack={onBack} showContinue={false} />
     </div>
   );
 }

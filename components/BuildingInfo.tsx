@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Building3D from '@/components/Building3D';
+import Footer from './Footer';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
 import { wallColors, trimColors, roofColors } from '@/data/menardsColors';
@@ -70,9 +71,10 @@ interface BuildingInfoProps {
   design: BuildingDesign;
   onSubmit: (data: BuildingDesign) => void;
   onNext?: () => void;
+  onBack?: () => void;
 }
 
-export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoProps) {
+export default function BuildingInfo({ design, onSubmit, onNext, onBack }: BuildingInfoProps) {
   const [infoTab, setInfoTab] = useState<'information' | '3d'>('information');
   const [currentDesign, setCurrentDesign] = useState<BuildingDesign>(design);
 
@@ -1546,23 +1548,13 @@ export default function BuildingInfo({ design, onSubmit, onNext }: BuildingInfoP
             )}
           </div>
           {/* Bottom actions (Next button) */}
-          <div className="mt-4 flex justify-end flex-shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                if (onNext) {
-                  onNext();
-                }
-              }}
-              disabled={!onNext}
-              className={`px-4 py-1.5 rounded-md font-semibold text-white transition-colors text-sm ${onNext
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-gray-400 cursor-not-allowed'
-                }`}
-            >
-              Next: Accessories
-            </button>
-          </div>
+          {/* Footer with Back and Next actions */}
+          <Footer
+            onBack={onBack}
+            onContinue={onNext}
+            isContinueDisabled={!onNext}
+            continueLabel="Next: Accessories"
+          />
         </div>
       </div >
 

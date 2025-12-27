@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Building3D from '@/components/Building3D';
+import Footer from './Footer';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
 import { trimColors } from '@/data/menardsColors';
@@ -70,9 +71,10 @@ interface BuildingAccessoriesProps {
   design: BuildingDesign;
   onSubmit: (data: BuildingDesign) => void;
   onNext?: () => void;
+  onBack?: () => void;
 }
 
-export default function BuildingAccessories({ design, onSubmit, onNext }: BuildingAccessoriesProps) {
+export default function BuildingAccessories({ design, onSubmit, onNext, onBack }: BuildingAccessoriesProps) {
   const [infoTab, setInfoTab] = useState<'information' | '3d'>('information');
   const [currentDesign, setCurrentDesign] = useState<BuildingDesign>(design);
 
@@ -1903,21 +1905,13 @@ export default function BuildingAccessories({ design, onSubmit, onNext }: Buildi
               )}
             </div>
             {/* Bottom actions (Next button) */}
-            {onNext && (
-              <div className="mt-4 flex justify-end flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (onNext) {
-                      onNext();
-                    }
-                  }}
-                  className="px-4 py-1.5 rounded-md font-semibold text-white transition-colors text-sm bg-green-600 hover:bg-green-700"
-                >
-                  Next: Leans & Openings
-                </button>
-              </div>
-            )}
+            {/* Footer with Back and Next actions */}
+            <Footer
+              onBack={onBack}
+              onContinue={onNext}
+              isContinueDisabled={!onNext}
+              continueLabel="Next: Leans & Openings"
+            />
           </div>
         </div>
       </div>

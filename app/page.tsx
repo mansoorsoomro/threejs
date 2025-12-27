@@ -15,11 +15,12 @@ type Step = 'landing' | 0 | 1 | 2 | 3 | 4 | 5;
 
 const STEPS = [
     'Store Selection',
-    'Size',
-    'Information',
+    'Building Size',
+    'Building Info',
     'Accessories',
-    'Openings',
-    'Summary'
+    'Leans & Openings',
+    'Summary',
+    'Delivery'
 ];
 
 export default function Home() {
@@ -94,14 +95,15 @@ export default function Home() {
             <div className="flex flex-col min-h-screen bg-gray-50">
                 <StepNavigation currentStep={currentStep + 1} steps={STEPS} />
 
-                <main className="flex-1 overflow-auto relative">
+                <main className={`flex-1 overflow-auto relative ${currentStep === 0 ? 'pb-0' : 'pb-24'}`}>
                     {currentStep === 0 && (
-                        <div className="max-w-4xl mx-auto py-8 px-4">
+                        <div className="w-full">
                             <StoreSelect
                                 buildingZipCode={design.buildingZipCode}
                                 selectedStore={design.selectedStore}
                                 onZipCodeChange={handleZipCodeChange}
                                 onStoreSelect={handleStoreSelect}
+                                onBack={handleBack}
                             />
                         </div>
                     )}
@@ -110,6 +112,7 @@ export default function Home() {
                         <BuildingSize
                             zipCode={design.buildingZipCode || ''}
                             onNext={handleNext}
+                            onBack={handleBack}
                             design={design}
                             onSubmit={updateDesign}
                         />
@@ -120,6 +123,7 @@ export default function Home() {
                             design={design}
                             onSubmit={updateDesign}
                             onNext={handleNext}
+                            onBack={handleBack}
                         />
                     )}
 
@@ -128,6 +132,7 @@ export default function Home() {
                             design={design}
                             onSubmit={updateDesign}
                             onNext={handleNext}
+                            onBack={handleBack}
                         />
                     )}
 
@@ -136,24 +141,16 @@ export default function Home() {
                             design={design}
                             onSubmit={updateDesign}
                             onNext={handleNext}
+                            onBack={handleBack}
                         />
                     )}
 
                     {currentStep === 5 && (
                         <BuildingSummary
                             design={design}
+                            onBack={handleBack}
                         />
                     )}
-
-                    {/* Global Back button for steps >= 0 */}
-                    <div className="fixed bottom-6 left-6 z-50">
-                        <button
-                            onClick={handleBack}
-                            className="bg-gray-800 hover:bg-black text-white px-8 py-2.5 rounded-full shadow-2xl font-bold transition-all transform hover:scale-105 flex items-center gap-2"
-                        >
-                            <span className="text-xl">←</span> Back
-                        </button>
-                    </div>
                 </main>
             </div>
         );

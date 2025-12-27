@@ -3126,7 +3126,7 @@ export default function Building3D({ design }: Building3DProps) {
   };
 
   return (
-    <div className="relative bg-white rounded-lg shadow-lg" style={{ height: '800px' }}>
+    <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ height: '80vh' }}>
       {/* Transparent Overlay Background */}
       {(activeColorPanel || activeViewPanel) && (
         <div

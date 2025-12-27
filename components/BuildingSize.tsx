@@ -4,17 +4,20 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
 import { fetchAllBuildingData } from '@/lib/store/slices/buildingDataSlice';
 import Building3D from './Building3D';
+import Footer from './Footer';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
+import Image from 'next/image';
 
 interface BuildingSizeProps {
   zipCode: string;
   onNext?: () => void;
+  onBack?: () => void;
   design?: BuildingDesign;
   onSubmit?: (data: BuildingDesign) => void;
 }
 
-export default function BuildingSize({ zipCode, onNext, design, onSubmit }: BuildingSizeProps) {
+export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit }: BuildingSizeProps) {
   const dispatch = useAppDispatch();
   const buildingData = useAppSelector((state) => state.buildingData);
 
@@ -35,15 +38,14 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
 
   const [buildingUse, setBuildingUse] = useState<string>(
     design?.buildingUse === 'agricultural' ? 'rural' :
-      design?.buildingUse === 'residential' ? 'residential-garage-storage' :
-        design?.buildingUse === 'storage' ? 'storage' : ''
+      design?.buildingUse === 'residential' ? 'residential-garage-storage' : ''
   );
-  const [framingType, setFramingType] = useState<string>(design?.framingType || '');
-  const [roofPitch, setRoofPitch] = useState<string>(design?.roofPitch || '');
-  const [trussSpacing, setTrussSpacing] = useState<string>(design?.trussSpacing || '');
-  const [length, setLength] = useState<string>(design?.length?.toString() || '');
-  const [width, setWidth] = useState<string>(design?.width?.toString() || '');
-  const [height, setHeight] = useState<string>(design?.clearHeight || '');
+  const [framingType, setFramingType] = useState<string>('');
+  const [roofPitch, setRoofPitch] = useState<string>('');
+  const [trussSpacing, setTrussSpacing] = useState<string>('');
+  const [length, setLength] = useState<string>('');
+  const [width, setWidth] = useState<string>('');
+  const [height, setHeight] = useState<string>('');
   const [activeSection, setActiveSection] = useState<string>('buildingUse');
   const [activeTab, setActiveTab] = useState<'information' | '3d'>('information');
   const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
@@ -121,12 +123,12 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
     }
   }, [trussSpacing]);
 
-  // Set default truss spacing to 4ft when ladder frame construction is selected
-  useEffect(() => {
-    if (framingType === 'ladder-frame-construction') {
-      setTrussSpacing('4');
-    }
-  }, [framingType]);
+  // Removed auto-set of truss spacing to 4ft for ladder frame, per user request to keep defaults empty.
+  // useEffect(() => {
+  //   if (framingType === 'ladder-frame-construction') {
+  //     setTrussSpacing('4');
+  //   }
+  // }, [framingType]);
 
   // Reset width when framing type, roof pitch, or truss spacing changes
   useEffect(() => {
@@ -278,8 +280,30 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
             <h2 className="text-lg font-bold text-gray-900 mb-4">
               Building Parameters
             </h2>
-
             <div className="overflow-y-auto flex-1 pr-2">
+              {/* Building Planner Banner */}
+              <div className="mb-4 p-3 border rounded bg-gray-50 flex items-center space-x-4">
+                <img
+                  src="/assets/building-planner-323x180.jpg"
+                  alt="Open Building Planner"
+                  className="w-36 h-auto rounded shadow-sm"
+                />
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-gray-900">Use our Building Planner</h3>
+                  <p className="text-xs text-gray-600 mb-2">Estimate the best size building for you.</p>
+                  <button
+                    onClick={() => window.open(
+                      'https://www.midwestmanufacturing.com/MidwestWebsite/web/buildingplanner/index.html',
+                      'BuildingPlanner',
+                      'width=1200,height=800,resizable=yes,scrollbars=yes'
+                    )}
+                    className="inline-block bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                  >
+                    Open Building Planner
+                  </button>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 {/* Building Use */}
                 <div
@@ -577,8 +601,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                 <button
                   onClick={() => setActiveTab('information')}
                   className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${activeTab === 'information'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                 >
                   Information
@@ -586,8 +610,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                 <button
                   onClick={() => setActiveTab('3d')}
                   className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${activeTab === '3d'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
                 >
                   3D Scene
@@ -644,8 +668,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                           <div
                             onClick={() => setBuildingUse('rural')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${buildingUse === 'rural'
-                                ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                : 'border-gray-300 hover:border-gray-400'
+                              ? 'border-blue-500 bg-blue-50 shadow-lg'
+                              : 'border-gray-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -665,8 +689,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                           <div
                             onClick={() => setBuildingUse('residential-garage-storage')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${buildingUse === 'residential-garage-storage'
-                                ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                : 'border-gray-300 hover:border-gray-400'
+                              ? 'border-blue-500 bg-blue-50 shadow-lg'
+                              : 'border-gray-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -693,8 +717,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                           <div
                             onClick={() => setFramingType('post-frame-construction')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${framingType === 'post-frame-construction'
-                                ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                : 'border-gray-300 hover:border-gray-400'
+                              ? 'border-blue-500 bg-blue-50 shadow-lg'
+                              : 'border-gray-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -720,8 +744,8 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
                           <div
                             onClick={() => setFramingType('ladder-frame-construction')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${framingType === 'ladder-frame-construction'
-                                ? 'border-blue-500 bg-blue-50 shadow-lg'
-                                : 'border-gray-300 hover:border-gray-400'
+                              ? 'border-blue-500 bg-blue-50 shadow-lg'
+                              : 'border-gray-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -950,36 +974,30 @@ export default function BuildingSize({ zipCode, onNext, design, onSubmit }: Buil
               )}
             </div>
             {/* Bottom actions (Next button) */}
-            <div className="mt-4 flex justify-end flex-shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  if (isStepComplete && onNext) {
-                    if (onSubmit && design) {
-                      onSubmit({
-                        ...design,
-                        buildingUse: buildingUse === 'rural' ? 'agricultural' : buildingUse === 'residential-garage-storage' ? 'residential' : 'storage' as any,
-                        framingType: framingType as any,
-                        roofPitch: roofPitch as any,
-                        trussSpacing: trussSpacing as any,
-                        length: parseFloat(length),
-                        width: parseFloat(width),
-                        clearHeight: height as any,
-                      });
-                    }
-                    onNext();
-                  }
-                }}
-                disabled={!isStepComplete || !onNext}
-                className={`px-4 py-1.5 rounded-md font-semibold text-white transition-colors text-sm ${isStepComplete && onNext
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-gray-400 cursor-not-allowed'
-                  }`}
-              >
-                Next: Building Info
-              </button>
-            </div>
           </div>
+          {/* Footer with Back and Next actions */}
+          <Footer
+            onBack={onBack}
+            onContinue={() => {
+              if (isStepComplete && onNext) {
+                if (onSubmit && design) {
+                  onSubmit({
+                    ...design,
+                    buildingUse: buildingUse === 'rural' ? 'agricultural' : buildingUse === 'residential-garage-storage' ? 'residential' : 'storage' as any,
+                    framingType: framingType as any,
+                    roofPitch: roofPitch as any,
+                    trussSpacing: trussSpacing as any,
+                    length: parseFloat(length),
+                    width: parseFloat(width),
+                    clearHeight: height as any,
+                  });
+                }
+                onNext();
+              }
+            }}
+            isContinueDisabled={!isStepComplete || !onNext}
+            continueLabel="Next: Building Info"
+          />
         </div>
       </div>
     </div>

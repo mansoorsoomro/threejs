@@ -4,10 +4,12 @@ import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
 import { wallColors, trimColors, roofColors } from '@/data/menardsColors';
 import FloorPlan from '@/components/FloorPlan';
+import Footer from './Footer';
 
 interface BuildingSummaryProps {
   design: BuildingDesign;
   onNext?: () => void;
+  onBack?: () => void;
 }
 
 interface Accessories {
@@ -31,7 +33,7 @@ interface Accessories {
   gableAccent?: string;
 }
 
-export default function BuildingSummary({ design, onNext }: BuildingSummaryProps) {
+export default function BuildingSummary({ design, onNext, onBack }: BuildingSummaryProps) {
   // use design prop instead of localStorage
   const accessories = design;
 
@@ -699,22 +701,14 @@ export default function BuildingSummary({ design, onNext }: BuildingSummaryProps
             </div>
           </div>
 
-          {/* Next Button */}
-          {onNext && (
-            <div className="mt-6 flex justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  if (onNext) {
-                    onNext();
-                  }
-                }}
-                className="px-6 py-2 rounded-md font-semibold text-white transition-colors bg-green-600 hover:bg-green-700"
-              >
-                Next: Delivery
-              </button>
-            </div>
-          )}
+          {/* Footer with Back and Next actions */}
+          <Footer
+            onBack={onBack}
+            onContinue={onNext}
+            isContinueDisabled={!onNext}
+            continueLabel="Next: Delivery"
+            showContinue={!!onNext}
+          />
         </div>
       </div>
     </div>
