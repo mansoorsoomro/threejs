@@ -15,10 +15,10 @@ export default function Building3D({ design }: Building3DProps) {
   const [viewMode, setViewMode] = useState<'exterior' | 'interior'>('exterior');
 
   // Color state (local to this component for UI updates)
-  const [localWallColor, setLocalWallColor] = useState(design.wallColor || 'white');
-  const [localRoofColor, setLocalRoofColor] = useState(design.roofColor || 'charcoal');
-  const [localTrimColor, setLocalTrimColor] = useState(design.trimColor || 'white');
-  const [localSoffitColor, setLocalSoffitColor] = useState(design.soffitColor || 'white');
+  const [localWallColor, setLocalWallColor] = useState(design.wallColor || 'ash-gray');
+  const [localRoofColor, setLocalRoofColor] = useState(design.roofColor || 'ash-gray');
+  const [localTrimColor, setLocalTrimColor] = useState(design.trimColor || 'ash-gray');
+  const [localSoffitColor, setLocalSoffitColor] = useState(design.soffitColor || 'ash-gray');
 
   // View options
   const [showFraming, setShowFraming] = useState(false);
@@ -60,7 +60,7 @@ export default function Building3D({ design }: Building3DProps) {
 
   // Sync local color state with design prop changes (for preview updates)
   useEffect(() => {
-    setLocalWallColor(design.wallColor || 'white');
+    setLocalWallColor(design.wallColor || 'ash-gray');
   }, [design.wallColor]);
 
   useEffect(() => {
@@ -145,7 +145,7 @@ export default function Building3D({ design }: Building3DProps) {
 
       // Update wall color - update both color and texture
       // Update wall color - update both color and texture
-      const wallColorHex = wallColors.find(c => c.value === localWallColor)?.hex || '#FFFFFF';
+      const wallColorHex = wallColors.find(c => c.value === localWallColor)?.hex || '#808080';
       if (wallMeshRef.current) {
         const wallColor = new THREE.Color(wallColorHex);
         const buildingHeight = parseInt(design.clearHeight) || 12;
@@ -284,8 +284,10 @@ export default function Building3D({ design }: Building3DProps) {
     // Dynamically import Three.js and Sky
     Promise.all([
       import('three'),
-      import('three/examples/jsm/objects/Sky.js')
-    ]).then(([THREE, { Sky }]) => {
+      import('three/examples/jsm/objects/Sky.js'),
+      import('three/examples/jsm/loaders/OBJLoader.js'),
+      import('three/examples/jsm/loaders/MTLLoader.js')
+    ]).then(([THREE, { Sky }, { OBJLoader }, { MTLLoader }]) => {
       if (!mountRef.current) return;
 
       try {
@@ -347,6 +349,13 @@ export default function Building3D({ design }: Building3DProps) {
           const width = mountRef.current.clientWidth || 800;
           const height = mountRef.current.clientHeight || 600;
           renderer.setSize(width, height);
+
+          // Enable Shadows and Tone Mapping for Realism
+          renderer.shadowMap.enabled = true;
+          renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          renderer.toneMappingExposure = 0.8;
+
           mountRef.current.appendChild(renderer.domElement);
 
           // Verify WebGL is actually working
@@ -371,13 +380,13 @@ export default function Building3D({ design }: Building3DProps) {
 
         const sun = new THREE.Vector3();
         const effectController = {
-          turbidity: 10,
-          rayleigh: 3,
+          turbidity: 4.0, // Realistic haze
+          rayleigh: 2.0, // Natural blue
           mieCoefficient: 0.005,
-          mieDirectionalG: 0.7,
-          elevation: 2,
-          azimuth: 180,
-          exposure: renderer.toneMappingExposure
+          mieDirectionalG: 0.8, // Subtle sun glow
+          elevation: 45, // Daytime brightness
+          azimuth: 180, // South (Front lit)
+          exposure: 0.7 // Balanced exposure for realism
         };
 
         const uniforms = sky.material.uniforms;
@@ -415,13 +424,27 @@ export default function Building3D({ design }: Building3DProps) {
         }
 
         // Enhanced lighting for better visuals
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 1.2);
         scene.add(ambientLight);
 
-        // Main directional light (sun)
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-        dirLight.position.set(50, 100, 50);
+        // Main directional light (Sunlight) - Match Sky Sun Position
+        const dirLight = new THREE.DirectionalLight(0xffffff, 2.5); // Stronger sun
+        // Calculate position from sun vector (large scale)
+        dirLight.position.setFromSphericalCoords(100, phi, theta);
         dirLight.castShadow = true;
+
+        // Improve shadow quality
+        dirLight.shadow.mapSize.width = 2048;
+        dirLight.shadow.mapSize.height = 2048;
+        dirLight.shadow.camera.near = 0.5;
+        dirLight.shadow.camera.far = 500;
+        // Adjust shadow camera to cover building area
+        const d = 100;
+        dirLight.shadow.camera.left = -d;
+        dirLight.shadow.camera.right = d;
+        dirLight.shadow.camera.top = d;
+        dirLight.shadow.camera.bottom = -d;
+
         scene.add(dirLight);
 
         // Additional fill light
@@ -2694,48 +2717,90 @@ export default function Building3D({ design }: Building3DProps) {
         // Create grass texture for floor
         const createGrassTexture = () => {
           const canvas = document.createElement('canvas');
-          canvas.height = 512;
+          canvas.width = 1024;
+          canvas.height = 1024;
           const ctx = canvas.getContext('2d')!;
 
-          // Base grass color
-          const baseColor = design.floorFinish === 'concrete' ? '#d3d3d3' : '#7cb342';
-          ctx.fillStyle = baseColor;
-          ctx.fillRect(0, 0, 512, 512);
+          // 1. Base Ground Colors (Multi-layered)
+          if (design.floorFinish === 'concrete') {
+            ctx.fillStyle = '#e0e0e0';
+            ctx.fillRect(0, 0, 1024, 1024);
+          } else {
+            // Draw a base dark green
+            ctx.fillStyle = '#2d4c06';
+            ctx.fillRect(0, 0, 1024, 1024);
 
-          if (design.floorFinish !== 'concrete') {
-            // Add grass texture variation
-            for (let i = 0; i < 2000; i++) {
-              const x = Math.random() * 512;
-              const y = Math.random() * 512;
-              const brightness = Math.random() * 0.3 + 0.7;
-              const grassColor = new THREE.Color(baseColor).lerp(new THREE.Color(0xffffff), brightness - 0.7);
-              ctx.fillStyle = grassColor.getStyle();
-              ctx.fillRect(x, y, 2, 2);
-            }
-
-            // Add darker patches
-            for (let i = 0; i < 100; i++) {
-              const x = Math.random() * 512;
-              const y = Math.random() * 512;
-              const size = Math.random() * 10 + 5;
-              const darkColor = new THREE.Color(baseColor).lerp(new THREE.Color(0x000000), 0.2);
-              ctx.fillStyle = darkColor.getStyle();
-              ctx.fillRect(x, y, size, size);
+            // Layer varied green patches
+            for (let i = 0; i < 50; i++) {
+              const x = Math.random() * 1024;
+              const y = Math.random() * 1024;
+              const rad = Math.random() * 400 + 200;
+              const colors = ['#3d6414', '#557d1b', '#4b7512', '#355e11'];
+              const grd = ctx.createRadialGradient(x, y, 0, x, y, rad);
+              grd.addColorStop(0, colors[Math.floor(Math.random() * colors.length)]);
+              grd.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = grd;
+              ctx.globalAlpha = 0.6;
+              ctx.beginPath();
+              ctx.arc(x, y, rad, 0, Math.PI * 2);
+              ctx.fill();
             }
           }
+
+          if (design.floorFinish !== 'concrete') {
+            // 2. Add Blade Details / Noise
+            ctx.globalAlpha = 0.4;
+            for (let i = 0; i < 60000; i++) {
+              const x = Math.random() * 1024;
+              const y = Math.random() * 1024;
+              const w = Math.random() * 2 + 1;
+              const h = Math.random() * 8 + 2;
+
+              const shade = Math.random();
+              if (shade < 0.3) ctx.fillStyle = '#1e3304'; // Deep shadow
+              else if (shade < 0.6) ctx.fillStyle = '#8cb845'; // Highlight
+              else ctx.fillStyle = '#d4e157'; // Dry/Light tip
+
+              ctx.fillRect(x, y, w, h);
+            }
+
+            // 3. Add organic brown/dirt patches
+            ctx.globalAlpha = 0.15;
+            for (let i = 0; i < 15; i++) {
+              const x = Math.random() * 1024;
+              const y = Math.random() * 1024;
+              const rad = Math.random() * 200 + 50;
+              const grd = ctx.createRadialGradient(x, y, 0, x, y, rad);
+              grd.addColorStop(0, '#5d4037'); // Dirt brown
+              grd.addColorStop(1, 'rgba(0,0,0,0)');
+              ctx.fillStyle = grd;
+              ctx.beginPath();
+              ctx.arc(x, y, rad, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          } else {
+            // Concrete Details
+            for (let i = 0; i < 50000; i++) {
+              const x = Math.random() * 1024;
+              const y = Math.random() * 1024;
+              ctx.fillStyle = Math.random() > 0.5 ? '#ffffff' : '#000000';
+              ctx.globalAlpha = 0.05;
+              ctx.fillRect(x, y, 2, 2);
+            }
+          }
+          ctx.globalAlpha = 1.0;
 
           const texture = new THREE.CanvasTexture(canvas);
           texture.wrapS = THREE.RepeatWrapping;
           texture.wrapT = THREE.RepeatWrapping;
-          texture.repeat.set(10, 10);
           return texture;
         };
 
         // Floor - Garden Look
         // Make it much larger to feel like a "real garden" environment
-        const floorGeometry = new THREE.PlaneGeometry(1000, 1000);
+        const floorGeometry = new THREE.PlaneGeometry(500, 500);
         const floorTexture = createGrassTexture();
-        // Repeat texture more for larger area
+        // Repeat texture less for smaller area
         floorTexture.repeat.set(50, 50);
 
         const floorColor = isInteriorView ? 0x8b4513 : 0x7cb342;
@@ -2766,50 +2831,94 @@ export default function Building3D({ design }: Building3DProps) {
           backWall.position.set(0, buildingHeight / 2, -buildingLength / 2);
           backWall.rotation.y = 0;
           backWall.name = 'backWall'; // Name it so we can find and hide it
-          scene.add(backWall);
         }
 
         // Add trees in the background (only in exterior view)
         if (!isInteriorView) {
-          const createTree = (x: number, z: number, scale: number = 1) => {
-            const treeGroup = new THREE.Group();
+          // Load 3D Tree Model
+          // Load Detailed Tree Model with MTL
+          const mtlLoader = new MTLLoader();
+          mtlLoader.setPath('/assets/tree_02/');
+          mtlLoader.load('Tree.mtl', (materials: any) => {
+            materials.preload();
+            const objLoader = new OBJLoader();
+            objLoader.setMaterials(materials);
+            objLoader.setPath('/assets/tree_02/');
+            objLoader.load('Tree.obj', (object: any) => {
+              object.traverse((child: any) => {
+                if (child.isMesh) {
+                  child.castShadow = true;
+                  child.receiveShadow = true;
+                }
+              });
 
-            // Tree trunk
-            const trunkGeometry = new THREE.CylinderGeometry(0.3 * scale, 0.4 * scale, 3 * scale, 8);
-            const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
-            const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
-            trunk.position.y = 1.5 * scale;
-            treeGroup.add(trunk);
+              const numTrees = 500; // High density as requested
+              const minRadius = Math.max(buildingWidth, buildingLength) * 1.5 + 15;
+              const maxRadius = 240; // Within 500x500 grass area
 
-            // Tree foliage (cone shape)
-            const foliageGeometry = new THREE.ConeGeometry(2 * scale, 4 * scale, 8);
-            const foliageMaterial = new THREE.MeshStandardMaterial({
-              color: new THREE.Color(0x2d5016).lerp(new THREE.Color(0x4a7c2a), Math.random() * 0.3)
+              for (let i = 0; i < numTrees; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = minRadius + Math.random() * (maxRadius - minRadius);
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+
+                const treeInstance = object.clone();
+                const scale = 3.0 + Math.random() * 4.0; // Scaled for prominence
+                treeInstance.scale.set(scale, scale, scale);
+                treeInstance.position.set(x, 0, z);
+                treeInstance.rotation.y = Math.random() * Math.PI * 2;
+
+                bgGroup.add(treeInstance);
+              }
             });
-            const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
-            foliage.position.y = 3 * scale + 2 * scale;
-            treeGroup.add(foliage);
-
-            treeGroup.position.set(x, 0, z);
-            return treeGroup;
-          };
-
-          // Add multiple trees in the background
-          const treePositions = [
-            [-buildingWidth * 1.5, -buildingLength * 1.2],
-            [-buildingWidth * 1.8, -buildingLength * 1.5],
-            [-buildingWidth * 2.1, -buildingLength * 1.0],
-            [buildingWidth * 1.5, -buildingLength * 1.2],
-            [buildingWidth * 1.8, -buildingLength * 1.5],
-            [buildingWidth * 2.1, -buildingLength * 1.0],
-            [-buildingWidth * 1.3, -buildingLength * 0.8],
-            [buildingWidth * 1.3, -buildingLength * 0.8],
-          ];
-
-          treePositions.forEach(([x, z]) => {
-            const tree = createTree(x, z, 0.8 + Math.random() * 0.4);
-            bgGroup.add(tree);
           });
+
+          // Add Realistic Cirrus Clouds (High Altitude Plane)
+          const cloudCanvas = document.createElement('canvas');
+          cloudCanvas.width = 1024;
+          cloudCanvas.height = 1024;
+          const cloudCtx = cloudCanvas.getContext('2d')!;
+          cloudCtx.fillStyle = 'rgba(255, 255, 255, 0)';
+          cloudCtx.fillRect(0, 0, 1024, 1024);
+
+          // Draw wispy cirrus streaks
+          for (let i = 0; i < 15; i++) {
+            const x = Math.random() * 1024;
+            const y = Math.random() * 1024;
+            const w = 400 + Math.random() * 600;
+            const h = 5 + Math.random() * 15;
+            const grd = cloudCtx.createLinearGradient(x, y, x + w, y + h);
+            grd.addColorStop(0, 'rgba(255, 255, 255, 0)');
+            grd.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
+            grd.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            cloudCtx.fillStyle = grd;
+            cloudCtx.globalAlpha = 0.5;
+            cloudCtx.save();
+            cloudCtx.translate(x, y);
+            cloudCtx.rotate(Math.PI / 4 + (Math.random() - 0.5) * 0.2); // Diagonal streaks
+            cloudCtx.fillRect(0, 0, w, h);
+            cloudCtx.restore();
+          }
+
+          const cloudTexture = new THREE.CanvasTexture(cloudCanvas);
+          cloudTexture.wrapS = THREE.RepeatWrapping;
+          cloudTexture.wrapT = THREE.RepeatWrapping;
+          cloudTexture.repeat.set(10, 10);
+
+          const cloudPlaneGeo = new THREE.PlaneGeometry(5000, 5000);
+          const cloudPlaneMat = new THREE.MeshBasicMaterial({
+            map: cloudTexture,
+            transparent: true,
+            opacity: 0.5,
+            depthWrite: false,
+            side: THREE.DoubleSide
+          });
+
+          const cloudPlane = new THREE.Mesh(cloudPlaneGeo, cloudPlaneMat);
+          cloudPlane.position.set(0, 800, 0); // Very high up
+          cloudPlane.rotation.x = Math.PI / 2;
+          bgGroup.add(cloudPlane);
+
         }
 
         scene.add(bgGroup);

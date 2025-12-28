@@ -1,4 +1,5 @@
 import React from 'react';
+import ChatWidget from './ChatWidget';
 
 interface FooterProps {
     onBack?: () => void;
@@ -55,6 +56,9 @@ export default function Footer({
                     </button>
                 )}
             </div>
+
+            {/* Chat Widget */}
+            <ChatWidget />
         </div>
     );
 }
