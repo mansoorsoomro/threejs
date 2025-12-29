@@ -418,8 +418,8 @@ export default function Building3D({ design }: Building3DProps) {
           camera.position.set(0, height * 0.4, length * 0.3);
           camera.lookAt(0, height * 0.4, -length / 2);
         } else {
-          // Exterior view: camera outside building - ZOOMED OUT
-          camera.position.set(width * 1.5, length * 1.0, width * 1.5);
+          // Exterior view: camera outside building - ZOOMED IN FOR BETTER FOCUS
+          camera.position.set(width * 1.2, length * 0.8, width * 1.2);
           camera.lookAt(0, 0, 0);
         }
 
@@ -2798,10 +2798,10 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Floor - Garden Look
         // Make it much larger to feel like a "real garden" environment
-        const floorGeometry = new THREE.PlaneGeometry(500, 500);
+        const floorGeometry = new THREE.PlaneGeometry(1000, 1000);
         const floorTexture = createGrassTexture();
         // Repeat texture less for smaller area
-        floorTexture.repeat.set(50, 50);
+        floorTexture.repeat.set(100, 100);
 
         const floorColor = isInteriorView ? 0x8b4513 : 0x7cb342;
         const floorMaterial = new THREE.MeshStandardMaterial({
@@ -2853,8 +2853,8 @@ export default function Building3D({ design }: Building3DProps) {
               });
 
               const numTrees = 500; // High density as requested
-              const minRadius = Math.max(buildingWidth, buildingLength) * 1.5 + 15;
-              const maxRadius = 240; // Within 500x500 grass area
+              const minRadius = Math.max(buildingWidth, buildingLength) * 2.5 + 40;
+              const maxRadius = 350; // Within extended landscape area
 
               for (let i = 0; i < numTrees; i++) {
                 const angle = Math.random() * Math.PI * 2;
@@ -3217,7 +3217,7 @@ export default function Building3D({ design }: Building3DProps) {
         cameraRef.current.position.set(0, height * 0.4, length * 0.3);
         cameraRef.current.lookAt(0, height * 0.4, -length / 2);
       } else {
-        cameraRef.current.position.set(width * 1.5, length * 1.0, width * 1.5);
+        cameraRef.current.position.set(width * 1.2, length * 0.8, width * 1.2);
         cameraRef.current.lookAt(0, 0, 0);
       }
     }
