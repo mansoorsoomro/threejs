@@ -207,14 +207,14 @@ export default function Building3D({ design }: Building3DProps) {
 
   // Update visibility when view options change
   useEffect(() => {
-    // Frame visibility: Show when showFraming toggle is ON
+    // Frame visibility: Always visible (both in Home and Framing views)
     if (framingGroupRef.current) {
-      framingGroupRef.current.visible = showFraming;
+      framingGroupRef.current.visible = true;
     }
 
-    // Walls visibility: Hide when frame is shown (opposite of frame)
-    // When "Framing" toggle ON -> hide walls, show frame
-    // When "Framing" toggle OFF -> show walls, hide frame
+    // Walls visibility: Hidden in Framing view, visible in Home view
+    // Home view (showFraming=false): Walls visible with frame
+    // Framing view (showFraming=true): Only frame visible, walls hidden
     if (wallMeshRef.current) {
       if (wallMeshRef.current.children) {
         // Wall group - hide all children when frame is shown
@@ -234,8 +234,9 @@ export default function Building3D({ design }: Building3DProps) {
       }
     });
 
-    // Roof visibility: Hide when frame is shown
-    // Show only when frame is OFF and showRoof is ON
+    // Roof visibility: Hidden in Framing view, visible in Home view (if showRoof is ON)
+    // Home view (showFraming=false): Roof visible if showRoof is true
+    // Framing view (showFraming=true): Roof hidden
     if (roofMeshRef.current) {
       roofMeshRef.current.visible = showRoof && !showFraming;
     }
@@ -864,8 +865,8 @@ export default function Building3D({ design }: Building3DProps) {
 
         scene.add(wallGroup);
         wallMeshRef.current = wallGroup;
-        // Walls hidden when frame is shown (opposite of frame)
-        // When frame is ON, walls are OFF. When frame is OFF, walls are ON
+        // Walls visibility: Hidden in Framing view, visible in Home view
+        // Home view (showFraming=false): Walls visible. Framing view (showFraming=true): Walls hidden
         wallGroup.visible = !showFraming;
 
         // --- OPENING FRAMES & DOORS ---
@@ -1067,13 +1068,16 @@ export default function Building3D({ design }: Building3DProps) {
         }
 
         // OFFSET CONSTANTS for layering "Inside -> Out"
-        // 0. Frame (Base)
+        // 0. Frame (Base) - Trusses and Purlins
         // 1. Walls (Cladding) = Frame + 0.1
         // 2. Trim = Walls + 0.1
-        const ROOF_OFFSET = 0.15; // Roof cladding offset
+        // 3. Roof (Cladding) = On top of purlins
+        const purlinHeight = 0.125; // Purlin height (1.5")
+        // Increase roof offset to further separate roof cladding from wood framing
+        const ROOF_OFFSET = 0.4; // Roof cladding offset - positions roof above purlins
 
-        const endWallOverhang = parseFloat(design.endWallOverhang || '0');
-        const sidewallOverhang = parseFloat(design.sidewallOverhang || '0');
+        const endWallOverhang = parseFloat(design.endWallOverhang || '0') + 1.0;
+        const sidewallOverhang = parseFloat(design.sidewallOverhang || '0') + 1.0;
 
         // Create framing group for visibility toggling
         const framingGroup = new THREE.Group();
@@ -1722,8 +1726,9 @@ export default function Building3D({ design }: Building3DProps) {
           });
 
           // 4. ROOF PURLINS (evenly spaced as shown in image)
-          const purlinOverhang = endWallOverhang > 0 ? parseFloat(design.endWallOverhang || '0') : 1.5;
-          const purlinLength = buildingLength + (purlinOverhang * 2);
+          // Purlins should be shorter than roof - roof extends beyond purlins
+          // Use building length only (no overhang) so roof covers them
+          const purlinLength = buildingLength;
           const purlinW = 0.29; // 3.5"
           const purlinH = 0.125; // 1.5"
           const pSlopeLen = Math.sqrt(Math.pow(buildingWidth / 2, 2) + Math.pow(peakHeight - buildingHeight, 2));
@@ -1739,23 +1744,28 @@ export default function Building3D({ design }: Building3DProps) {
             const x = ratio * (buildingWidth / 2);
             const yDrop = ratio * (peakHeight - buildingHeight);
 
+            // Purlin positioning: On top of rafters (truss structure)
+            // Rafters are at peakHeight level, purlins sit on top (slightly above for rafter thickness)
+            const purlinYOffset = trussThickness / 2; // Position purlins on top of rafter surface
+
             // Left slope purlin
             const lP = new THREE.Mesh(purlinGeo, woodMaterial);
             lP.rotation.z = roofAngle;
-            lP.position.set(-x, peakHeight - yDrop + 0.2 + ROOF_OFFSET, 0);
+            lP.position.set(-x, peakHeight - yDrop + purlinYOffset, 0);
             framingGroup.add(lP);
 
             // Right slope purlin
             const rP = new THREE.Mesh(purlinGeo, woodMaterial);
             rP.rotation.z = -roofAngle;
-            rP.position.set(x, peakHeight - yDrop + 0.2 + ROOF_OFFSET, 0);
+            rP.position.set(x, peakHeight - yDrop + purlinYOffset, 0);
             framingGroup.add(rP);
           }
 
-          // Ridge Cap (at peak)
+          // Ridge Cap (at peak) - positioned on top of trusses
           const rCapGeo = new THREE.BoxGeometry(0.3, 0.15, purlinLength);
           const rCap = new THREE.Mesh(rCapGeo, woodMaterial);
-          rCap.position.set(0, peakHeight + 0.2 + ROOF_OFFSET, 0);
+          rCap.name = 'ridgeBeam';
+          rCap.position.set(0, peakHeight + trussThickness / 2, 0);
           framingGroup.add(rCap);
 
           // 3.5 FLOOR - Internal Building Pad
@@ -2026,8 +2036,9 @@ export default function Building3D({ design }: Building3DProps) {
           }
 
           // 10. ROOF PURLINS
-          const purlinOverhang = endWallOverhang > 0 ? parseFloat(design.endWallOverhang || '0') : 1.5;
-          const purlinLength = buildingLength + (purlinOverhang * 2);
+          // Purlins should be shorter than roof - roof extends beyond purlins
+          // Use building length only (no overhang) so roof covers them
+          const purlinLength = buildingLength;
           const purlinW = 0.29; // 3.5"
           const purlinH = 0.125; // 1.5"
           const pSlopeLen = Math.sqrt(Math.pow(buildingWidth / 2, 2) + Math.pow(peakHeight - buildingHeight, 2));
@@ -2041,14 +2052,18 @@ export default function Building3D({ design }: Building3DProps) {
             const x = ratio * (buildingWidth / 2);
             const yDrop = ratio * (peakHeight - buildingHeight);
 
+            // Purlin positioning: On top of rafters (truss structure)
+            // Rafters use studWidth, purlins sit on top
+            const purlinYOffset = studWidth / 2; // Position purlins on top of rafter surface
+
             const lP = new THREE.Mesh(purlinGeo, woodMaterial);
             lP.rotation.z = roofAngle;
-            lP.position.set(-x, peakHeight - yDrop + 0.2, 0);
+            lP.position.set(-x, peakHeight - yDrop + purlinYOffset, 0);
             framingGroup.add(lP);
 
             const rP = new THREE.Mesh(purlinGeo, woodMaterial);
             rP.rotation.z = -roofAngle;
-            rP.position.set(x, peakHeight - yDrop + 0.2, 0);
+            rP.position.set(x, peakHeight - yDrop + purlinYOffset, 0);
             framingGroup.add(rP);
           }
 
@@ -2206,6 +2221,13 @@ export default function Building3D({ design }: Building3DProps) {
           let leftRoofAlphaMap = null;
           let leftRoofMatProps: any = { color: roofColor3D, side: THREE.DoubleSide };
 
+          // Use polygon offset to avoid z-fighting with underlying framing (purlins/rafters)
+          // and ensure the roof renders cleanly over the wood members.
+          leftRoofMatProps.polygonOffset = true;
+          // stronger offset to ensure roof renders above thin wood members
+          leftRoofMatProps.polygonOffsetFactor = -10;
+          leftRoofMatProps.polygonOffsetUnits = 10;
+
           if (skylightLen > 0 && leftSkyQty > 0) {
             leftRoofAlphaMap = generateRoofAlphaMap(slopeLength, totalLen, skylightLen, leftSkyQty);
             leftRoofMatProps.alphaMap = leftRoofAlphaMap;
@@ -2216,6 +2238,12 @@ export default function Building3D({ design }: Building3DProps) {
 
           let rightRoofAlphaMap = null;
           let rightRoofMatProps: any = { color: roofColor3D, side: THREE.DoubleSide };
+
+          // Use polygon offset to avoid z-fighting with underlying framing (purlins/rafters)
+          rightRoofMatProps.polygonOffset = true;
+          // stronger offset to ensure roof renders above thin wood members
+          rightRoofMatProps.polygonOffsetFactor = -10;
+          rightRoofMatProps.polygonOffsetUnits = 10;
 
           if (skylightLen > 0 && rightSkyQty > 0) {
             rightRoofAlphaMap = generateRoofAlphaMap(slopeLength, totalLen, skylightLen, rightSkyQty);
@@ -2229,6 +2257,8 @@ export default function Building3D({ design }: Building3DProps) {
           const lMesh = new THREE.Mesh(simpleGeo, leftRoofMaterial);
           lMesh.rotation.set(0, 0, angle);
           lMesh.position.set(-run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
+          // Ensure roof draws after framing
+          lMesh.renderOrder = 1000;
           roofGroup.add(lMesh);
 
           // Right Side Mesh
@@ -2237,6 +2267,7 @@ export default function Building3D({ design }: Building3DProps) {
           // Rotation Z: -angle.
           rMesh.rotation.set(0, 0, -angle);
           rMesh.position.set(run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
+          rMesh.renderOrder = 1000;
 
           // --- RIDGE CAP ---
           if (design.ridgeOptions && design.ridgeOptions !== 'None') {
@@ -2348,8 +2379,16 @@ export default function Building3D({ design }: Building3DProps) {
             }
           }
 
+          // Ensure roofGroup renders after framing group and sits above wood
+          roofGroup.renderOrder = 1000;
+          soffitGroup.renderOrder = 999;
+
           roofGroup.add(lMesh);
           roofGroup.add(rMesh);
+
+          // Hide central ridge beam from framing when roof is visible
+          const ridgeBeam = framingGroup.getObjectByName && framingGroup.getObjectByName('ridgeBeam');
+          if (ridgeBeam) ridgeBeam.visible = !showRoof;
 
           // --- SNOW GUARDS ---
           if (design.snowGuards === 'Yes') {
@@ -2576,7 +2615,9 @@ export default function Building3D({ design }: Building3DProps) {
         // 2. GABLE / RAKE TRIM - Follows the roof slope on front and back
         const roofHeight = peakHeight - buildingHeight;
         const roofHalfWidth = buildingWidth / 2;
-        const roofSlopeLength = Math.sqrt(roofHeight * roofHeight + roofHalfWidth * roofHalfWidth);
+        const roofRunInclOverhang = roofHalfWidth + sidewallOverhang;
+        const roofHeightInclOverhang = roofHeight + (sidewallOverhang * Math.tan(roofAngle));
+        const roofSlopeLength = Math.sqrt(roofHeightInclOverhang * roofHeightInclOverhang + roofRunInclOverhang * roofRunInclOverhang);
         // roofAngle already calculated above
 
         const getFasciaHeight = () => {
@@ -2597,29 +2638,29 @@ export default function Building3D({ design }: Building3DProps) {
         // Front Left Rake
         const flRake = new THREE.Mesh(rakeGeo, trimMaterial);
         flRake.rotation.z = roofAngle;
-        // Position: X needs to be midpoint of slope, Y midpoint of slope height + wall height
-        flRake.position.set(-roofHalfWidth / 2, buildingHeight + roofHeight / 2, buildingLength / 2 + trimThickness / 2);
+        // Position: X needs to be midpoint of slope (including overhang), Y midpoint of slope height + wall height
+        flRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), buildingLength / 2 + trimThickness / 2 + endWallOverhang);
         scene.add(flRake);
         trimMeshesRef.current.push(flRake);
 
         // Front Right Rake
         const frRake = new THREE.Mesh(rakeGeo, trimMaterial);
         frRake.rotation.z = -roofAngle;
-        frRake.position.set(roofHalfWidth / 2, buildingHeight + roofHeight / 2, buildingLength / 2 + trimThickness / 2);
+        frRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), buildingLength / 2 + trimThickness / 2 + endWallOverhang);
         scene.add(frRake);
         trimMeshesRef.current.push(frRake);
 
         // Back Left Rake
         const blRake = new THREE.Mesh(rakeGeo, trimMaterial);
         blRake.rotation.z = roofAngle;
-        blRake.position.set(-roofHalfWidth / 2, buildingHeight + roofHeight / 2, -buildingLength / 2 - trimThickness / 2);
+        blRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
         scene.add(blRake);
         trimMeshesRef.current.push(blRake);
 
         // Back Right Rake
         const brRake = new THREE.Mesh(rakeGeo, trimMaterial);
         brRake.rotation.z = -roofAngle;
-        brRake.position.set(roofHalfWidth / 2, buildingHeight + roofHeight / 2, -buildingLength / 2 - trimThickness / 2);
+        brRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
         scene.add(brRake);
         trimMeshesRef.current.push(brRake);
 
@@ -2628,13 +2669,13 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Left Eave
         const leftEave = new THREE.Mesh(eaveTrimGeo, trimMaterial);
-        leftEave.position.set(-buildingWidth / 2 - trimThickness / 2, buildingHeight - 0.2, 0);
+        leftEave.position.set(-roofRunInclOverhang - trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) - 0.2, 0);
         scene.add(leftEave);
         trimMeshesRef.current.push(leftEave);
 
         // Right Eave
         const rightEave = new THREE.Mesh(eaveTrimGeo, trimMaterial);
-        rightEave.position.set(buildingWidth / 2 + trimThickness / 2, buildingHeight - 0.2, 0);
+        rightEave.position.set(roofRunInclOverhang + trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) - 0.2, 0);
         scene.add(rightEave);
         trimMeshesRef.current.push(rightEave);
 
@@ -2929,8 +2970,8 @@ export default function Building3D({ design }: Building3DProps) {
         // Structure order: 1. Frame (base), 2. Walls (on frame), 3. Roof (on top)
         scene.add(framingGroup);
         framingGroupRef.current = framingGroup;
-        // Frame visible when showFraming toggle is ON
-        framingGroup.visible = showFraming;
+        // Frame always visible (both in Home and Framing views)
+        framingGroup.visible = true;
 
         // Simple controls
         let isDragging = false;
