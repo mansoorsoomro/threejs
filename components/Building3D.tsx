@@ -494,52 +494,96 @@ export default function Building3D({ design }: Building3DProps) {
         const trimColor3D = new THREE.Color(trimColorHex);
 
         // Create corrugated metal texture for walls
+        // Create corrugated metal texture for walls
         const createCorrugatedTexture = (color: THREE.Color, textureWidth: number, textureHeight: number, isVertical: boolean = true, repeatX: number = 1, repeatY: number = 1) => {
           const canvas = document.createElement('canvas');
           canvas.width = textureWidth;
           canvas.height = textureHeight;
           const ctx = canvas.getContext('2d')!;
 
-          // Check if color is white (or very close to white) - for pure white, no shadows/highlights
-          const isWhite = color.r > 0.95 && color.g > 0.95 && color.b > 0.95;
-
           // Base color
           ctx.fillStyle = color.getStyle();
           ctx.fillRect(0, 0, textureWidth, textureHeight);
 
-          // For white colors, skip shadows/highlights to keep it pure white
+          // Check if color is white (or very close) - apply subtler effect if so
+          const isWhite = color.r > 0.9 && color.g > 0.9 && color.b > 0.9;
+
           if (!isWhite) {
-            // Create corrugated pattern
-            const patternSize = 8; // Size of each corrugation
-            const gradient = ctx.createLinearGradient(0, 0, isVertical ? 0 : textureWidth, isVertical ? textureHeight : 0);
+            // "Rib" parameters
+            // Based on user image: wide flat valleys, narrow raised ribs.
+            // Let's say rib is 1 unit, valley is 3 units.
+            const ribSpacing = 32; // Pixels per rib cycle
+            const ribWidth = 12;   // Width of the raised part
 
-            // Add highlights and shadows for 3D effect
-            for (let i = 0; i < (isVertical ? textureHeight : textureWidth); i += patternSize) {
-              const pos = i / (isVertical ? textureHeight : textureWidth);
-              const highlight = color.clone().lerp(new THREE.Color(0xffffff), 0.15);
-              const shadow = color.clone().lerp(new THREE.Color(0x000000), 0.15);
+            // Loop across the surface
+            const limit = isVertical ? textureWidth : textureHeight;
+            const length = isVertical ? textureHeight : textureWidth;
 
-              gradient.addColorStop(Math.max(0, pos - 0.1), highlight.getStyle());
-              gradient.addColorStop(pos, color.getStyle());
-              gradient.addColorStop(Math.min(1, pos + 0.1), shadow.getStyle());
-            }
+            // Colors for lighting
+            const highlight = color.clone().lerp(new THREE.Color(0xffffff), 0.3).getStyle();
+            const shadow = color.clone().lerp(new THREE.Color(0x000000), 0.3).getStyle();
+            const deepShadow = color.clone().lerp(new THREE.Color(0x000000), 0.5).getStyle();
 
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, textureWidth, textureHeight);
+            for (let i = 0; i < limit; i += ribSpacing) {
+              const x = i;
 
-            // Add vertical lines for corrugation effect
-            ctx.strokeStyle = color.clone().lerp(new THREE.Color(0x000000), 0.1).getStyle();
-            ctx.lineWidth = 1;
-            for (let i = 0; i < (isVertical ? textureWidth : textureHeight); i += patternSize) {
-              ctx.beginPath();
               if (isVertical) {
-                ctx.moveTo(i, 0);
-                ctx.lineTo(i, textureHeight);
+                // Draw Rib vertical
+                // Left Edge (Highlight - Light from top-left/left)
+                ctx.fillStyle = highlight;
+                ctx.fillRect(x, 0, ribWidth / 2, length);
+
+                // Right Edge (Shadow)
+                ctx.fillStyle = shadow;
+                ctx.fillRect(x + ribWidth / 2, 0, ribWidth / 2, length);
+
+                // Sharp crease shadow at the very edge of the rib to make it "pop"
+                ctx.fillStyle = deepShadow;
+                ctx.fillRect(x + ribWidth, 0, 1, length);
+
               } else {
-                ctx.moveTo(0, i);
-                ctx.lineTo(textureWidth, i);
+                // Draw Rib horizontal
+                // Top Edge (Highlight)
+                ctx.fillStyle = highlight;
+                ctx.fillRect(0, x, length, ribWidth / 2);
+
+                // Bottom Edge (Shadow)
+                ctx.fillStyle = shadow;
+                ctx.fillRect(0, x + ribWidth / 2, length, ribWidth / 2);
+
+                // Sharp crease
+                ctx.fillStyle = deepShadow;
+                ctx.fillRect(0, x + ribWidth, length, 1);
               }
-              ctx.stroke();
+            }
+          } else {
+            // For white, use very subtle greys
+            const ribSpacing = 32;
+            const ribWidth = 12;
+            const limit = isVertical ? textureWidth : textureHeight;
+            const length = isVertical ? textureHeight : textureWidth;
+
+            const highlight = '#ffffff';
+            const shadow = '#e0e0e0';
+            const deepShadow = '#cccccc';
+
+            for (let i = 0; i < limit; i += ribSpacing) {
+              const x = i;
+              if (isVertical) {
+                ctx.fillStyle = highlight;
+                ctx.fillRect(x, 0, ribWidth / 2, length);
+                ctx.fillStyle = shadow;
+                ctx.fillRect(x + ribWidth / 2, 0, ribWidth / 2, length);
+                ctx.fillStyle = deepShadow;
+                ctx.fillRect(x + ribWidth, 0, 1, length);
+              } else {
+                ctx.fillStyle = highlight;
+                ctx.fillRect(0, x, length, ribWidth / 2);
+                ctx.fillStyle = shadow;
+                ctx.fillRect(0, x + ribWidth / 2, length, ribWidth / 2);
+                ctx.fillStyle = deepShadow;
+                ctx.fillRect(0, x + ribWidth, length, 1);
+              }
             }
           }
 
@@ -1100,7 +1144,7 @@ export default function Building3D({ design }: Building3DProps) {
 
         // --- GABLE ENDS (Triangular Wall Sections) ---
         // Fill the gap between the top of the wall and the roof peak
-        const gableHeight = peakHeight - buildingHeight;
+        const gableHeight = peakHeight - buildingHeight + ROOF_OFFSET;
         const gableShape = new THREE.Shape();
         gableShape.moveTo(-outerWallWidth / 2, 0); // Bottom-left
         gableShape.lineTo(outerWallWidth / 2, 0);  // Bottom-right
@@ -2322,12 +2366,12 @@ export default function Building3D({ design }: Building3DProps) {
             // Offset for width:
             // lCap should be on the LEFT slope.
             // Center of lCap is at x = -ridgeCapWidth/2 * cos(angle).
-            lCap.position.set(-ridgeCapWidth / 2 * Math.cos(angle), peakHeight + 0.08, 0);
+            lCap.position.set(-ridgeCapWidth / 2 * Math.cos(angle), peakHeight + ROOF_OFFSET + 0.08, 0);
 
             // Right piece
             const rCap = new THREE.Mesh(ridgeGeo.clone(), ridgeMat);
             rCap.rotation.z = -angle; // Matches right slope logic
-            rCap.position.set(ridgeCapWidth / 2 * Math.cos(angle), peakHeight + 0.08, 0);
+            rCap.position.set(ridgeCapWidth / 2 * Math.cos(angle), peakHeight + ROOF_OFFSET + 0.08, 0);
 
             roofGroup.add(lCap);
             roofGroup.add(rCap);
@@ -2357,7 +2401,7 @@ export default function Building3D({ design }: Building3DProps) {
 
               // Front Cap (+Z end)
               const fCap = new THREE.Mesh(capGeo, ridgeMat);
-              fCap.position.set(0, peakHeight + 0.08, totalLen / 2);
+              fCap.position.set(0, peakHeight + ROOF_OFFSET + 0.08, totalLen / 2);
               // Extrude creates volume in +Z. We want it at the end.
               roofGroup.add(fCap);
 
@@ -2374,7 +2418,7 @@ export default function Building3D({ design }: Building3DProps) {
               // Extrude is +Z.
               // Rotate Y 180 (Math.PI).
               bCap.rotation.y = Math.PI;
-              bCap.position.set(0, peakHeight + 0.08, -totalLen / 2);
+              bCap.position.set(0, peakHeight + ROOF_OFFSET + 0.08, -totalLen / 2);
               roofGroup.add(bCap);
             }
           }
@@ -2639,28 +2683,28 @@ export default function Building3D({ design }: Building3DProps) {
         const flRake = new THREE.Mesh(rakeGeo, trimMaterial);
         flRake.rotation.z = roofAngle;
         // Position: X needs to be midpoint of slope (including overhang), Y midpoint of slope height + wall height
-        flRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), buildingLength / 2 + trimThickness / 2 + endWallOverhang);
+        flRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2) + ROOF_OFFSET, buildingLength / 2 + trimThickness / 2 + endWallOverhang);
         scene.add(flRake);
         trimMeshesRef.current.push(flRake);
 
         // Front Right Rake
         const frRake = new THREE.Mesh(rakeGeo, trimMaterial);
         frRake.rotation.z = -roofAngle;
-        frRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), buildingLength / 2 + trimThickness / 2 + endWallOverhang);
+        frRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2) + ROOF_OFFSET, buildingLength / 2 + trimThickness / 2 + endWallOverhang);
         scene.add(frRake);
         trimMeshesRef.current.push(frRake);
 
         // Back Left Rake
         const blRake = new THREE.Mesh(rakeGeo, trimMaterial);
         blRake.rotation.z = roofAngle;
-        blRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
+        blRake.position.set(-roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2) + ROOF_OFFSET, -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
         scene.add(blRake);
         trimMeshesRef.current.push(blRake);
 
         // Back Right Rake
         const brRake = new THREE.Mesh(rakeGeo, trimMaterial);
         brRake.rotation.z = -roofAngle;
-        brRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2), -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
+        brRake.position.set(roofRunInclOverhang / 2, buildingHeight + roofHeight / 2 - (sidewallOverhang * Math.tan(roofAngle) / 2) + ROOF_OFFSET, -buildingLength / 2 - trimThickness / 2 - endWallOverhang);
         scene.add(brRake);
         trimMeshesRef.current.push(brRake);
 
@@ -2669,13 +2713,13 @@ export default function Building3D({ design }: Building3DProps) {
 
         // Left Eave
         const leftEave = new THREE.Mesh(eaveTrimGeo, trimMaterial);
-        leftEave.position.set(-roofRunInclOverhang - trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) - 0.2, 0);
+        leftEave.position.set(-roofRunInclOverhang - trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) + ROOF_OFFSET - (fasciaHeight / 2), 0);
         scene.add(leftEave);
         trimMeshesRef.current.push(leftEave);
 
         // Right Eave
         const rightEave = new THREE.Mesh(eaveTrimGeo, trimMaterial);
-        rightEave.position.set(roofRunInclOverhang + trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) - 0.2, 0);
+        rightEave.position.set(roofRunInclOverhang + trimThickness / 2, buildingHeight - (sidewallOverhang * Math.tan(roofAngle)) + ROOF_OFFSET - (fasciaHeight / 2), 0);
         scene.add(rightEave);
         trimMeshesRef.current.push(rightEave);
 
@@ -2751,7 +2795,7 @@ export default function Building3D({ design }: Building3DProps) {
         // Ridge Cap (Apex Trim)
         const ridgeCapGeo = new THREE.BoxGeometry(0.5, 0.1, buildingLength + 1);
         const ridgeCap = new THREE.Mesh(ridgeCapGeo, trimMaterial);
-        ridgeCap.position.set(0, peakHeight + 0.05, 0);
+        ridgeCap.position.set(0, peakHeight + ROOF_OFFSET + 0.05, 0);
         scene.add(ridgeCap);
         trimMeshesRef.current.push(ridgeCap);
 
