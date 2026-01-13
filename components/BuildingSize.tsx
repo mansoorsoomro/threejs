@@ -272,32 +272,32 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
   };
 
   return (
-    <div className="h-screen bg-gray-50 overflow-hidden">
-      <div className="w-full h-full p-2">
-        <div className="grid grid-cols-12 gap-[10px] h-full">
+    <div className="min-h-screen bg-gray-50 overflow-auto pb-20">
+      <div className="w-full h-full p-2 md:p-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-[10px] min-h-screen">
           {/* Left Side - Options */}
-          <div className="bg-white rounded-lg shadow-md p-4 col-span-12 lg:col-span-4 flex flex-col h-full overflow-hidden">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">
+          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-4 flex flex-col max-h-screen lg:h-full overflow-hidden order-2 lg:order-1">
+            <h2 className="text-base md:text-lg font-bold text-gray-900 mb-3 md:mb-4">
               Building Parameters
             </h2>
             <div className="overflow-y-auto flex-1 pr-2">
               {/* Building Planner Banner */}
-              <div className="mb-4 p-3 border rounded bg-gray-50 flex items-center space-x-4">
+              <div className="mb-3 md:mb-4 p-2 md:p-3 border rounded bg-gray-50 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
                 <img
                   src="/assets/building-planner-323x180.jpg"
                   alt="Open Building Planner"
-                  className="w-36 h-auto rounded shadow-sm"
+                  className="w-full md:w-36 h-auto rounded shadow-sm"
                 />
-                <div className="flex-1">
-                  <h3 className="text-sm font-bold text-gray-900">Use our Building Planner</h3>
-                  <p className="text-xs text-gray-600 mb-2">Estimate the best size building for you.</p>
+                <div className="flex-1 w-full">
+                  <h3 className="text-xs md:text-sm font-bold text-gray-900">Use our Building Planner</h3>
+                  <p className="text-[10px] md:text-xs text-gray-600 mb-2">Estimate the best size building for you.</p>
                   <button
                     onClick={() => window.open(
                       'https://www.midwestmanufacturing.com/MidwestWebsite/web/buildingplanner/index.html',
                       'BuildingPlanner',
                       'width=1200,height=800,resizable=yes,scrollbars=yes'
                     )}
-                    className="inline-block bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition-colors"
+                    className="w-full md:w-auto inline-block bg-blue-600 text-white px-3 py-2 rounded text-xs md:text-sm hover:bg-blue-700 transition-colors"
                   >
                     Open Building Planner
                   </button>
@@ -595,12 +595,12 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
           </div>
 
           {/* Right Side - Data Display */}
-          <div className="bg-white rounded-lg shadow-md p-4 col-span-12 lg:col-span-8 flex flex-col h-full overflow-hidden">
-            <div className="mb-3 flex-shrink-0">
+          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-8 flex flex-col max-h-[60vh] lg:max-h-full lg:h-full overflow-hidden order-1 lg:order-2">
+            <div className="mb-2 md:mb-3 flex-shrink-0">
               <div className="flex space-x-2 border-b">
                 <button
                   onClick={() => setActiveTab('information')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${activeTab === 'information'
+                  className={`px-2 md:px-3 py-1.5 font-semibold rounded-t transition-colors text-xs md:text-sm ${activeTab === 'information'
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
@@ -609,7 +609,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                 </button>
                 <button
                   onClick={() => setActiveTab('3d')}
-                  className={`px-3 py-1.5 font-semibold rounded-t transition-colors text-sm ${activeTab === '3d'
+                  className={`px-2 md:px-3 py-1.5 font-semibold rounded-t transition-colors text-xs md:text-sm ${activeTab === '3d'
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                     }`}
@@ -661,13 +661,13 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                   {/* Conditional Content Based on Active Section */}
                   {activeSection === 'buildingUse' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Building Use</h3>
-                      <div className={`grid gap-3 ${buildingUse ? 'grid-cols-1' : 'grid-cols-2'}`}>
+                      <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 md:mb-3">Building Use</h3>
+                      <div className={`grid gap-2 md:gap-3 ${buildingUse ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                         {/* Rural Card */}
                         {(!buildingUse || buildingUse === 'rural') && (
                           <div
                             onClick={() => setBuildingUse('rural')}
-                            className={`border-2 rounded p-3 cursor-pointer transition-all ${buildingUse === 'rural'
+                            className={`border-2 rounded p-2 md:p-3 cursor-pointer transition-all ${buildingUse === 'rural'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
                               : 'border-gray-300 hover:border-gray-400'
                               }`}
@@ -675,10 +675,10 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             <img
                               src="/assets/rular.jpg"
                               alt="Agricultural Use Building"
-                              className="w-1/2 h-auto rounded mb-2"
+                              className="w-full sm:w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-sm font-semibold text-gray-900 mb-1">Rural</h4>
-                            <p className="text-xs text-gray-600">
+                            <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">Rural</h4>
+                            <p className="text-[10px] md:text-xs text-gray-600">
                               Buildings in a rural or farm setting that don&apos;t need to meet any codes or are code exempt.
                             </p>
                           </div>
@@ -688,7 +688,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                         {(!buildingUse || buildingUse === 'residential-garage-storage') && (
                           <div
                             onClick={() => setBuildingUse('residential-garage-storage')}
-                            className={`border-2 rounded p-3 cursor-pointer transition-all ${buildingUse === 'residential-garage-storage'
+                            className={`border-2 rounded p-2 md:p-3 cursor-pointer transition-all ${buildingUse === 'residential-garage-storage'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
                               : 'border-gray-300 hover:border-gray-400'
                               }`}
@@ -696,10 +696,10 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             <img
                               src="/assets/Residential.jpg"
                               alt="Residential Use Building"
-                              className="w-1/2 h-auto rounded mb-2"
+                              className="w-full sm:w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-sm font-semibold text-gray-900 mb-1">Residential Garage/Storage</h4>
-                            <p className="text-xs text-gray-600">
+                            <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">Residential Garage/Storage</h4>
+                            <p className="text-[10px] md:text-xs text-gray-600">
                               Buildings in a suburban or residential area where some codes need to be met.
                             </p>
                           </div>

@@ -24,3 +24,9 @@ body {
   }
 }
 
+@media (max-width: 1000px) {
+  .responsive_overlay {
+    width: 100% !important;
+  }
+}
+

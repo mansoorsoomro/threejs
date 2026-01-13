@@ -1,0 +1,181 @@
+/* Coupe Building Designer Styles */
+#coupe-building-designer {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f9fafb;
+}
+
+.coupe-container {
+    box-sizing: border-box;
+}
+
+.coupe-grid {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+@media (max-width: 1024px) {
+    .coupe-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Sidebar */
+.coupe-sidebar {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.coupe-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #111827;
+}
+
+.coupe-form-group {
+    margin-bottom: 16px;
+}
+
+.coupe-form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #374151;
+}
+
+.coupe-form-group input,
+.coupe-form-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    box-sizing: border-box;
+}
+
+.coupe-section {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.coupe-section h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.coupe-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Button */
+#submit-design {
+    width: 100%;
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#submit-design:hover {
+    background-color: #1d4ed8;
+}
+
+/* View Controls */
+.coupe-view-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.view-btn {
+    padding: 8px 16px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    color: #374151;
+}
+
+.view-btn.active {
+    background: #2563eb;
+    color: white;
+}
+
+/* Visualization Containers */
+.coupe-main-display {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    min-height: 600px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+.coupe-viz-container {
+    display: none;
+    flex-grow: 1;
+    width: 100%;
+    height: 600px; /* specific height for canvas/diagram */
+    position: relative;
+}
+
+.coupe-viz-container.active {
+    display: block;
+}
+
+#building-3d-canvas, 
+#floorplan-diagram {
+    width: 100%;
+    height: 100%;
+}
+
+/* Stats and Price */
+.floorplan-stats {
+    text-align: center;
+    margin-top: 10px;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.coupe-pricing-summary {
+    position: absolute;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e5e7eb;
+    pointer-events: none; /* Allow clicking through if needed, but usually price is just display */
+}
+
+.coupe-pricing-summary h3 {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.price-large {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+}

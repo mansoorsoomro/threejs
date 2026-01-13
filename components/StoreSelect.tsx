@@ -95,17 +95,17 @@ export default function StoreSelect({
 
   return (
     <div className="bg-white pb-0">
-      <div className="w-full px-10 py-0">
-        <h1 className="text-xl font-bold text-gray-900 mb-2">
+      <div className="w-full px-4 md:px-10 max-[1000px]:px-2 py-0">
+        <h1 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
           Let&apos;s get started planning your dream today!
         </h1>
 
-        <p className="text-gray-700 mb-2 text-sm">
+        <p className="text-gray-700 mb-2 text-xs md:text-sm">
           Please enter the zip code you will be building in.
         </p>
 
         <div className="mb-2">
-          <label className="block text-sm font-bold text-gray-900 mb-1">
+          <label className="block text-xs md:text-sm font-bold text-gray-900 mb-1">
             Building Zip Code:
           </label>
           <input
@@ -113,7 +113,7 @@ export default function StoreSelect({
             value={zipCode}
             onChange={handleZipCodeChange}
             placeholder="Enter 5-digit zip code"
-            className="w-full max-w-xs px-3 py-1.5 border-2 border-blue-400 rounded text-sm focus:outline-none focus:border-blue-600"
+            className="w-full max-w-xs px-3 py-2 border-2 border-blue-400 rounded text-sm focus:outline-none focus:border-blue-600"
             maxLength={5}
           />
         </div>
@@ -132,11 +132,11 @@ export default function StoreSelect({
               For proper pricing service, and plant production, please tell us which store you would like to facilitate your purchase (including delivery to if applicable).
             </p>
 
+            {/* Desktop Table View - Hidden on mobile */}
             <div
-              className="overflow-x-auto mt-2 max-h-[40vh] overflow-y-auto border border-gray-200"
+              className="hidden md:block overflow-x-auto mt-2 max-h-[40vh] overflow-y-auto border border-gray-200"
               onScroll={(e) => {
                 const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop === e.currentTarget.clientHeight;
-                // Add a small threshold for better UX (e.g., load when within 50px of bottom)
                 const nearBottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 50;
 
                 if (nearBottom && hasMore && !loadingMore) {
@@ -190,6 +190,45 @@ export default function StoreSelect({
               </table>
             </div>
 
+            {/* Mobile Card View - Visible only on mobile */}
+            <div
+              className="md:hidden mt-2 max-h-[50vh] overflow-y-auto space-y-3 border border-gray-200 p-2 rounded"
+              onScroll={(e) => {
+                const nearBottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 50;
+                if (nearBottom && hasMore && !loadingMore) {
+                  handleLoadMore();
+                }
+              }}
+            >
+              {stores.map((store) => (
+                <div
+                  key={store.id}
+                  className={`border-2 rounded-lg p-3 ${selectedStore?.id === store.id
+                    ? 'border-green-600 bg-green-50'
+                    : 'border-gray-300 bg-white'
+                    }`}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-bold text-gray-900 text-sm">{store.name}</h3>
+                    <span className="text-xs text-gray-600 whitespace-nowrap ml-2">
+                      {store.distance.toFixed(1)} mi
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-700 mb-1">{store.address}</p>
+                  <p className="text-xs text-gray-600 mb-3">{store.phone}</p>
+                  <button
+                    onClick={() => handleStoreSelect(store)}
+                    className={`w-full px-4 py-2.5 rounded text-sm font-semibold transition-colors ${selectedStore?.id === store.id
+                      ? 'bg-green-600 text-white'
+                      : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
+                      }`}
+                  >
+                    {selectedStore?.id === store.id ? 'Selected' : 'Select This Store'}
+                  </button>
+                </div>
+              ))}
+            </div>
+
             {loadingMore && (
               <div className="text-center py-2 text-sm text-blue-600">Loading more stores...</div>
             )}
@@ -201,17 +240,9 @@ export default function StoreSelect({
             No stores found for this zip code. Please try a different zip code.
           </div>
         )}
-
-        {/* Disclaimer */}
-        <div className="mt-2">
-          <p className="text-green-700 italic text-xs leading-relaxed">
-            The estimates from this program are for code exempt buildings. Menards can provide estimates for engineered buildings. If your building official requires an engineered building, please design your building and then chat with a post frame specialist, or visit your local Menards store for more information. All building designs should be verified by local building officials prior to starting your project.
-          </p>
-        </div>
       </div>
 
       <Footer onBack={onBack} showContinue={false} />
     </div>
   );
 }
-

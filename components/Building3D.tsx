@@ -170,17 +170,29 @@ export default function Building3D({ design }: Building3DProps) {
 
       // Update roof color - update both color and texture
       const roofColorHex = roofColors.find(c => c.value === localRoofColor)?.hex || '#FFFFFF';
-      if (roofMeshRef.current && roofMeshRef.current.material) {
+      if (roofMeshRef.current) {
         const roofColor = new THREE.Color(roofColorHex);
-        roofMeshRef.current.material.color.set(roofColorHex);
-
-        // Dispose old texture
-        if (roofMeshRef.current.material.map) {
-          roofMeshRef.current.material.map.dispose();
-        }
         const buildingLength = design.length || 30;
-        roofMeshRef.current.material.map = createCorrugatedTexture(roofColor, 512, 256, true, 1, buildingLength / 2);
-        roofMeshRef.current.material.needsUpdate = true;
+        const roofTexture = createCorrugatedTexture(roofColor, 512, 256, true, 1, buildingLength / 2);
+
+        const updateRoofMesh = (mesh: any) => {
+          if (mesh.isMesh && mesh.material) {
+            // Only update meshes that are meant to be roof-colored (avoid ridge caps if they use trim color)
+            // We'll use the mesh name or check material color if it matches the current roof color hex
+            if (mesh.name && (mesh.name.includes('Roof') || mesh.name.includes('slat') || mesh.name.includes('Cupola_Roof'))) {
+              mesh.material.color.set(roofColorHex);
+              if (mesh.material.map) mesh.material.map.dispose();
+              mesh.material.map = roofTexture.clone();
+              mesh.material.needsUpdate = true;
+            }
+          }
+        };
+
+        if (roofMeshRef.current.isGroup) {
+          roofMeshRef.current.traverse(updateRoofMesh);
+        } else {
+          updateRoofMesh(roofMeshRef.current);
+        }
       }
 
       // Update trim colors
@@ -2278,6 +2290,10 @@ export default function Building3D({ design }: Building3DProps) {
             leftRoofMatProps.alphaTest = 0.5;
             leftRoofMatProps.transparent = false;
           }
+          // Add initial corrugated texture
+          const leftRoofTexture = createCorrugatedTexture(roofColor3D, 512, 256, true, 1, design.length / 2);
+          leftRoofMatProps.map = leftRoofTexture;
+
           const leftRoofMaterial = new THREE.MeshStandardMaterial(leftRoofMatProps);
 
           let rightRoofAlphaMap = null;
@@ -2295,10 +2311,15 @@ export default function Building3D({ design }: Building3DProps) {
             rightRoofMatProps.alphaTest = 0.5;
             rightRoofMatProps.transparent = false;
           }
+          // Add initial corrugated texture
+          const rightRoofTexture = createCorrugatedTexture(roofColor3D, 512, 256, true, 1, design.length / 2);
+          rightRoofMatProps.map = rightRoofTexture;
+
           const rightRoofMaterial = new THREE.MeshStandardMaterial(rightRoofMatProps);
 
           // Left Side Mesh
           const lMesh = new THREE.Mesh(simpleGeo, leftRoofMaterial);
+          lMesh.name = 'Roof_Left';
           lMesh.rotation.set(0, 0, angle);
           lMesh.position.set(-run / 2, (peakHeight + ROOF_OFFSET) - fullRise / 2, 0);
           // Ensure roof draws after framing
@@ -2307,6 +2328,7 @@ export default function Building3D({ design }: Building3DProps) {
 
           // Right Side Mesh
           const rMesh = new THREE.Mesh(simpleGeo, rightRoofMaterial);
+          rMesh.name = 'Roof_Right';
           // Right Side: Slopes DOWN from left-to-right.
           // Rotation Z: -angle.
           rMesh.rotation.set(0, 0, -angle);
@@ -2512,6 +2534,7 @@ export default function Building3D({ design }: Building3DProps) {
             const cupolaRoofGeo = new THREE.ConeGeometry(size * 0.8, size / 2, 4);
             const cupolaRoofMat = new THREE.MeshStandardMaterial({ color: roofColor3D });
             const cupolaRoof = new THREE.Mesh(cupolaRoofGeo, cupolaRoofMat);
+            cupolaRoof.name = 'Cupola_Roof';
             cupolaRoof.position.set(0, peakHeight + size + size / 4, 0);
             cupolaRoof.rotation.y = Math.PI / 4; // Align square
             roofGroup.add(cupolaRoof);
