@@ -775,7 +775,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       {framingType === 'post-frame-construction' && (
                         <div className="mb-3">
                           <img
-                            src="/assets/roof_pitch.jpg"
+                            src={roofPitch === '6/12' ? '/assets/roof_pitch6.png' : '/assets/roof_pitch.jpg'}
                             alt="Roof Pitch - Post Frame Construction"
                             className="w-1/2 h-auto rounded border border-gray-300"
                           />
@@ -787,7 +787,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       {framingType === 'ladder-frame-construction' && (
                         <div className="mb-3">
                           <img
-                            src="/assets/ladder_roof_pitch.png"
+                            src={roofPitch === '6/12' ? '/assets/ladder_roof_pitch6.png' : '/assets/ladder_roof_pitch.png'}
                             alt="Roof Pitch - Ladder Frame Construction"
                             className="w-1/2 h-auto rounded border border-gray-300"
                           />
@@ -945,7 +945,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                         trussSpacing: (trussSpacing as '4' | '6' | '8' | '9') || '6',
                         // Pass framing type and roof pitch through to the 3D scene
                         framingType: framingType ? (framingType as 'post-frame-construction' | 'ladder-frame-construction') : undefined,
-                        roofPitch: (roofPitch as '4/12' | '6/12') || undefined,
+                        roofPitch: (roofPitch as '4/12' | '6/12') || '4/12',
                         floorFinish: 'dirt-gravel',
                         thickenedEdgeSlab: false,
                         postConstructionSlab: false,

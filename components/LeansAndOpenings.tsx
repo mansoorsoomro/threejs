@@ -497,13 +497,13 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
               {viewMode === 'top' && (
                 <div className="relative w-full h-[500px] bg-gray-100 group animate-in fade-in">
 
-                  {/* Sidewall Navigation */}
-                  <div className="absolute top-4 right-4 flex gap-2 z-10">
+                  {/* Sidewall Navigation - Responsive */}
+                  <div className="absolute top-4 right-4 flex flex-wrap gap-2 z-10 max-w-[calc(100%-2rem)]">
                     {walls.map(wall => (
                       <button
                         key={wall.id}
                         onClick={() => setSelectedWall(wall.value)}
-                        className={`px-3 py-1 text-sm font-semibold rounded transition-colors shadow-sm ${selectedWall === wall.value
+                        className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold rounded transition-colors shadow-sm whitespace-nowrap ${selectedWall === wall.value
                           ? 'bg-red-600 text-white border-b-2 border-red-800'
                           : 'bg-white text-gray-700 hover:bg-gray-100'
                           }`}
@@ -710,41 +710,43 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                     </div>
                   </div>
 
-                  {/* Dimension label */}
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur px-3 py-1 rounded shadow-sm border border-gray-300 text-sm font-semibold z-10">
-                    {wallDims.width}&apos; Width x {wallDims.height}&apos; Height
-                  </div>
-
-                  {/* Viewport Controls */}
-                  <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-2 flex gap-2 z-10 transition-opacity hover:opacity-100 opacity-80">
-                    <button
-                      onClick={handleZoomIn}
-                      className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
-                      title="Zoom In"
-                    >
-                      <span>➕</span>
-                    </button>
-                    <button
-                      onClick={handleZoomOut}
-                      className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
-                      title="Zoom Out"
-                    >
-                      <span>➖</span>
-                    </button>
-                    <button
-                      onClick={handleResetView}
-                      className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1"
-                      title="Reset View"
-                    >
-                      <span>↺</span>
-                    </button>
-                    <div className="w-[1px] h-full bg-gray-300 mx-1"></div>
-                    <button
-                      onClick={() => setShowInfo(!showInfo)}
-                      className="px-3 py-1 text-xs bg-blue-50 text-blue-600 hover:bg-blue-100 rounded flex items-center gap-1"
-                    >
-                      <span>ℹ️</span> Info
-                    </button>
+                  {/* Viewport Controls - Better spacing and responsive */}
+                  <div className="absolute bottom-4 left-4 right-4 flex flex-col items-center gap-3 z-10">
+                    {/* Dimension label - Above controls */}
+                    <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-gray-300 text-sm sm:text-base font-semibold">
+                      {wallDims.width}&apos; Width × {wallDims.height}&apos; Height
+                    </div>
+                    {/* Zoom and Info Controls */}
+                    <div className="bg-white rounded-lg shadow-lg p-2 flex flex-wrap gap-2 transition-opacity hover:opacity-100 opacity-90">
+                      <button
+                        onClick={handleZoomIn}
+                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        title="Zoom In"
+                      >
+                        <span>➕</span>
+                      </button>
+                      <button
+                        onClick={handleZoomOut}
+                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        title="Zoom Out"
+                      >
+                        <span>➖</span>
+                      </button>
+                      <button
+                        onClick={handleResetView}
+                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        title="Reset View"
+                      >
+                        <span>↺</span>
+                      </button>
+                      <div className="w-[1px] h-full bg-gray-300 mx-1 hidden sm:block"></div>
+                      <button
+                        onClick={() => setShowInfo(!showInfo)}
+                        className="px-3 py-2 text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 rounded flex items-center gap-1 font-semibold"
+                      >
+                        <span>ℹ️</span> Info
+                      </button>
+                    </div>
                   </div>
 
                   {/* Navigation Arrows */}
