@@ -272,32 +272,32 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 overflow-auto pb-20">
+    <div className="min-h-screen bg-cream-200 overflow-auto pb-20">
       <div className="w-full h-full p-2 md:p-4">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-[10px] min-h-screen">
           {/* Left Side - Options */}
           <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-4 flex flex-col max-h-screen lg:h-full overflow-hidden order-2 lg:order-1">
-            <h2 className="text-base md:text-lg font-bold text-gray-900 mb-3 md:mb-4">
+            <h2 className="text-base md:text-lg font-bold text-brown-900 mb-3 md:mb-4">
               Building Parameters
             </h2>
             <div className="overflow-y-auto flex-1 pr-2">
               {/* Building Planner Banner */}
-              <div className="mb-3 md:mb-4 p-2 md:p-3 border rounded bg-gray-50 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
+              <div className="mb-3 md:mb-4 p-2 md:p-3 border rounded bg-cream-200 flex flex-col md:flex-row items-start md:items-center space-y-2 md:space-y-0 md:space-x-4">
                 <img
                   src="/assets/building-planner-323x180.jpg"
                   alt="Open Building Planner"
                   className="w-full md:w-36 h-auto rounded shadow-sm"
                 />
                 <div className="flex-1 w-full">
-                  <h3 className="text-xs md:text-sm font-bold text-gray-900">Use our Building Planner</h3>
-                  <p className="text-[10px] md:text-xs text-gray-600 mb-2">Estimate the best size building for you.</p>
+                  <h3 className="text-xs md:text-sm font-bold text-brown-900">Use our Building Planner</h3>
+                  <p className="text-[10px] md:text-xs text-brown-500 mb-2">Estimate the best size building for you.</p>
                   <button
                     onClick={() => window.open(
                       'https://www.midwestmanufacturing.com/MidwestWebsite/web/buildingplanner/index.html',
                       'BuildingPlanner',
                       'width=1200,height=800,resizable=yes,scrollbars=yes'
                     )}
-                    className="w-full md:w-auto inline-block bg-blue-600 text-white px-3 py-2 rounded text-xs md:text-sm hover:bg-blue-700 transition-colors"
+                    className="w-full md:w-auto inline-block bg-[#5a4538] text-white px-3 py-2 rounded text-xs md:text-sm hover:bg-[#e2d6be] transition-colors"
                   >
                     Open Building Planner
                   </button>
@@ -307,14 +307,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
               <div className="space-y-3">
                 {/* Building Use */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'buildingUse' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'buildingUse' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('buildingUse')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Building Use
                   </label>
-                  <p className="text-xs text-gray-600 mb-2">What will you use your building for?</p>
+                  <p className="text-xs text-brown-500 mb-2">What will you use your building for?</p>
                   <select
                     value={buildingUse}
                     onChange={(e) => {
@@ -325,7 +325,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       e.stopPropagation();
                       setActiveSection('buildingUse');
                     }}
-                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${buildingUse ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${buildingUse ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                       }`}
                   >
                     <option value="">Choose use</option>
@@ -336,14 +336,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Construction Framing Type */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'framingType' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'framingType' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('framingType')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Construction Framing Type
                   </label>
-                  <p className="text-xs text-gray-600 mb-2">Select framing type</p>
+                  <p className="text-xs text-brown-500 mb-2">Select framing type</p>
                   <select
                     value={framingType}
                     onChange={(e) => {
@@ -354,7 +354,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       e.stopPropagation();
                       setActiveSection('framingType');
                     }}
-                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${framingType ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${framingType ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                       }`}
                   >
                     <option value="">Choose framing</option>
@@ -365,14 +365,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Roof Pitch */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'roofPitch' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'roofPitch' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('roofPitch')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Roof Pitch
                   </label>
-                  <p className="text-xs text-gray-600 mb-2">Roof pitch</p>
+                  <p className="text-xs text-brown-500 mb-2">Roof pitch</p>
                   <select
                     value={roofPitch}
                     onChange={(e) => {
@@ -383,7 +383,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       e.stopPropagation();
                       setActiveSection('roofPitch');
                     }}
-                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${roofPitch ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${roofPitch ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                       }`}
                   >
                     <option value="">Select a pitch</option>
@@ -395,16 +395,16 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Truss Spacing and Length */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'trussSpacing' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'trussSpacing' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('trussSpacing')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Truss Spacing and Length
                   </label>
                   <div className="space-y-2">
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Select truss spacing</p>
+                      <p className="text-xs text-brown-500 mb-1">Select truss spacing</p>
                       <select
                         value={trussSpacing}
                         onChange={(e) => {
@@ -415,7 +415,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                           e.stopPropagation();
                           setActiveSection('trussSpacing');
                         }}
-                        className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${trussSpacing ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                        className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${trussSpacing ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                           }`}
                         disabled={framingType === 'ladder-frame-construction'}
                       >
@@ -433,7 +433,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       </select>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-600 mb-1">Choose length of building</p>
+                      <p className="text-xs text-brown-500 mb-1">Choose length of building</p>
                       <select
                         value={length}
                         onChange={(e) => {
@@ -444,7 +444,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                           e.stopPropagation();
                           setActiveSection('trussSpacing');
                         }}
-                        className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${length ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                        className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${length ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                           }`}
                         disabled={!trussSpacing}
                       >
@@ -461,14 +461,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Width */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'width' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'width' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('width')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Width
                   </label>
-                  <p className="text-xs text-gray-600 mb-2">Choose width of building</p>
+                  <p className="text-xs text-brown-500 mb-2">Choose width of building</p>
                   <select
                     value={width}
                     onChange={(e) => {
@@ -479,7 +479,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       e.stopPropagation();
                       setActiveSection('width');
                     }}
-                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${width ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${width ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                       }`}
                     disabled={
                       // Enable if truss spacing is 4ft
@@ -547,14 +547,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Height */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'height' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-gray-50'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'height' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('height')}
                 >
-                  <label className="block text-sm font-bold text-gray-900 mb-1">
+                  <label className="block text-sm font-bold text-brown-900 mb-1">
                     Height
                   </label>
-                  <p className="text-xs text-gray-600 mb-2">Choose inside clear height of building</p>
+                  <p className="text-xs text-brown-500 mb-2">Choose inside clear height of building</p>
                   <select
                     value={height}
                     onChange={(e) => {
@@ -565,7 +565,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       e.stopPropagation();
                       setActiveSection('height');
                     }}
-                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${height ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                    className={`w-full px-3 py-1.5 border-2 rounded focus:outline-none text-sm ${height ? 'border-blue-500 bg-blue-50' : 'border-cream-300'
                       }`}
                     disabled={!framingType}
                   >
@@ -601,8 +601,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                 <button
                   onClick={() => setActiveTab('information')}
                   className={`px-2 md:px-3 py-1.5 font-semibold rounded-t transition-colors text-xs md:text-sm ${activeTab === 'information'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-brown-600 text-white'
+                    : 'bg-cream-400 text-brown-700 hover:bg-gray-300'
                     }`}
                 >
                   Information
@@ -610,8 +610,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                 <button
                   onClick={() => setActiveTab('3d')}
                   className={`px-2 md:px-3 py-1.5 font-semibold rounded-t transition-colors text-xs md:text-sm ${activeTab === '3d'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    ? 'bg-brown-600 text-white'
+                    : 'bg-cream-400 text-brown-700 hover:bg-gray-300'
                     }`}
                 >
                   3D Scene
@@ -624,23 +624,23 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                 <>
                   {/* Price Summary Box */}
                   {estimatedPrice !== null && (
-                    <div className="mb-4 p-3 border border-gray-300 rounded-lg bg-gray-50">
-                      <p className="text-xs text-gray-500 mb-2">
+                    <div className="mb-4 p-3 border border-cream-300 rounded-lg bg-cream-200">
+                      <p className="text-xs text-brown-400 mb-2">
                         *Today&apos;s estimated price, future pricing may go up or down. Tax, labor, and delivery not included.
                       </p>
                       <div className="flex flex-col gap-1">
                         <div>
-                          <span className="text-sm font-semibold text-gray-700 mr-1">Building Price:</span>
-                          <span className="text-xl font-bold text-gray-900 align-baseline">
+                          <span className="text-sm font-semibold text-brown-700 mr-1">Building Price:</span>
+                          <span className="text-xl font-bold text-brown-900 align-baseline">
                             ${estimatedPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </div>
                         {designId && (
                           <>
-                            <p className="text-sm font-semibold text-gray-900">
+                            <p className="text-sm font-semibold text-brown-900">
                               Design Id: <span className="font-normal">{designId}</span>
                             </p>
-                            <p className="text-sm font-semibold text-gray-900">
+                            <p className="text-sm font-semibold text-brown-900">
                               Design Name: <span className="font-normal">{designName}</span>
                             </p>
                           </>
@@ -652,7 +652,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                   {/* Helper Banner */}
                   {estimatedPrice === null && (
                     <div className="mb-4 p-2 bg-blue-50 border border-blue-200 rounded">
-                      <p className="text-xs text-gray-700">
+                      <p className="text-xs text-brown-700">
                         Please fill in Width, Truss Spacing, Length, and Height to get a price.
                       </p>
                     </div>
@@ -661,7 +661,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                   {/* Conditional Content Based on Active Section */}
                   {activeSection === 'buildingUse' && (
                     <div className="mb-4">
-                      <h3 className="text-sm md:text-base font-bold text-gray-900 mb-2 md:mb-3">Building Use</h3>
+                      <h3 className="text-sm md:text-base font-bold text-brown-900 mb-2 md:mb-3">Building Use</h3>
                       <div className={`grid gap-2 md:gap-3 ${buildingUse ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2'}`}>
                         {/* Rural Card */}
                         {(!buildingUse || buildingUse === 'rural') && (
@@ -669,7 +669,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             onClick={() => setBuildingUse('rural')}
                             className={`border-2 rounded p-2 md:p-3 cursor-pointer transition-all ${buildingUse === 'rural'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
-                              : 'border-gray-300 hover:border-gray-400'
+                              : 'border-cream-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -677,8 +677,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                               alt="Agricultural Use Building"
                               className="w-full sm:w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">Rural</h4>
-                            <p className="text-[10px] md:text-xs text-gray-600">
+                            <h4 className="text-xs md:text-sm font-semibold text-brown-900 mb-1">Rural</h4>
+                            <p className="text-[10px] md:text-xs text-brown-500">
                               Buildings in a rural or farm setting that don&apos;t need to meet any codes or are code exempt.
                             </p>
                           </div>
@@ -690,7 +690,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             onClick={() => setBuildingUse('residential-garage-storage')}
                             className={`border-2 rounded p-2 md:p-3 cursor-pointer transition-all ${buildingUse === 'residential-garage-storage'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
-                              : 'border-gray-300 hover:border-gray-400'
+                              : 'border-cream-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -698,8 +698,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                               alt="Residential Use Building"
                               className="w-full sm:w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-xs md:text-sm font-semibold text-gray-900 mb-1">Residential Garage/Storage</h4>
-                            <p className="text-[10px] md:text-xs text-gray-600">
+                            <h4 className="text-xs md:text-sm font-semibold text-brown-900 mb-1">Residential Garage/Storage</h4>
+                            <p className="text-[10px] md:text-xs text-brown-500">
                               Buildings in a suburban or residential area where some codes need to be met.
                             </p>
                           </div>
@@ -710,7 +710,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'framingType' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Construction Framing Type</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Construction Framing Type</h3>
                       <div className={`grid gap-3 ${framingType ? 'grid-cols-1' : 'grid-cols-2'}`}>
                         {/* Post Frame Construction Card */}
                         {(!framingType || framingType === 'post-frame-construction') && (
@@ -718,7 +718,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             onClick={() => setFramingType('post-frame-construction')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${framingType === 'post-frame-construction'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
-                              : 'border-gray-300 hover:border-gray-400'
+                              : 'border-cream-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -726,8 +726,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                               alt="Post Frame Construction"
                               className="w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-sm font-semibold text-gray-900 mb-2">Post Frame Construction</h4>
-                            <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                            <h4 className="text-sm font-semibold text-brown-900 mb-2">Post Frame Construction</h4>
+                            <ul className="text-xs text-brown-500 space-y-1 list-disc list-inside">
                               <li>Uses treated posts or laminated columns for vertical supports.</li>
                               <li>Truss spacing available at 9&apos;, 8&apos;, 6&apos;, or 4&apos; oc spacing.</li>
                               <li>12&apos; to 70&apos; wide buildings available to choose from.</li>
@@ -745,7 +745,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                             onClick={() => setFramingType('ladder-frame-construction')}
                             className={`border-2 rounded p-3 cursor-pointer transition-all ${framingType === 'ladder-frame-construction'
                               ? 'border-blue-500 bg-blue-50 shadow-lg'
-                              : 'border-gray-300 hover:border-gray-400'
+                              : 'border-cream-300 hover:border-gray-400'
                               }`}
                           >
                             <img
@@ -753,8 +753,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                               alt="Ladder Frame Construction"
                               className="w-1/2 h-auto rounded mb-2"
                             />
-                            <h4 className="text-sm font-semibold text-gray-900 mb-2">Ladder Frame Construction</h4>
-                            <ul className="text-xs text-gray-600 space-y-1 list-disc list-inside">
+                            <h4 className="text-sm font-semibold text-brown-900 mb-2">Ladder Frame Construction</h4>
+                            <ul className="text-xs text-brown-500 space-y-1 list-disc list-inside">
                               <li>Great alternative to stud framed buildings.</li>
                               <li>Uses 2-ply or 3-ply studs 4&apos; oc with 4&apos; oc trusses.</li>
                               <li>2x6 wall girts laid horizontally between wall studs.</li>
@@ -771,15 +771,15 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'roofPitch' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Roof Pitch</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Roof Pitch</h3>
                       {framingType === 'post-frame-construction' && (
                         <div className="mb-3">
                           <img
                             src={roofPitch === '6/12' ? '/assets/roof_pitch6.png' : '/assets/roof_pitch.jpg'}
                             alt="Roof Pitch - Post Frame Construction"
-                            className="w-1/2 h-auto rounded border border-gray-300"
+                            className="w-1/2 h-auto rounded border border-cream-300"
                           />
-                          <p className="text-xs text-gray-600 mt-2">
+                          <p className="text-xs text-brown-500 mt-2">
                             Having a steeper pitch will help water and snow run off the roof.
                           </p>
                         </div>
@@ -789,9 +789,9 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                           <img
                             src={roofPitch === '6/12' ? '/assets/ladder_roof_pitch6.png' : '/assets/ladder_roof_pitch.png'}
                             alt="Roof Pitch - Ladder Frame Construction"
-                            className="w-1/2 h-auto rounded border border-gray-300"
+                            className="w-1/2 h-auto rounded border border-cream-300"
                           />
-                          <p className="text-xs text-gray-600 mt-2">
+                          <p className="text-xs text-brown-500 mt-2">
                             Having a steeper pitch will help water and snow run off the roof.
                           </p>
                         </div>
@@ -808,14 +808,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'trussSpacing' && framingType === 'post-frame-construction' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Truss Spacing and Length</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Truss Spacing and Length</h3>
                       <div className="mb-3">
                         <img
                           src="/assets/lengthV3.jpg"
                           alt="Truss Spacing and Length"
-                          className="w-1/2 h-auto rounded border border-gray-300 mb-3"
+                          className="w-1/2 h-auto rounded border border-cream-300 mb-3"
                         />
-                        <div className="space-y-2 text-xs text-gray-700">
+                        <div className="space-y-2 text-xs text-brown-700">
                           <p className="font-semibold">Select truss spacing:</p>
                           <ul className="list-disc list-inside space-y-1 ml-2">
                             <li><strong>9&apos;</strong> - Most economical and often used in agricultural buildings.</li>
@@ -842,14 +842,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'trussSpacing' && framingType === 'ladder-frame-construction' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Truss Spacing and Length</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Truss Spacing and Length</h3>
                       <div className="mb-3">
                         <img
                           src="/assets/ladder_framing_length.jpg"
                           alt="Truss Spacing and Length - Ladder Frame"
-                          className="w-1/2 h-auto rounded border border-gray-300 mb-3"
+                          className="w-1/2 h-auto rounded border border-cream-300 mb-3"
                         />
-                        <div className="space-y-2 text-xs text-gray-700">
+                        <div className="space-y-2 text-xs text-brown-700">
                           <p>
                             Choose from lengths between 16&apos; and 192&apos;.
                           </p>
@@ -860,14 +860,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'width' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Width</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Width</h3>
                       <div className="mb-3">
                         <img
                           src="/assets/widthV2.jpg"
                           alt="Building Width"
-                          className="w-1/2 h-auto rounded border border-gray-300 mb-3"
+                          className="w-1/2 h-auto rounded border border-cream-300 mb-3"
                         />
-                        <div className="space-y-2 text-xs text-gray-700">
+                        <div className="space-y-2 text-xs text-brown-700">
                           <div>
                             <p className="font-semibold mb-2">Popular Truss Sizes:</p>
                             <p>
@@ -892,14 +892,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {activeSection === 'height' && (
                     <div className="mb-4">
-                      <h3 className="text-base font-bold text-gray-900 mb-3">Height</h3>
+                      <h3 className="text-base font-bold text-brown-900 mb-3">Height</h3>
                       <div className="mb-3">
                         <img
                           src="/assets/height.jpg"
                           alt="Building Height"
-                          className="w-1/2 h-auto rounded border border-gray-300 mb-3"
+                          className="w-1/2 h-auto rounded border border-cream-300 mb-3"
                         />
-                        <div className="space-y-2 text-xs text-gray-700">
+                        <div className="space-y-2 text-xs text-brown-700">
                           <ul className="list-disc list-inside space-y-2 ml-2">
                             <li>
                               Height is measured from the top of the concrete floor or from the top of the concrete curb to the bottom of the truss.
@@ -915,14 +915,14 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                   {/* Disclaimer - Only show when Building Use section is active */}
                   {activeSection === 'buildingUse' && (
-                    <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded">
-                      <p className="text-xs text-green-700 italic leading-relaxed">
+                    <div className="mt-4 p-3 bg-cream-200 border border-green-200 rounded">
+                      <p className="text-xs text-brown-600 italic leading-relaxed">
                         The building estimates from this program are for code exempt applications (examples: buildings used for personal storage or agricultural use). Menards can provide estimates for all types of &quot;Engineered&quot; Post Frame Buildings (examples: used for a business, rental or personal storage buildings that need to be code compliant).
                       </p>
-                      <p className="text-xs text-green-700 italic leading-relaxed mt-2">
+                      <p className="text-xs text-brown-600 italic leading-relaxed mt-2">
                         If you need to meet a specific snow or wind load rating or are required to provide sealed blueprints, please chat with a post frame specialist or visit your local Menards store for more information.
                       </p>
-                      <p className="text-xs text-green-700 font-semibold italic leading-relaxed mt-2">
+                      <p className="text-xs text-brown-600 font-semibold italic leading-relaxed mt-2">
                         All Building Designs should be verified by local officials prior to starting your project.
                       </p>
                     </div>

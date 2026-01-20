@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface StepNavigationProps {
   currentStep: number;
@@ -13,17 +14,17 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
   return (
     <div className="w-full relative z-[100]">
       {/* Top dark grey strip */}
-      <div className="w-full h-1 bg-gray-800"></div>
+      <div className="w-full h-1 bg-brown-800"></div>
 
       {/* Main navigation bar */}
-      <div className="w-full bg-[#16a34a] py-3 md:py-4 px-4 md:px-6">
+      <div className="w-full bg-brown-600 py-3 md:py-4 px-4 md:px-6">
         <div className="max-w-7xl mx-auto flex items-center justify-between min-[1101px]:justify-start gap-4">
 
           {/* Logo & Burger (Mobile/Tablet < 1100px) */}
           <div className="flex items-center gap-4">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="min-[1101px]:hidden text-white p-2 hover:bg-green-700 rounded-lg transition-colors"
+              className="min-[1101px]:hidden text-white p-2 hover:bg-brown-700 rounded-lg transition-colors"
             >
               {isMenuOpen ? (
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,7 +37,14 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
               )}
             </button>
             <div className="flex items-center min-[1101px]:mr-6 max-[500px]:hidden">
-              <div className="text-black font-bold text-lg md:text-xl">Menards®</div>
+              <Image
+                src="/assets/logowhite.png"
+                alt="Menards Logo"
+                width={180}
+                height={60}
+                className="h-12 md:h-16 w-auto"
+                priority
+              />
             </div>
           </div>
 
@@ -51,7 +59,7 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
                   {isActive ? (
                     <div className="relative">
                       <div className="bg-white px-6 py-2 transform -skew-x-12 border-2 border-white shadow-sm">
-                        <span className="text-green-700 font-bold text-sm whitespace-nowrap transform skew-x-12 inline-block">
+                        <span className="text-brown-600 font-bold text-sm whitespace-nowrap transform skew-x-12 inline-block">
                           {step}
                         </span>
                       </div>
@@ -73,7 +81,7 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
 
           {/* Current Step Label (Mobile < 1100px) */}
           <div className="min-[1101px]:hidden">
-            <span style={{ fontSize: '12px' }} className="text-white font-bold text-sm uppercase tracking-wider bg-green-700 px-3 py-1 rounded">
+            <span style={{ fontSize: '12px' }} className="text-white font-bold text-sm uppercase tracking-wider bg-brown-700 px-3 py-1 rounded">
               Step {currentStep}: {steps[currentStep - 1]}
             </span>
           </div>
@@ -93,14 +101,14 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
             return (
               <div
                 key={index}
-                className={`px-6 py-4 flex items-center gap-4 border-b border-gray-50 last:border-none ${isActive ? 'bg-green-50 border-l-4 border-l-green-600' : ''
+                className={`px-6 py-4 flex items-center gap-4 border-b border-cream-300 last:border-none ${isActive ? 'bg-cream-200 border-l-4 border-l-brown-600' : ''
                   }`}
               >
-                <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isActive ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-400'
+                <span className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${isActive ? 'bg-brown-600 text-white' : 'bg-cream-300 text-brown-400'
                   }`}>
                   {stepNumber}
                 </span>
-                <span className={`text-sm font-bold ${isActive ? 'text-green-700' : 'text-gray-600'}`}>
+                <span className={`text-sm font-bold ${isActive ? 'text-brown-600' : 'text-brown-400'}`}>
                   {step}
                 </span>
               </div>

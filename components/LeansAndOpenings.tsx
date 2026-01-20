@@ -293,23 +293,23 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
   const selectedOpening = (design.openings || []).find(o => o.id === selectedOpeningId);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-cream-200">
       <div className="w-full py-8">
         <div className="grid grid-cols-12 gap-[10px]">
           {/* Left Column - Opening Types */}
           <div className="bg-white rounded-lg shadow-md p-6 col-span-12 lg:col-span-4 flex flex-col max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Choose An Opening Or Lean</h2>
+              <h2 className="text-lg font-bold text-brown-900">Choose An Opening Or Lean</h2>
               <button
                 onClick={() => setShowInfo(!showInfo)}
-                className="px-3 py-1 bg-green-600 text-white rounded text-sm font-semibold hover:bg-green-700"
+                className="px-3 py-1 bg-brown-600 text-white rounded text-sm font-semibold hover:bg-brown-700"
               >
                 Info
               </button>
             </div>
 
             {showInfo && (
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-gray-700">
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-brown-700">
                 <p className="font-semibold mb-2">How to add openings:</p>
                 <ol className="list-decimal list-inside space-y-1">
                   <li>Select a wall using the tabs above the viewport</li>
@@ -325,8 +325,8 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                   key={type.id}
                   onClick={() => handleImmediateAddOpening(type)}
                   className={`p-3 border-2 rounded-lg transition-all ${selectedOpeningType === type.id
-                    ? 'border-green-600 bg-green-50 ring-2 ring-green-300'
-                    : 'border-gray-300 bg-white hover:border-gray-400'
+                    ? 'border-brown-600 bg-cream-200 ring-2 ring-brown-300'
+                    : 'border-cream-300 bg-white hover:border-gray-400'
                     }`}
                 >
                   <div className="mb-2 flex items-center justify-center">
@@ -336,7 +336,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                       className="w-20 h-16 object-contain"
                     />
                   </div>
-                  <div className="text-xs font-semibold text-gray-900 text-center leading-tight">{type.name}</div>
+                  <div className="text-xs font-semibold text-brown-900 text-center leading-tight">{type.name}</div>
                 </button>
               ))}
             </div>
@@ -346,22 +346,22 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
           <div className="bg-white rounded-lg shadow-md p-6 col-span-12 lg:col-span-8 flex flex-col">
             {/* Price Summary */}
             {totalPrice > 0 && (
-              <div className="mb-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
-                <p className="text-sm text-gray-500 mb-2">
+              <div className="mb-4 p-4 border border-cream-300 rounded-lg bg-cream-200">
+                <p className="text-sm text-brown-400 mb-2">
                   *Today&apos;s estimated price, future pricing may go up or down. Tax, labor, and delivery not included.
                 </p>
                 <div className="flex flex-col gap-2">
                   <div>
-                    <span className="text-lg font-semibold text-gray-700 mr-1">Building Price:</span>
-                    <span className="text-3xl font-bold text-gray-900 align-baseline">
+                    <span className="text-lg font-semibold text-brown-700 mr-1">Building Price:</span>
+                    <span className="text-3xl font-bold text-brown-900 align-baseline">
                       ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <p className="text-base font-semibold text-gray-900">
+                    <p className="text-base font-semibold text-brown-900">
                       Design Id: <span className="font-normal">{designId}</span>
                     </p>
-                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
                       <path
                         fillRule="evenodd"
                         d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -369,7 +369,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                       />
                     </svg>
                   </div>
-                  <p className="text-base font-semibold text-gray-900">
+                  <p className="text-base font-semibold text-brown-900">
                     Design Name: <span className="font-normal">{designName}</span>
                   </p>
                 </div>
@@ -378,14 +378,14 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
 
             {/* Edit Panel - Only visible when an opening is selected */}
             {selectedOpening && (
-              <div className="mb-4 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
-                <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-                  <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+              <div className="mb-4 bg-white border border-cream-300 rounded-lg shadow-sm overflow-hidden animate-in fade-in slide-in-from-top-2">
+                <div className="bg-cream-200 px-4 py-2 border-b border-cream-300 flex justify-between items-center">
+                  <h3 className="font-semibold text-brown-800 flex items-center gap-2">
                     <span>✏️</span> Edit Selected {selectedOpening.name}
                   </h3>
                   <button
                     onClick={() => setSelectedOpeningId(null)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-brown-400 hover:text-brown-700"
                   >
                     Close
                   </button>
@@ -394,14 +394,14 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
 
                   {/* Dimensions */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Dimensions (W x H)</label>
+                    <label className="block text-sm font-medium text-brown-700 mb-1">Dimensions (W x H)</label>
                     <select
                       value={`${selectedOpening.width}x${selectedOpening.height}`}
                       onChange={(e) => {
                         const [w, h] = e.target.value.split('x').map(Number);
                         handleUpdateOpening(selectedOpening.id, { width: w, height: h });
                       }}
-                      className="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 py-2"
+                      className="w-full border-cream-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 py-2"
                     >
                       <option value={`${selectedOpening.width}x${selectedOpening.height}`}>{selectedOpening.width}&apos; x {selectedOpening.height}&apos;</option>
                       <option value="3x3">3&apos; x 3&apos;</option>
@@ -418,7 +418,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
 
                   {/* Position */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Position From Left</label>
+                    <label className="block text-sm font-medium text-brown-700 mb-1">Position From Left</label>
                     <div className="flex items-center gap-2">
                       <div className="relative flex-1">
                         <input
@@ -429,18 +429,18 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                             const newX = (feet / wallDims.width) * 100;
                             handleUpdateOpening(selectedOpening.id, { x: Math.max(0, Math.min(100, newX)) });
                           }}
-                          className="w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 py-2 pl-3 pr-8"
+                          className="w-full border-cream-300 rounded-md shadow-sm focus:ring-brown-500 focus:border-brown-500 py-2 pl-3 pr-8"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">ft</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-brown-400 text-sm">ft</span>
                       </div>
                       <div className="relative w-24">
                         <input
                           type="number"
                           value={0}
                           disabled
-                          className="w-full bg-gray-100 border-gray-300 rounded-md py-2 px-2 text-gray-500 pr-8"
+                          className="w-full bg-cream-300 border-cream-300 rounded-md py-2 px-2 text-brown-400 pr-8"
                         />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 text-sm">in</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-brown-400 text-sm">in</span>
                       </div>
                     </div>
                   </div>
@@ -449,7 +449,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                   <div className="md:col-span-2 flex gap-2 mt-2">
                     <button
                       onClick={() => handleCopyOpening(selectedOpening)}
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors"
+                      className="flex-1 bg-brown-500 hover:bg-brown-600 text-white font-semibold py-2 px-4 rounded shadow-sm transition-colors"
                     >
                       Copy
                     </button>
@@ -471,31 +471,31 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
             )}
 
             {/* View Mode Tabs (2D vs 3D) */}
-            <div className="mb-0 flex gap-1 z-10 w-fit rounded-t-lg overflow-hidden border-t border-l border-r border-gray-300 bg-gray-100 border-b-0">
+            <div className="mb-0 flex gap-1 z-10 w-fit rounded-t-lg overflow-hidden border-t border-l border-r border-cream-300 bg-cream-300 border-b-0">
               <button
                 onClick={() => setViewMode('top')}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${viewMode === 'top'
-                  ? 'bg-white text-gray-900 border-b-2 border-green-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-b border-gray-300'}`}
+                  ? 'bg-white text-brown-900 border-b-2 border-brown-600'
+                  : 'bg-cream-300 text-brown-500 hover:bg-cream-400 border-b border-cream-300'}`}
               >
                 2D Sidewall View
               </button>
               <button
                 onClick={() => setViewMode('3d')}
                 className={`px-4 py-2 text-sm font-semibold transition-colors ${viewMode === '3d'
-                  ? 'bg-white text-gray-900 border-b-2 border-green-600'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200 border-b border-gray-300'}`}
+                  ? 'bg-white text-brown-900 border-b-2 border-brown-600'
+                  : 'bg-cream-300 text-brown-500 hover:bg-cream-400 border-b border-cream-300'}`}
               >
                 3D Preview
               </button>
             </div>
 
             {/* Combined Viewport Area */}
-            <div className="flex-1 flex flex-col gap-4 border-2 border-gray-300 rounded-b-lg rounded-tr-lg p-0 bg-white overflow-hidden mt-[-1px]">
+            <div className="flex-1 flex flex-col gap-4 border-2 border-cream-300 rounded-b-lg rounded-tr-lg p-0 bg-white overflow-hidden mt-[-1px]">
 
               {/* 2D View (Elevation) */}
               {viewMode === 'top' && (
-                <div className="relative w-full h-[500px] bg-gray-100 group animate-in fade-in">
+                <div className="relative w-full h-[500px] bg-cream-300 group animate-in fade-in">
 
                   {/* Sidewall Navigation - Responsive */}
                   <div className="absolute top-4 right-4 flex flex-wrap gap-2 z-10 max-w-[calc(100%-2rem)]">
@@ -505,7 +505,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                         onClick={() => setSelectedWall(wall.value)}
                         className={`px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-semibold rounded transition-colors shadow-sm whitespace-nowrap ${selectedWall === wall.value
                           ? 'bg-red-600 text-white border-b-2 border-red-800'
-                          : 'bg-white text-gray-700 hover:bg-gray-100'
+                          : 'bg-white text-brown-700 hover:bg-cream-300'
                           }`}
                       >
                         {wall.label}
@@ -578,7 +578,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                             </div>
 
                             {/* Main Wall Body */}
-                            <div className="absolute inset-0 bg-gray-200 border-2 border-black border-t-0 box-border z-0" style={{ backgroundColor: '#e5e7eb' }}>
+                            <div className="absolute inset-0 bg-cream-400 border-2 border-black border-t-0 box-border z-0" style={{ backgroundColor: '#e5e7eb' }}>
                               <div className="absolute inset-0 opacity-10"
                                 style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 19px, #000 20px)' }}
                               ></div>
@@ -624,7 +624,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                             }}
                           >
                             {/* Realistic Opening Look based on Type */}
-                            <div className={`w-full h-full border-[2px] box-border relative shadow-inner overflow-hidden ${isSelected ? 'border-green-500 ring-2 ring-green-300' : 'border-gray-500 hover:border-gray-400'} ${opening.id.includes('framed-opening') ? 'bg-transparent' : 'bg-white'}`}>
+                            <div className={`w-full h-full border-[2px] box-border relative shadow-inner overflow-hidden ${isSelected ? 'border-brown-500 ring-2 ring-brown-300' : 'border-gray-500 hover:border-gray-400'} ${opening.id.includes('framed-opening') ? 'bg-transparent' : 'bg-white'}`}>
 
                               {/* Common Glass/Fill for Windows */}
                               {opening.id.includes('window') && (
@@ -653,7 +653,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                                     style={{ backgroundImage: 'repeating-linear-gradient(90deg, #000, #000 1px, transparent 1px, transparent 8px)' }}>
                                   </div>
                                   {/* Center Vertical Split */}
-                                  <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-gray-500 -translate-x-1/2"></div>
+                                  <div className="absolute left-1/2 top-0 bottom-0 w-[2px] bg-cream-2000 -translate-x-1/2"></div>
                                 </div>
                               )}
 
@@ -661,7 +661,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                               {opening.id.includes('framed-opening') && (
                                 <div className="absolute inset-0 flex items-center justify-center">
                                   {/* X mark to denote opening */}
-                                  <svg viewBox="0 0 100 100" className="w-full h-full text-gray-400 opacity-50 p-1">
+                                  <svg viewBox="0 0 100 100" className="w-full h-full text-brown-400 opacity-50 p-1">
                                     <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="2" />
                                     <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="2" />
                                   </svg>
@@ -687,7 +687,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                             </div>
 
                             {/* Selection indicator / Label */}
-                            <div className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold px-1 rounded ${isSelected ? 'bg-green-600 text-white' : 'bg-white/80 text-gray-900 border border-gray-300'}`}>
+                            <div className={`absolute -bottom-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold px-1 rounded ${isSelected ? 'bg-brown-600 text-white' : 'bg-white/80 text-brown-900 border border-cream-300'}`}>
                               {opening.name}
                             </div>
 
@@ -713,28 +713,28 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                   {/* Viewport Controls - Better spacing and responsive */}
                   <div className="absolute bottom-4 left-4 right-4 flex flex-col items-center gap-3 z-10">
                     {/* Dimension label - Above controls */}
-                    <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-gray-300 text-sm sm:text-base font-semibold">
+                    <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-cream-300 text-sm sm:text-base font-semibold">
                       {wallDims.width}&apos; Width × {wallDims.height}&apos; Height
                     </div>
                     {/* Zoom and Info Controls */}
                     <div className="bg-white rounded-lg shadow-lg p-2 flex flex-wrap gap-2 transition-opacity hover:opacity-100 opacity-90">
                       <button
                         onClick={handleZoomIn}
-                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        className="px-3 py-2 text-sm bg-cream-300 hover:bg-cream-400 rounded flex items-center gap-1 font-semibold"
                         title="Zoom In"
                       >
                         <span>➕</span>
                       </button>
                       <button
                         onClick={handleZoomOut}
-                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        className="px-3 py-2 text-sm bg-cream-300 hover:bg-cream-400 rounded flex items-center gap-1 font-semibold"
                         title="Zoom Out"
                       >
                         <span>➖</span>
                       </button>
                       <button
                         onClick={handleResetView}
-                        className="px-3 py-2 text-sm bg-gray-100 hover:bg-gray-200 rounded flex items-center gap-1 font-semibold"
+                        className="px-3 py-2 text-sm bg-cream-300 hover:bg-cream-400 rounded flex items-center gap-1 font-semibold"
                         title="Reset View"
                       >
                         <span>↺</span>
@@ -758,7 +758,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                     }}
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg hover:bg-white z-10 transition-all hover:scale-110"
                   >
-                    <span className="text-2xl font-bold text-gray-700">‹</span>
+                    <span className="text-2xl font-bold text-brown-700">‹</span>
                   </button>
                   <button
                     onClick={() => {
@@ -768,7 +768,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
                     }}
                     className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg hover:bg-white z-10 transition-all hover:scale-110"
                   >
-                    <span className="text-2xl font-bold text-gray-700">›</span>
+                    <span className="text-2xl font-bold text-brown-700">›</span>
                   </button>
                 </div>
               )}

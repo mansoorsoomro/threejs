@@ -94,18 +94,18 @@ export default function StoreSelect({
   };
 
   return (
-    <div className="bg-white pb-0">
+    <div className="bg-cream-200 pb-0">
       <div className="w-full px-4 md:px-10 max-[1000px]:px-2 py-0">
-        <h1 className="text-lg md:text-xl font-bold text-gray-900 mb-2">
+        <h1 className="text-lg md:text-xl font-bold text-brown-900 mb-2">
           Let&apos;s get started planning your dream today!
         </h1>
 
-        <p className="text-gray-700 mb-2 text-xs md:text-sm">
+        <p className="text-brown-700 mb-2 text-xs md:text-sm">
           Please enter the zip code you will be building in.
         </p>
 
         <div className="mb-2">
-          <label className="block text-xs md:text-sm font-bold text-gray-900 mb-1">
+          <label className="block text-xs md:text-sm font-bold text-brown-900 mb-1">
             Building Zip Code:
           </label>
           <input
@@ -128,13 +128,13 @@ export default function StoreSelect({
 
         {showStoreList && stores.length > 0 && (
           <div className="mt-2">
-            <p className="text-gray-700 mb-2 text-sm">
+            <p className="text-brown-700 mb-2 text-sm">
               For proper pricing service, and plant production, please tell us which store you would like to facilitate your purchase (including delivery to if applicable).
             </p>
 
             {/* Desktop Table View - Hidden on mobile */}
             <div
-              className="hidden md:block overflow-x-auto mt-2 max-h-[40vh] overflow-y-auto border border-gray-200"
+              className="hidden md:block overflow-x-auto mt-2 max-h-[40vh] overflow-y-auto border border-cream-300"
               onScroll={(e) => {
                 const bottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop === e.currentTarget.clientHeight;
                 const nearBottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 50;
@@ -146,38 +146,38 @@ export default function StoreSelect({
             >
               <table className="w-full border-collapse text-sm">
                 <thead>
-                  <tr className="bg-gray-200 sticky top-0 z-10">
-                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Store</th>
-                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Address</th>
-                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Distance</th>
-                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Phone</th>
-                    <th className="border border-gray-300 px-2 py-1 text-left font-semibold text-gray-900 text-sm">Action</th>
+                  <tr className="bg-cream-400 sticky top-0 z-10">
+                    <th className="border border-cream-300 px-2 py-1 text-left font-semibold text-brown-900 text-sm">Store</th>
+                    <th className="border border-cream-300 px-2 py-1 text-left font-semibold text-brown-900 text-sm">Address</th>
+                    <th className="border border-cream-300 px-2 py-1 text-left font-semibold text-brown-900 text-sm">Distance</th>
+                    <th className="border border-cream-300 px-2 py-1 text-left font-semibold text-brown-900 text-sm">Phone</th>
+                    <th className="border border-cream-300 px-2 py-1 text-left font-semibold text-brown-900 text-sm">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stores.map((store, index) => (
                     <tr
                       key={store.id}
-                      className={`${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'
-                        } ${selectedStore?.id === store.id ? 'bg-blue-50' : ''}`}
+                      className={`${index % 2 === 0 ? 'bg-cream-200' : 'bg-cream-100'
+                        } ${selectedStore?.id === store.id ? 'bg-cream-300' : ''}`}
                     >
-                      <td className="border border-gray-300 px-2 py-1 font-semibold text-gray-900 text-sm">
+                      <td className="border border-cream-300 px-2 py-1 font-semibold text-brown-900 text-sm">
                         {store.name}
                       </td>
-                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
+                      <td className="border border-cream-300 px-2 py-1 text-brown-700 text-sm">
                         {store.address}
                       </td>
-                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
+                      <td className="border border-cream-300 px-2 py-1 text-brown-700 text-sm">
                         {store.distance.toFixed(1)} miles
                       </td>
-                      <td className="border border-gray-300 px-2 py-1 text-gray-700 text-sm">
+                      <td className="border border-cream-300 px-2 py-1 text-brown-700 text-sm">
                         {store.phone}
                       </td>
-                      <td className="border border-gray-300 px-2 py-1">
+                      <td className="border border-cream-300 px-2 py-1">
                         <button
                           onClick={() => handleStoreSelect(store)}
                           className={`px-3 py-1.5 rounded text-sm ${selectedStore?.id === store.id
-                            ? 'bg-green-600 text-white'
+                            ? 'bg-brown-600 text-white'
                             : 'bg-blue-600 text-white hover:bg-blue-700'
                             }`}
                         >
@@ -192,7 +192,7 @@ export default function StoreSelect({
 
             {/* Mobile Card View - Visible only on mobile */}
             <div
-              className="md:hidden mt-2 max-h-[50vh] overflow-y-auto space-y-3 border border-gray-200 p-2 rounded"
+              className="md:hidden mt-2 max-h-[50vh] overflow-y-auto space-y-3 border border-cream-300 p-2 rounded"
               onScroll={(e) => {
                 const nearBottom = e.currentTarget.scrollHeight - e.currentTarget.scrollTop <= e.currentTarget.clientHeight + 50;
                 if (nearBottom && hasMore && !loadingMore) {
@@ -204,22 +204,22 @@ export default function StoreSelect({
                 <div
                   key={store.id}
                   className={`border-2 rounded-lg p-3 ${selectedStore?.id === store.id
-                    ? 'border-green-600 bg-green-50'
-                    : 'border-gray-300 bg-white'
+                    ? 'border-brown-600 bg-cream-300'
+                    : 'border-cream-300 bg-cream-100'
                     }`}
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-gray-900 text-sm">{store.name}</h3>
-                    <span className="text-xs text-gray-600 whitespace-nowrap ml-2">
+                    <h3 className="font-bold text-brown-900 text-sm">{store.name}</h3>
+                    <span className="text-xs text-brown-500 whitespace-nowrap ml-2">
                       {store.distance.toFixed(1)} mi
                     </span>
                   </div>
-                  <p className="text-xs text-gray-700 mb-1">{store.address}</p>
-                  <p className="text-xs text-gray-600 mb-3">{store.phone}</p>
+                  <p className="text-xs text-brown-700 mb-1">{store.address}</p>
+                  <p className="text-xs text-brown-500 mb-3">{store.phone}</p>
                   <button
                     onClick={() => handleStoreSelect(store)}
                     className={`w-full px-4 py-2.5 rounded text-sm font-semibold transition-colors ${selectedStore?.id === store.id
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-brown-600 text-white'
                       : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
                       }`}
                   >
@@ -236,7 +236,7 @@ export default function StoreSelect({
         )}
 
         {showStoreList && stores.length === 0 && !loading && (
-          <div className="text-gray-600 mt-2 text-sm">
+          <div className="text-brown-500 mt-2 text-sm">
             No stores found for this zip code. Please try a different zip code.
           </div>
         )}

@@ -67,7 +67,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
               <label className="block text-sm font-medium mb-1">Client Name *</label>
               <input
                 {...register('clientName', { required: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-cream-300 rounded-md"
                 placeholder="John Doe"
               />
             </div>
@@ -75,7 +75,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
               <label className="block text-sm font-medium mb-1">Client Address *</label>
               <input
                 {...register('clientAddress', { required: true })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-cream-300 rounded-md"
                 placeholder="123 Main St, City, State ZIP"
               />
             </div>
@@ -86,7 +86,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
             <label className="block text-sm font-medium mb-1">Building Use *</label>
             <select
               {...register('buildingUse', { required: true })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-cream-300 rounded-md"
             >
               <option value="residential">Residential</option>
               <option value="storage">Storage</option>
@@ -103,7 +103,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
                 type="number"
                 {...register('width', { required: true, min: 20, max: 60 })}
                 onChange={handleWidthChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-cream-300 rounded-md"
                 step="2"
                 min="20"
                 max="60"
@@ -115,7 +115,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
                 type="number"
                 {...register('length', { required: true, min: 20, max: 200 })}
                 onChange={handleLengthChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-cream-300 rounded-md"
                 step="2"
                 min="20"
                 max="200"
@@ -128,7 +128,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
             <label className="block text-sm font-medium mb-1">Truss Spacing *</label>
             <select
               {...register('trussSpacing', { required: true })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-cream-300 rounded-md"
             >
               <option value="4">4'</option>
               <option value="6">6'</option>
@@ -143,7 +143,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Floor Finish *</label>
         <select
           {...register('floorFinish', { required: true })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-cream-300 rounded-md"
         >
           <option value="dirt-gravel">Dirt/Gravel</option>
           <option value="concrete">Concrete</option>
@@ -190,7 +190,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Sidewall Posts *</label>
         <select
           {...register('sidewallPosts', { required: true })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-cream-300 rounded-md"
         >
           <option value="4x6">4x6</option>
           <option value="6x6">6x6</option>
@@ -205,7 +205,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
             <label className="block text-sm font-medium mb-1">Inside Clear Height *</label>
             <select
               {...register('clearHeight', { required: true })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-cream-300 rounded-md"
             >
               <option value="8">8'</option>
               <option value="10">10'</option>
@@ -224,7 +224,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Girt Type *</label>
         <select
           {...register('girtType', { required: true })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-cream-300 rounded-md"
         >
           <option value="flat">Flat Girts (Standard)</option>
           <option value="bookshelf">Bookshelf Girts</option>
@@ -237,7 +237,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Girt Size *</label>
         <select
           {...register('girtSize', { required: true })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-cream-300 rounded-md"
         >
           <option value="2x4">2x4</option>
           <option value="2x6">2x6</option>
@@ -249,7 +249,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
         <label className="block text-sm font-medium mb-1">Grade Board Type *</label>
         <select
           {...register('gradeBoard', { required: true })}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          className="w-full px-3 py-2 border border-cream-300 rounded-md"
         >
           <option value="2x6">2x6</option>
           <option value="2x8">2x8</option>
@@ -262,7 +262,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
           <label className="block text-sm font-medium mb-1">Wall Color *</label>
           <select
             {...register('wallColor', { required: true })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-cream-300 rounded-md"
           >
             {wallColors.map(color => (
               <option key={color.value} value={color.value}>{color.label}</option>
@@ -273,7 +273,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
           <label className="block text-sm font-medium mb-1">Trim Color *</label>
           <select
             {...register('trimColor', { required: true })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-cream-300 rounded-md"
           >
             {trimColors.map(color => (
               <option key={color.value} value={color.value}>{color.label}</option>
@@ -284,7 +284,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
           <label className="block text-sm font-medium mb-1">Roof Color *</label>
           <select
             {...register('roofColor', { required: true })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-cream-300 rounded-md"
           >
             {roofColors.map(color => (
               <option key={color.value} value={color.value}>{color.label}</option>
@@ -299,7 +299,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
           <label className="block text-sm font-medium mb-1">End Wall Overhang *</label>
           <select
             {...register('endWallOverhang', { required: true })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-cream-300 rounded-md"
           >
             <option value="0">0'</option>
             <option value="1">1'</option>
@@ -310,7 +310,7 @@ export default function BuildingForm({ onSubmit, initialData, mode = 'full' }: B
           <label className="block text-sm font-medium mb-1">Sidewall Overhang *</label>
           <select
             {...register('sidewallOverhang', { required: true })}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            className="w-full px-3 py-2 border border-cream-300 rounded-md"
           >
             <option value="0">0'</option>
             <option value="1">1'</option>

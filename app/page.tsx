@@ -92,7 +92,7 @@ export default function Home() {
         }
 
         return (
-            <div className="flex flex-col min-h-screen bg-gray-50">
+            <div className="flex flex-col min-h-screen bg-cream-200">
                 <StepNavigation currentStep={currentStep + 1} steps={STEPS} />
 
                 <main className={`flex-1 overflow-auto relative ${currentStep === 0 ? 'pb-0' : 'pb-24'}`}>

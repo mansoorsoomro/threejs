@@ -105,7 +105,7 @@ export default function BuildingInfoSheet({ design }: BuildingInfoSheetProps) {
             {design.thickenedEdgeSlab && <li>Thickened Edge Slab</li>}
             {design.postConstructionSlab && <li>Post Construction Slab</li>}
             {!design.sitePreparation && !design.thickenedEdgeSlab && !design.postConstructionSlab && (
-              <li className="text-gray-500">None</li>
+              <li className="text-brown-400">None</li>
             )}
           </ul>
         </div>
@@ -128,7 +128,7 @@ export default function BuildingInfoSheet({ design }: BuildingInfoSheetProps) {
         <div className="bg-blue-50 p-4 rounded-lg">
           <h4 className="font-semibold text-xl mb-2">Total Estimated Price</h4>
           <p className="text-3xl font-bold text-blue-600">${totalPrice.toLocaleString()}</p>
-          <p className="text-sm text-gray-600 mt-2">Price per sq ft: ${(totalPrice / sqft).toFixed(2)}</p>
+          <p className="text-sm text-brown-500 mt-2">Price per sq ft: ${(totalPrice / sqft).toFixed(2)}</p>
         </div>
       </div>
     </div>

@@ -60,7 +60,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
               className={`px-4 py-2 rounded ${
                 selectedWall === wall
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  : 'bg-cream-400 text-brown-700 hover:bg-gray-300'
               }`}
             >
               {wall.charAt(0).toUpperCase() + wall.slice(1)}
@@ -80,7 +80,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
               className="px-4 py-2 bg-blue-100 hover:bg-blue-200 rounded text-left"
             >
               <div className="font-medium">{option.name}</div>
-              <div className="text-sm text-gray-600">${option.price}</div>
+              <div className="text-sm text-brown-500">${option.price}</div>
             </button>
           ))}
         </div>
@@ -94,7 +94,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
               className="px-4 py-2 bg-purple-100 hover:bg-purple-200 rounded text-left"
             >
               <div className="font-medium">{option.name}</div>
-              <div className="text-sm text-gray-600">${option.price}</div>
+              <div className="text-sm text-brown-500">${option.price}</div>
             </button>
           ))}
         </div>
@@ -105,13 +105,13 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
         <h4 className="font-semibold mb-2">
           Placed Openings ({selectedWall} wall)
           {design.openings && design.openings.length > 0 && (
-            <span className="ml-2 text-sm font-normal text-gray-600">
+            <span className="ml-2 text-sm font-normal text-brown-500">
               ({design.openings.filter(o => o.wall === selectedWall).length} on this wall)
             </span>
           )}
         </h4>
         {!design.openings || design.openings.filter(o => o.wall === selectedWall).length === 0 ? (
-          <p className="text-gray-500 text-sm">No openings on this wall. Click above to add.</p>
+          <p className="text-brown-400 text-sm">No openings on this wall. Click above to add.</p>
         ) : (
           <div className="space-y-2">
             {design.openings
@@ -119,12 +119,12 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
               .map(opening => (
                 <div
                   key={opening.id}
-                  className="p-3 bg-gray-50 rounded border"
+                  className="p-3 bg-cream-200 rounded border"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <div className="font-medium">{opening.name}</div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-brown-500">
                         {opening.width}' × {opening.height}' | Position: {opening.x.toFixed(0)}%, {opening.y.toFixed(0)}%
                       </div>
                     </div>
@@ -136,7 +136,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
                     </button>
                   </div>
                   <div className="flex gap-2 items-center">
-                    <label className="text-xs text-gray-600 w-16">Horizontal:</label>
+                    <label className="text-xs text-brown-500 w-16">Horizontal:</label>
                     <input
                       type="range"
                       min="0"
@@ -148,10 +148,10 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
                       className="flex-1"
                       title="Horizontal position"
                     />
-                    <span className="text-xs text-gray-600 w-8">{opening.x}%</span>
+                    <span className="text-xs text-brown-500 w-8">{opening.x}%</span>
                   </div>
                   <div className="flex gap-2 items-center mt-2">
-                    <label className="text-xs text-gray-600 w-16">Vertical:</label>
+                    <label className="text-xs text-brown-500 w-16">Vertical:</label>
                     <input
                       type="range"
                       min="0"
@@ -163,7 +163,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
                       className="flex-1"
                       title="Vertical position"
                     />
-                    <span className="text-xs text-gray-600 w-8">{opening.y}%</span>
+                    <span className="text-xs text-brown-500 w-8">{opening.y}%</span>
                   </div>
                 </div>
               ))}
@@ -174,7 +174,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
         {design.openings && design.openings.length > 0 && (
           <div className="mt-4 pt-4 border-t">
             <h4 className="font-semibold mb-2 text-sm">All Openings ({design.openings.length} total)</h4>
-            <div className="text-xs text-gray-600 space-y-1">
+            <div className="text-xs text-brown-500 space-y-1">
               {['front', 'back', 'left', 'right'].map(wall => {
                 const count = design.openings.filter(o => o.wall === wall).length;
                 return count > 0 ? (

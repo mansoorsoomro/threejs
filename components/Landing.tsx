@@ -82,7 +82,7 @@ export default function Landing({ onStartDesigning }: LandingProps) {
 function Feature({ text }: { text: string }) {
     return (
         <div className="flex items-center gap-3">
-            <span className="text-[#0a8f3f] font-bold">✦</span>
+            <span className="text-brown-600 font-bold">✦</span>
             <span>{text}</span>
         </div>
     );
@@ -92,7 +92,7 @@ function Button({ text, onClick }: { text: string; onClick?: () => void }) {
     return (
         <button
             onClick={onClick}
-            className="bg-[#0a8f3f] hover:bg-[#087a36] w-full sm:w-auto
+            className="bg-brown-600 hover:bg-brown-700 w-full sm:w-auto
       px-10 py-4 rounded-full text-[13px] font-bold uppercase transition-all hover:scale-105 active:scale-95 shadow-lg"
         >
             {text}
@@ -103,7 +103,7 @@ function Button({ text, onClick }: { text: string; onClick?: () => void }) {
 function List({ text }: { text: string }) {
     return (
         <div className="flex items-center gap-3">
-            <span className="text-[#0a8f3f] text-xs">■</span>
+            <span className="text-brown-600 text-xs">■</span>
             <span>{text}</span>
         </div>
     );

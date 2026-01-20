@@ -20,14 +20,14 @@ export default function Footer({
 }: FooterProps) {
     return (
         <div
-            className={`fixed bottom-0 left-0 right-0 h-[56px] bg-[#16a34a] flex items-center px-4 z-50 ${className}`}
+            className={`fixed bottom-0 left-0 right-0 h-[56px] bg-brown-600 flex items-center px-4 z-50 ${className}`}
         >
             {/* Back Button */}
             <div className="flex-1">
                 {onBack && (
                     <button
                         onClick={onBack}
-                        className="bg-white text-gray-800 px-4 md:px-6 py-1.5 rounded-md font-semibold text-sm shadow hover:bg-gray-100 flex items-center justify-center min-w-[40px]"
+                        className="bg-white text-brown-800 px-4 md:px-6 py-1.5 rounded-md font-semibold text-sm shadow hover:bg-cream-300 flex items-center justify-center min-w-[40px]"
                     >
                         <span className="hidden min-[601px]:inline">Back</span>
                         <svg className="w-5 h-5 min-[601px]:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -51,8 +51,8 @@ export default function Footer({
                         disabled={isContinueDisabled}
                         className={`px-4 md:px-6 py-1.5 rounded-md font-semibold text-sm text-white shadow flex items-center justify-center min-w-[40px]
                             ${isContinueDisabled
-                                ? 'bg-green-700 opacity-60 cursor-not-allowed'
-                                : 'bg-[#4CAF50] hover:bg-[#43a047]'
+                                ? 'bg-brown-700 opacity-60 cursor-not-allowed'
+                                : 'bg-brown-500 hover:bg-brown-600'
                             }`}
                     >
                         <span className="hidden min-[601px]:inline">{continueLabel}</span>

@@ -3144,8 +3144,8 @@ export default function Building3D({ design }: Building3DProps) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h3 className="text-2xl font-bold mb-4">3D Rendering</h3>
-        <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center" style={{ height: '800px' }}>
-          <p className="text-gray-500">Loading...</p>
+        <div className="border-2 border-cream-300 rounded-lg overflow-hidden bg-cream-200 flex items-center justify-center" style={{ height: '800px' }}>
+          <p className="text-brown-400">Loading...</p>
         </div>
       </div>
     );
@@ -3186,7 +3186,7 @@ export default function Building3D({ design }: Building3DProps) {
     return (
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h3 className="text-2xl font-bold mb-4">3D Rendering (CSS Fallback)</h3>
-        <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gradient-to-b from-sky-200 to-green-100 relative" style={{ height: '800px' }}>
+        <div className="border-2 border-cream-300 rounded-lg overflow-hidden bg-gradient-to-b from-sky-200 to-green-100 relative" style={{ height: '800px' }}>
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{ perspective: '1000px' }}
@@ -3296,12 +3296,12 @@ export default function Building3D({ design }: Building3DProps) {
           </div>
 
           {/* Info Overlay */}
-          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-200">
-            <p className="text-xs font-semibold mb-2 text-gray-700">Building Dimensions:</p>
-            <p className="text-xs text-gray-600">Width: {width} ft</p>
-            <p className="text-xs text-gray-600">Length: {length} ft</p>
-            <p className="text-xs text-gray-600">Height: {height} ft</p>
-            <p className="text-xs text-gray-500 mt-2 italic">Click and drag to rotate</p>
+          <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-cream-300">
+            <p className="text-xs font-semibold mb-2 text-brown-700">Building Dimensions:</p>
+            <p className="text-xs text-brown-500">Width: {width} ft</p>
+            <p className="text-xs text-brown-500">Length: {length} ft</p>
+            <p className="text-xs text-brown-500">Height: {height} ft</p>
+            <p className="text-xs text-brown-400 mt-2 italic">Click and drag to rotate</p>
           </div>
 
           {/* WebGL Notice */}
@@ -3357,7 +3357,7 @@ export default function Building3D({ design }: Building3DProps) {
 
       {/* Slide-in Panel from Right - Transparent */}
       <div
-        className={`absolute top-0 right-0 bottom-0 w-96 bg-white/95 backdrop-blur-md shadow-2xl z-40 transition-transform duration-300 ease-in-out border-l border-gray-200 ${(activeColorPanel || activeViewPanel) ? 'translate-x-0' : 'translate-x-full'
+        className={`absolute top-0 right-0 bottom-0 w-96 bg-white/95 backdrop-blur-md shadow-2xl z-40 transition-transform duration-300 ease-in-out border-l border-cream-300 ${(activeColorPanel || activeViewPanel) ? 'translate-x-0' : 'translate-x-full'
           }`}
       >
         <div className="h-full overflow-y-auto p-6 relative">
@@ -3383,12 +3383,12 @@ export default function Building3D({ design }: Building3DProps) {
                         setLocalWallColor(color.value);
                       }}
                       className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${localWallColor === color.value
-                        ? 'border-green-500 ring-4 ring-green-200'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-brown-500 ring-4 ring-green-200'
+                        : 'border-cream-300 hover:border-gray-400'
                         }`}
                       style={{ backgroundColor: color.hex }}
                     >
-                      <div className="text-sm font-semibold mt-2 text-gray-800">{color.label}</div>
+                      <div className="text-sm font-semibold mt-2 text-brown-800">{color.label}</div>
                     </button>
                   ))}
                 </div>
@@ -3411,12 +3411,12 @@ export default function Building3D({ design }: Building3DProps) {
                         setLocalRoofColor(color.value);
                       }}
                       className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${localRoofColor === color.value
-                        ? 'border-green-500 ring-4 ring-green-200'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-brown-500 ring-4 ring-green-200'
+                        : 'border-cream-300 hover:border-gray-400'
                         }`}
                       style={{ backgroundColor: color.hex }}
                     >
-                      <div className="text-sm font-semibold mt-2 text-gray-800">{color.label}</div>
+                      <div className="text-sm font-semibold mt-2 text-brown-800">{color.label}</div>
                     </button>
                   ))}
                 </div>
@@ -3439,12 +3439,12 @@ export default function Building3D({ design }: Building3DProps) {
                         setLocalTrimColor(color.value);
                       }}
                       className={`p-4 rounded-lg border-2 transition-all hover:scale-105 ${localTrimColor === color.value
-                        ? 'border-green-500 ring-4 ring-green-200'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-brown-500 ring-4 ring-green-200'
+                        : 'border-cream-300 hover:border-gray-400'
                         }`}
                       style={{ backgroundColor: color.hex }}
                     >
-                      <div className="text-sm font-semibold mt-2 text-gray-800">{color.label}</div>
+                      <div className="text-sm font-semibold mt-2 text-brown-800">{color.label}</div>
                     </button>
                   ))}
                 </div>
@@ -3466,12 +3466,12 @@ export default function Building3D({ design }: Building3DProps) {
                       setShowFraming(!showFraming);
                     }}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${showFraming
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-brown-500 bg-cream-200'
+                      : 'border-cream-300 hover:border-gray-400'
                       }`}
                   >
                     <div className="font-semibold text-lg mb-1">Framing</div>
-                    <div className="text-sm text-gray-600">Toggle visibility of posts, trusses, and girts</div>
+                    <div className="text-sm text-brown-500">Toggle visibility of posts, trusses, and girts</div>
                   </button>
 
                   <button
@@ -3479,12 +3479,12 @@ export default function Building3D({ design }: Building3DProps) {
                       setShowBackground(!showBackground);
                     }}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${showBackground
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-brown-500 bg-cream-200'
+                      : 'border-cream-300 hover:border-gray-400'
                       }`}
                   >
                     <div className="font-semibold text-lg mb-1">Background</div>
-                    <div className="text-sm text-gray-600">Toggle visibility of trees and landscape</div>
+                    <div className="text-sm text-brown-500">Toggle visibility of trees and landscape</div>
                   </button>
 
                   <button
@@ -3492,12 +3492,12 @@ export default function Building3D({ design }: Building3DProps) {
                       setShowRoof(!showRoof);
                     }}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${showRoof
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-brown-500 bg-cream-200'
+                      : 'border-cream-300 hover:border-gray-400'
                       }`}
                   >
                     <div className="font-semibold text-lg mb-1">Roof</div>
-                    <div className="text-sm text-gray-600">Toggle visibility of roof</div>
+                    <div className="text-sm text-brown-500">Toggle visibility of roof</div>
                   </button>
                 </div>
               </div>
@@ -3508,37 +3508,37 @@ export default function Building3D({ design }: Building3DProps) {
                 <div className="space-y-3">
                   <button
                     onClick={resetCamera}
-                    className="w-full p-4 rounded-lg border-2 border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 transition-all text-left flex items-center gap-3"
+                    className="w-full p-4 rounded-lg border-2 border-cream-300 hover:border-gray-400 bg-cream-200 hover:bg-cream-300 transition-all text-left flex items-center gap-3"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                     <div>
                       <div className="font-semibold text-lg mb-1">Reset View</div>
-                      <div className="text-sm text-gray-600">Reset camera to default position</div>
+                      <div className="text-sm text-brown-500">Reset camera to default position</div>
                     </div>
                   </button>
 
                   <button
                     onClick={() => setViewMode('exterior')}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${viewMode === 'exterior'
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-brown-500 bg-cream-200'
+                      : 'border-cream-300 hover:border-gray-400'
                       }`}
                   >
                     <div className="font-semibold text-lg mb-1">Exterior</div>
-                    <div className="text-sm text-gray-600">View building from outside</div>
+                    <div className="text-sm text-brown-500">View building from outside</div>
                   </button>
 
                   <button
                     onClick={() => setViewMode('interior')}
                     className={`w-full p-4 rounded-lg border-2 transition-all text-left ${viewMode === 'interior'
-                      ? 'border-green-500 bg-green-50'
-                      : 'border-gray-300 hover:border-gray-400'
+                      ? 'border-brown-500 bg-cream-200'
+                      : 'border-cream-300 hover:border-gray-400'
                       }`}
                   >
                     <div className="font-semibold text-lg mb-1">Interior</div>
-                    <div className="text-sm text-gray-600">View building from inside</div>
+                    <div className="text-sm text-brown-500">View building from inside</div>
                   </button>
                 </div>
               </div>
@@ -3549,14 +3549,14 @@ export default function Building3D({ design }: Building3DProps) {
                 <div className="space-y-3">
                   <button
                     onClick={toggleFullscreen}
-                    className="w-full p-4 rounded-lg border-2 border-gray-300 hover:border-gray-400 bg-gray-50 hover:bg-gray-100 transition-all text-left flex items-center gap-3"
+                    className="w-full p-4 rounded-lg border-2 border-cream-300 hover:border-gray-400 bg-cream-200 hover:bg-cream-300 transition-all text-left flex items-center gap-3"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                     </svg>
                     <div>
                       <div className="font-semibold text-lg mb-1">Fullscreen</div>
-                      <div className="text-sm text-gray-600">Toggle fullscreen mode</div>
+                      <div className="text-sm text-brown-500">Toggle fullscreen mode</div>
                     </div>
                   </button>
                 </div>
@@ -3570,7 +3570,7 @@ export default function Building3D({ design }: Building3DProps) {
               setActiveColorPanel(null);
               setActiveViewPanel(null);
             }}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-cream-400 hover:bg-gray-300 flex items-center justify-center transition-colors"
             title="Close"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3589,7 +3589,7 @@ export default function Building3D({ design }: Building3DProps) {
           }}
           className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all shadow-lg ${activeColorPanel === 'wall'
             ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-700 hover:bg-gray-100'
+            : 'bg-white text-brown-700 hover:bg-cream-300'
             }`}
         >
           Colors
@@ -3601,7 +3601,7 @@ export default function Building3D({ design }: Building3DProps) {
           }}
           className={`px-6 py-3 rounded-lg font-semibold text-sm transition-all shadow-lg ${activeViewPanel === 'views'
             ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-700 hover:bg-gray-100'
+            : 'bg-white text-brown-700 hover:bg-cream-300'
             }`}
         >
           Views
@@ -3611,13 +3611,13 @@ export default function Building3D({ design }: Building3DProps) {
 
       {/* Main 3D View */}
       <div className="h-full">
-        <div className="border-2 border-gray-300 rounded-lg overflow-hidden bg-gray-50 h-full">
+        <div className="border-2 border-cream-300 rounded-lg overflow-hidden bg-cream-200 h-full">
           <div
             ref={mountRef}
             className="w-full h-full"
           />
         </div>
-        <p className="mt-2 text-sm text-gray-600 text-center">Click and drag to rotate, scroll to zoom</p>
+        <p className="mt-2 text-sm text-brown-500 text-center">Click and drag to rotate, scroll to zoom</p>
       </div>
     </div>
   );

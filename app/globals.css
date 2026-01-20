@@ -3,19 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+  /* Coupe Building Company Color Palette */
+  --cream-bg: #F5F0E1;
+  --cream-light: #FAF6ED;
+  --cream-dark: #EDE5D3;
+  --brown-primary: #6B5344;
+  --brown-secondary: #8B7355;
+  --brown-light: #A08366;
+  --brown-dark: #5A4538;
+  
+  --foreground-rgb: 107, 83, 68; /* Brown primary */
+  --background-color: #F5F0E1;
+  --background-light: #FAF6ED;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: var(--background-color);
 }
 
 @layer utilities {

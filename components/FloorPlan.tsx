@@ -661,7 +661,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
       <h3 className="text-xl font-bold mb-4 text-center">FLOOR PLAN</h3>
       <div
         ref={diagramDiv}
-        className="border-2 border-gray-300 rounded"
+        className="border-2 border-cream-300 rounded"
         style={{
           width: '100%',
           height: '700px',
@@ -669,7 +669,7 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
           background: '#ffffff',
         }}
       />
-      <div className="mt-4 text-sm text-gray-600 text-center">
+      <div className="mt-4 text-sm text-brown-500 text-center">
         <p className="font-semibold">Total Area: {design.width * design.length} sq ft</p>
         <p className="font-semibold">Perimeter: {(design.width + design.length) * 2} linear ft</p>
       </div>
