@@ -57,7 +57,7 @@ export async function savePricingConfig(config: PricingConfig): Promise<{ succes
         if (process.env.VERCEL) {
             return {
                 success: false,
-                error: "Vercel is 'Read-Only'. Please go to Vercel Dashboard and connect a KV Database."
+                error: "Vercel is 'Read-Only'. Please connect a Vercel KV Database. See VERCEL_SETUP.md for instructions."
             };
         }
         return { success: false, error: 'Internal Server Error: ' + error.message };
