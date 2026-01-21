@@ -4,7 +4,13 @@ import path from 'path';
 import { PricingConfig, defaultPricing } from './pricing';
 
 const PRICING_FILE_PATH = path.join(process.cwd(), 'data', 'pricing-config.json');
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI =
+    process.env.MONGODB_URI ||
+    process.env.MONGODB_URL ||
+    process.env.DATABASE_URL ||
+    process.env.STORAGE_MONGODB_URI ||
+    process.env.STORAGE_MONGODB_URI_URL ||
+    process.env.STORAGE_URL;
 const DB_NAME = 'building-designer';
 const COLLECTION_NAME = 'pricing';
 
@@ -93,3 +99,4 @@ export async function savePricingConfig(config: PricingConfig): Promise<{ succes
         return { success: false, error: 'Internal Server Error: ' + error.message };
     }
 }
+

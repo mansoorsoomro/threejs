@@ -14,8 +14,8 @@ Since Vercel has a read-only filesystem, you need a database like MongoDB Atlas 
 1. In the Atlas Dashboard, go to **Database**.
 2. Click **Connect** on your cluster.
 3. Choose **Connect your application**.
-4. Copy the connection string. It looks like:
-   `mongodb+srv://<username>:<password>@cluster0.abcde.mongodb.net/?retryWrites=true&w=majority`
+4. Copy the connection string. Your string is:
+    `mongodb+srv://Vercel-Admin-atlas-lime-school-test:K4ot4QkmQ6rQDhLU@atlas-lime-school-test.4mxjy5w.mongodb.net/?retryWrites=true&w=majority`
 
 ## 3. Add to Vercel
 1. Go to your project in the [Vercel Dashboard](https://vercel.com).
@@ -28,6 +28,6 @@ Since Vercel has a read-only filesystem, you need a database like MongoDB Atlas 
 ## 4. Local Development (Optional)
 If you want to use MongoDB locally, add the same `MONGODB_URI` to your `.env.local` file:
 ```env
-MONGODB_URI=mongodb+srv://...
+MONGODB_URI="mongodb+srv://Vercel-Admin-atlas-lime-school-test:K4ot4QkmQ6rQDhLU@atlas-lime-school-test.4mxjy5w.mongodb.net/?retryWrites=true&w=majority"
 ```
 If this variable is missing locally, the app will continue to use the local `data/pricing-config.json` file.
