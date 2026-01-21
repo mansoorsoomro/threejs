@@ -58,8 +58,8 @@ const openingTypes = [
     type: 'window' as const,
     imageSrc: '/assets/window.png',
     defaultWidth: 3,
-    defaultHeight: 2,
-    price: 200,
+    defaultHeight: 3,
+    price: 250,
   },
   {
     id: 'service-door',

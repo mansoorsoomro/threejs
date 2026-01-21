@@ -2,24 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { BuildingDesign } from '@/types/building';
 import nodemailer from 'nodemailer';
 import { generatePDF } from '@/lib/pdfGenerator';
-import fs from 'fs';
-import path from 'path';
+import { getPricingConfig } from '@/lib/pricingPersistence';
 
 export async function POST(request: NextRequest) {
   try {
     const design: BuildingDesign = await request.json();
 
     // Read pricing config for accurate PDF calculation
-    let pricingConfig = undefined;
-    try {
-      const configPath = path.join(process.cwd(), 'data', 'pricing-config.json');
-      if (fs.existsSync(configPath)) {
-        const fileContents = fs.readFileSync(configPath, 'utf8');
-        pricingConfig = JSON.parse(fileContents);
-      }
-    } catch (e) {
-      console.error('Error reading pricing config for quote:', e);
-    }
+    const pricingConfig = await getPricingConfig();
 
     // Generate PDF
     const pdfBlob = await generatePDF(design, pricingConfig);

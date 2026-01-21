@@ -13,6 +13,7 @@
     "@react-three/drei": "^9.88.0",
     "@react-three/fiber": "^8.15.0",
     "@reduxjs/toolkit": "^2.11.0",
+    "@vercel/kv": "^3.0.0",
     "gojs": "^3.1.2",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",

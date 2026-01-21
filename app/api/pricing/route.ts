@@ -1,26 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
-import { PricingConfig } from '@/lib/pricing';
-
-const PRICING_FILE_PATH = path.join(process.cwd(), 'data', 'pricing-config.json');
-
-// Helper to ensure data directory exists
-const ensureDataDir = () => {
-    const dataDir = path.join(process.cwd(), 'data');
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-    }
-};
+import { getPricingConfig, savePricingConfig } from '@/lib/pricingPersistence';
 
 export async function GET() {
     try {
-        ensureDataDir();
-        if (!fs.existsSync(PRICING_FILE_PATH)) {
-            return NextResponse.json({ error: 'Pricing file not found' }, { status: 404 });
-        }
-        const fileContents = fs.readFileSync(PRICING_FILE_PATH, 'utf8');
-        const pricingData = JSON.parse(fileContents);
+        const pricingData = await getPricingConfig();
         return NextResponse.json(pricingData);
     } catch (error) {
         console.error('Error reading pricing data:', error);
@@ -38,8 +21,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        ensureDataDir();
-        fs.writeFileSync(PRICING_FILE_PATH, JSON.stringify(pricing, null, 2), 'utf8');
+        const result = await savePricingConfig(pricing);
+
+        if (!result.success) {
+            return NextResponse.json({ error: result.error }, { status: 403 });
+        }
 
         return NextResponse.json({ success: true });
     } catch (error) {

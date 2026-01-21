@@ -10,7 +10,7 @@ export type OpeningOption = {
 
 export const windowOptions: OpeningOption[] = [
   { id: 'w1', type: 'window', width: 2, height: 2, name: '2x2 Window', price: 150 },
-  { id: 'w2', type: 'window', width: 3, height: 2, name: '3x2 Window', price: 200 },
+  { id: 'w2', type: 'window', width: 3, height: 3, name: '3x3 Window', price: 250 },
   { id: 'w3', type: 'window', width: 4, height: 3, name: '4x3 Window', price: 280 },
   { id: 'w4', type: 'window', width: 5, height: 3, name: '5x3 Window', price: 350 },
 ];
