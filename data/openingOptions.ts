@@ -1,4 +1,4 @@
-// Window and door options from Menards
+// Window and door options
 export type OpeningOption = {
   id: string;
   type: 'window' | 'door';

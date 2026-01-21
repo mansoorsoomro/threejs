@@ -69,9 +69,9 @@ export default function Landing({ onStartDesigning }: LandingProps) {
             {/* FOOTER */}
             <div className="relative lg:absolute bottom-0 lg:bottom-4 w-full py-6 lg:py-0 text-center text-[10px] md:text-[11px] opacity-70 z-10 bg-black/40 lg:bg-transparent">
                 <span className="bg-[#f05a28] px-1.5 py-0.5 font-bold italic rounded">
-                    MENARDS®
+                    COUPE BUILDING CO.
                 </span>{' '}
-                ©2004–2024 Menard, Inc. All Rights Reserved.
+                ©2004–2026 Coupe Building Co. All Rights Reserved.
             </div>
         </div>
     );

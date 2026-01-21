@@ -5,7 +5,8 @@ import Building3D from '@/components/Building3D';
 import Footer from './Footer';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
-import { wallColors, trimColors, roofColors } from '@/data/menardsColors';
+import { useAppSelector } from '@/lib/store/hooks';
+import { wallColors, trimColors, roofColors } from '@/data/buildingColors';
 
 // Helper function to get color image path
 const getColorImagePath = (colorValue: string, colorLabel: string): string => {
@@ -75,6 +76,7 @@ interface BuildingInfoProps {
 }
 
 export default function BuildingInfo({ design, onSubmit, onNext, onBack }: BuildingInfoProps) {
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
   const [infoTab, setInfoTab] = useState<'information' | '3d'>('information');
   const [currentDesign, setCurrentDesign] = useState<BuildingDesign>(design);
 
@@ -99,7 +101,7 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
   // UI-only floor thickness when concrete is selected
   const [floorThickness, setFloorThickness] = useState<string>('4 in');
 
-  // Local-only UI options (not used in pricing yet) to match Menards-style planner
+  // Local-only UI options (not used in pricing yet)
   const [postFoundation, setPostFoundation] = useState<string>('Post Embedded');
   const [postEmbedmentDepth, setPostEmbedmentDepth] = useState<string>(design.postEmbedmentDepth || '4 ft');
   const [footingSize, setFootingSize] = useState<string>(design.footingSize || '20 in x 6 in (Pre-cast)');
@@ -147,7 +149,7 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
       height: o.height,
       price: o.price,
     })),
-  });
+  }, pricingConfig);
 
   const infoSeed = `${currentDesign.width}-${currentDesign.length}-${currentDesign.clearHeight}-${currentDesign.trussSpacing}`;
   let infoHash = 0;
@@ -178,12 +180,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
 
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'floor'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('floor')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'floor' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'floor' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Floor</p>
                     <p className="text-xs text-brown-800 mb-3">Floor type</p>
@@ -227,12 +229,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {/* Sidewall Posts */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'sidewallPosts'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('sidewallPosts')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'sidewallPosts' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'sidewallPosts' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Sidewall Posts</p>
                     <p className="text-xs text-brown-700 mb-3">Select post option</p>
@@ -257,12 +259,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {/* Post Foundation */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'postFoundation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('postFoundation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'postFoundation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'postFoundation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Post Foundation</p>
                     <p className="text-xs text-brown-700 mb-3">Select the construction method</p>
@@ -291,16 +293,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {postFoundation === 'Post Embedded' && (
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'postEmbedment'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('postEmbedment')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'postEmbedment' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'postEmbedment' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Post Embedment</p>
                     <p className="text-xs text-brown-700">Select the post embedment depth</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'postEmbedment' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'postEmbedment' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Select embedment depth</span>
                       <select
@@ -348,12 +350,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {/* Gradeboard */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gradeboard'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('gradeboard')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'gradeboard' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'gradeboard' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Gradeboard</p>
                     <p className="text-xs text-brown-700 mb-3">Select the gradeboard type</p>
@@ -377,7 +379,7 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 </div>
 
                 {(currentDesign.gradeBoard === '2x6-centermatch' || currentDesign.gradeBoard === '2x6-fusion-centermatch') && (
-                  <div className="mt-4 space-y-3 pt-3 border-t border-yellow-300/50">
+                  <div className="mt-4 space-y-3 pt-3 border-t border-brown-300/50">
                     {[
                       { label: 'Sidewall A rows of centermatch', key: 'sidewallA' },
                       { label: 'Sidewall B rows of centermatch', key: 'sidewallB' },
@@ -420,12 +422,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {/* Girt Type */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'girtType'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('girtType')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'girtType' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'girtType' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Girt Type</p>
                     <p className="text-xs text-brown-700 mb-3">Select the girt type</p>
@@ -450,12 +452,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
               {/* Girt Size */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'girtSize'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('girtSize')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'girtSize' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'girtSize' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Girt Size</p>
                     <p className="text-xs text-brown-700 mb-3">Select the exterior girt size</p>
@@ -478,16 +480,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Wall Color */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'steelWall'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('steelWall')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'steelWall' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'steelWall' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Steel Wall Panels</p>
                     <p className="text-xs text-brown-700">Steel panel type &amp; wall color</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelWall' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelWall' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Steel Panel Type</span>
                       <select
@@ -527,16 +529,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Roof Color */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'steelRoof'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('steelRoof')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'steelRoof' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'steelRoof' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Steel Roof Panels</p>
                     <p className="text-xs text-brown-700">Steel panel type &amp; roof color</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelRoof' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'steelRoof' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Steel Panel Type</span>
                       <select
@@ -576,12 +578,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Trim Color */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'trimColor'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('trimColor')}
                 >
-                  <div className={`px-4 py-4 ${activeSection === 'trimColor' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-4 ${activeSection === 'trimColor' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <div>
                       <p className="text-sm font-bold text-brown-900 mb-2">Trim Color</p>
                       <p className="text-xs text-brown-700 mb-3">Choose trim color</p>
@@ -614,16 +616,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Overhangs */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'overhangs'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('overhangs')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'overhangs' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'overhangs' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Overhangs</p>
                     <p className="text-xs text-brown-700">Endwall and sidewall overhang length</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'overhangs' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'overhangs' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Endwall overhang length</span>
                       <select
@@ -692,16 +694,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Fascia */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'fascia'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('fascia')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'fascia' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'fascia' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Fascia</p>
                     <p className="text-xs text-brown-700">Select the fascia size</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'fascia' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'fascia' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Select the fascia size</span>
                       <select
@@ -720,16 +722,16 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Fastener Placement */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'fastenerPlacement'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('fastenerPlacement')}
                 >
-                  <div className={`px-4 py-2 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-2 ${activeSection === 'fastenerPlacement' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <p className="text-sm font-bold text-brown-900">Fastener Placement</p>
                     <p className="text-xs text-brown-700">Choose wall &amp; roof fastener location</p>
                   </div>
-                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'fastenerPlacement' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-3 space-y-3 ${activeSection === 'fastenerPlacement' ? 'bg-cream-50' : 'bg-transparent'}`}>
                     <div>
                       <span className="text-xs text-brown-700 block mb-2">Wall fastener location</span>
                       <select
@@ -760,12 +762,12 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                 {/* Plans */}
                 <div
                   className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'plans'
-                    ? 'bg-yellow-100 border-2 border-yellow-300'
+                    ? 'bg-cream-100 border-2 border-brown-300'
                     : 'bg-transparent border-0 hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('plans')}
                 >
-                  <div className={`px-4 py-4 ${activeSection === 'plans' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                  <div className={`px-4 py-4 ${activeSection === 'plans' ? 'bg-cream-200' : 'bg-transparent'}`}>
                     <div>
                       <p className="text-sm font-bold text-brown-900 mb-2">Plans</p>
                       <p className="text-xs text-brown-700 mb-3">Choose a Mini-Print option</p>
@@ -1494,14 +1496,14 @@ export default function BuildingInfo({ design, onSubmit, onNext, onBack }: Build
                       {/* Additional Information */}
                       <div className="space-y-3 text-sm text-brown-700">
                         <p>
-                          The building estimates from this program are code exempt applications (examples: buildings used for personal storage or agricultural use). Menards can provide estimates for all types of &quot;Engineered&quot; Post Frame Buildings and Barndominiums (examples: used for a business, living space, rental or personal storage buildings that need to be code compliant).
+                          The building estimates from this program are code exempt applications (examples: buildings used for personal storage or agricultural use). Coupe Building Co. can provide estimates for all types of &quot;Engineered&quot; Post Frame Buildings and Barndominiums (examples: used for a business, living space, rental or personal storage buildings that need to be code compliant).
                         </p>
                         <p>
                           If you need to meet a specific snow or wind load rating or are required to provide sealed blueprints, please chat or leave a message, e-mail{' '}
-                          <a href="mailto:postframe@midwestmanufacturing.com" className="text-blue-600 hover:underline">
-                            postframe@midwestmanufacturing.com
+                          <a href="mailto:sales@coupebuildingco.com" className="text-blue-600 hover:underline">
+                            sales@coupebuildingco.com
                           </a>
-                          , or visit your local Menards store for more information.
+                          , or contact us for more information.
                         </p>
                       </div>
                     </div>

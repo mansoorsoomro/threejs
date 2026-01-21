@@ -5,7 +5,8 @@ import Building3D from '@/components/Building3D';
 import Footer from './Footer';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
-import { trimColors } from '@/data/menardsColors';
+import { useAppSelector } from '@/lib/store/hooks';
+import { trimColors } from '@/data/buildingColors';
 
 // Helper function to get color image path
 const getColorImagePath = (colorValue: string, colorLabel: string): string => {
@@ -75,6 +76,7 @@ interface BuildingAccessoriesProps {
 }
 
 export default function BuildingAccessories({ design, onSubmit, onNext, onBack }: BuildingAccessoriesProps) {
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
   const [infoTab, setInfoTab] = useState<'information' | '3d'>('information');
   const [currentDesign, setCurrentDesign] = useState<BuildingDesign>(design);
 
@@ -197,7 +199,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
       height: o.height,
       price: o.price,
     })),
-  });
+  }, pricingConfig);
 
   const infoSeed = `${currentDesign.width}-${currentDesign.length}-${currentDesign.clearHeight}-${currentDesign.trussSpacing}`;
   let infoHash = 0;
@@ -280,16 +282,16 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Open Wall */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'openWall'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('openWall')}
               >
-                <div className={`px-4 py-2 ${activeSection === 'openWall' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-2 ${activeSection === 'openWall' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <p className="text-sm font-bold text-brown-900">Open Wall</p>
                   <p className="text-xs text-brown-700">Add an open wall</p>
                 </div>
-                <div className={`px-4 py-3 space-y-3 ${activeSection === 'openWall' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'openWall' ? 'bg-cream-50' : 'bg-transparent'}`}>
                   <div>
                     <span className="text-xs text-brown-700 block mb-2">Add an open wall</span>
                     <select
@@ -374,16 +376,16 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Gable Accent */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gableAccent'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('gableAccent')}
               >
-                <div className={`px-4 py-2 ${activeSection === 'gableAccent' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-2 ${activeSection === 'gableAccent' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <p className="text-sm font-bold text-brown-900">Gable Accent</p>
                   <p className="text-xs text-brown-700">Add Gable Accent</p>
                 </div>
-                <div className={`px-4 py-3 space-y-3 ${activeSection === 'gableAccent' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'gableAccent' ? 'bg-cream-50' : 'bg-transparent'}`}>
                   <div>
                     <span className="text-xs text-brown-700 block mb-2">Add Gable Accent</span>
                     <select
@@ -469,16 +471,16 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Wainscot */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wainscot'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('wainscot')}
               >
-                <div className={`px-4 py-2 ${activeSection === 'wainscot' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-2 ${activeSection === 'wainscot' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <p className="text-sm font-bold text-brown-900">Wainscot</p>
                   <p className="text-xs text-brown-700">Add wainscoting</p>
                 </div>
-                <div className={`px-4 py-3 space-y-3 ${activeSection === 'wainscot' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'wainscot' ? 'bg-cream-50' : 'bg-transparent'}`}>
                   <div>
                     <span className="text-xs text-brown-700 block mb-2">Add wainscoting</span>
                     <select
@@ -615,12 +617,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Wall Insulation */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wallInsulation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('wallInsulation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'wallInsulation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'wallInsulation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Wall Insulation</p>
                     <p className="text-xs text-brown-700 mb-3">Select type of wall insulation</p>
@@ -642,12 +644,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Wall Condensation Control */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'wallCondensation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('wallCondensation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'wallCondensation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'wallCondensation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Wall Condensation Control</p>
                     <p className="text-xs text-brown-700 mb-3">Select type</p>
@@ -669,12 +671,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Interior Wall Liner */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'interiorWallLiner'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('interiorWallLiner')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'interiorWallLiner' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'interiorWallLiner' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Interior Wall Liner</p>
                     <p className="text-xs text-brown-700 mb-3">Select type of wall liner</p>
@@ -729,12 +731,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Roof Condensation Control */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'roofCondensation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('roofCondensation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'roofCondensation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'roofCondensation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Roof Condensation Control</p>
                     <p className="text-xs text-brown-700 mb-3">Select type</p>
@@ -755,12 +757,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Ceiling Insulation */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ceilingInsulation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('ceilingInsulation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'ceilingInsulation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'ceilingInsulation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Ceiling Insulation</p>
                     <p className="text-xs text-brown-700 mb-3">Select type of ceiling insulation</p>
@@ -791,12 +793,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Ceiling Liner */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ceilingLiner'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('ceilingLiner')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'ceilingLiner' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'ceilingLiner' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Ceiling Liner</p>
                     <p className="text-xs text-brown-700 mb-3">Select type of ceiling liner</p>
@@ -851,12 +853,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Ridge Options */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ridgeOptions'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('ridgeOptions')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'ridgeOptions' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'ridgeOptions' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Ridge Options</p>
                     <p className="text-xs text-brown-700 mb-3">Select the type of ridge cap</p>
@@ -880,12 +882,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Outside Closure Strip */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'outsideClosure'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('outsideClosure')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'outsideClosure' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'outsideClosure' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Outside Closure Strip</p>
                     <p className="text-xs text-brown-700 mb-3">Select outside closure strip</p>
@@ -906,12 +908,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Ridge Ventilation */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'ridgeVentilation'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('ridgeVentilation')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'ridgeVentilation' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'ridgeVentilation' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Ridge Ventilation</p>
                     <p className={`text-xs mb-2 italic ${currentDesign.roofColor === 'galvanized' ? 'text-red-600' : 'text-brown-500'}`}>This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
@@ -938,12 +940,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Gable Vents */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gableVents'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('gableVents')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'gableVents' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'gableVents' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Gable Vents</p>
                     <p className={`text-xs mb-2 italic ${currentDesign.roofColor === 'galvanized' ? 'text-red-600' : 'text-brown-500'}`}>This option cannot be changed when Steel Roof Panels option Galvanized is chosen</p>
@@ -969,12 +971,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* End Caps */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'endCaps'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('endCaps')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'endCaps' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'endCaps' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">End Caps</p>
                     <p className="text-xs text-brown-700 mb-3">Add end caps</p>
@@ -997,12 +999,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Snow Guards */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'snowGuards'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('snowGuards')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'snowGuards' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'snowGuards' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Snow Guards</p>
                     <p className="text-xs text-brown-700 mb-3">Add snow guards</p>
@@ -1025,12 +1027,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Skylights */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'skylights'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('skylights')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'skylights' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'skylights' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Skylights</p>
                     <p className="text-xs text-brown-700 mb-3">Skylight size</p>
@@ -1074,16 +1076,16 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Eave Light */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'eaveLight'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('eaveLight')}
               >
-                <div className={`px-4 py-2 ${activeSection === 'eaveLight' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-2 ${activeSection === 'eaveLight' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <p className="text-sm font-bold text-brown-900">Eave Light</p>
                   <p className="text-xs text-brown-700">Sidewall A and B eavelight</p>
                 </div>
-                <div className={`px-4 py-3 space-y-3 ${activeSection === 'eaveLight' ? 'bg-yellow-50' : 'bg-transparent'}`}>
+                <div className={`px-4 py-3 space-y-3 ${activeSection === 'eaveLight' ? 'bg-cream-50' : 'bg-transparent'}`}>
                   <div>
                     <span className="text-xs text-brown-700 block mb-2">Sidewall A eavelight</span>
                     <select
@@ -1124,12 +1126,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Gutters */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'gutters'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('gutters')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'gutters' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'gutters' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Gutters</p>
                     <p className="text-xs text-brown-500 mb-2 italic">This option cannot be changed when Overhangs option 0 ft is chosen</p>
@@ -1184,12 +1186,12 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
               {/* Cupolas */}
               <div
                 className={`mb-3 cursor-pointer rounded-lg overflow-hidden transition-all ${activeSection === 'cupolas'
-                  ? 'bg-yellow-100 border-2 border-yellow-300'
+                  ? 'bg-cream-100 border-2 border-brown-300'
                   : 'bg-transparent border-0 hover:bg-cream-200'
                   }`}
                 onClick={() => setActiveSection('cupolas')}
               >
-                <div className={`px-4 py-4 ${activeSection === 'cupolas' ? 'bg-yellow-200' : 'bg-transparent'}`}>
+                <div className={`px-4 py-4 ${activeSection === 'cupolas' ? 'bg-cream-200' : 'bg-transparent'}`}>
                   <div>
                     <p className="text-sm font-bold text-brown-900 mb-2">Cupolas</p>
                     <p className="text-xs text-brown-500 mb-2 italic">This option cannot be changed when Steel Wall Panels option Galvanized is chosen</p>

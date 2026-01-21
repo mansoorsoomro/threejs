@@ -3,8 +3,13 @@ import './globals.css'
 import StoreProvider from '@/lib/store/StoreProvider'
 
 export const metadata: Metadata = {
-  title: 'Coupe Building Designer',
+  title: 'Coupe Building Company',
   description: 'Design your custom building with instant pricing',
+  icons: {
+    icon: '/assets/main.png',
+    shortcut: '/assets/main.png',
+    apple: '/assets/main.png',
+  },
 }
 
 export default function RootLayout({

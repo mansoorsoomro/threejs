@@ -1,8 +1,8 @@
 import { Store } from '@/types/building';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_MENARDS_API_BASE_URL || 'https://external-midwest.menards.com/postframe-web';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BUILDING_API_BASE_URL || 'https://external-midwest.menards.com/postframe-web';
 
-export interface MenardsStoreResponse {
+export interface BuildingStoreResponse {
   inAllowedRegion: boolean;
   count: number;
   closestStores: Array<{
@@ -30,9 +30,9 @@ export interface MenardsStoreResponse {
 }
 
 /**
- * Transform Menards API response to Store format
+ * Transform API response to Store format
  */
-const transformStore = (store: MenardsStoreResponse['closestStores'][0]): Store => {
+const transformStore = (store: BuildingStoreResponse['closestStores'][0]): Store => {
   const addressParts = [
     store.address.street,
     store.address.city,
@@ -59,9 +59,8 @@ export const fetchStoresByZipCode = async (zipCode: string, offset: number = 1):
     throw new Error('Zip code must be 5 digits');
   }
 
-  // Use Next.js rewrite proxy - calls /api/menards which rewrites to external API
-  // This avoids CORS issues without needing a backend API route
-  const url = `/api/menards/getClosestStores.do?storesPerPage=10&offset=${offset}&zipCode=${zipCode}`;
+  // Use Next.js rewrite proxy - calls /api/building-api which rewrites to external API
+  const url = `/api/building-api/getClosestStores.do?storesPerPage=10&offset=${offset}&zipCode=${zipCode}`;
 
   try {
     const response = await fetch(url, {
@@ -75,7 +74,7 @@ export const fetchStoresByZipCode = async (zipCode: string, offset: number = 1):
       throw new Error(`Failed to fetch stores: ${response.status} ${response.statusText}`);
     }
 
-    const data: MenardsStoreResponse = await response.json();
+    const data: BuildingStoreResponse = await response.json();
 
     if (!data.closestStores || data.closestStores.length === 0) {
       return [];

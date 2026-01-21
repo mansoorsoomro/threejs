@@ -14,7 +14,13 @@ export interface BuildingDesign {
 
   // Client Information
   clientName: string;
+  clientEmail?: string;
+  clientPhone?: string;
   clientAddress: string;
+  // Metadata for PDF
+  rendering3D?: string;
+  floorPlanImage?: string;
+
   buildingUse: 'residential' | 'storage' | 'agricultural' | 'barndominium';
   width: number;
   length: number;
@@ -106,4 +112,3 @@ export interface Opening {
   price: number;
   wall: 'front' | 'back' | 'left' | 'right';
 }
-

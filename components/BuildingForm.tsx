@@ -2,8 +2,8 @@
 
 import { useForm } from 'react-hook-form';
 import { BuildingDesign } from '@/types/building';
-import { wallColors, trimColors, roofColors } from '@/data/menardsColors';
-import { windowOptions, doorOptions } from '@/data/windowsDoors';
+import { wallColors, trimColors, roofColors } from '@/data/buildingColors';
+import { windowOptions, doorOptions } from '@/data/openingOptions';
 
 interface BuildingFormProps {
   onSubmit: (data: BuildingDesign) => void;

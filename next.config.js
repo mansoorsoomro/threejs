@@ -11,7 +11,7 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/menards/:path*',
+        source: '/api/building-api/:path*',
         destination: 'https://external-midwest.menards.com/postframe-web/:path*',
       },
     ];

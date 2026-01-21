@@ -20,6 +20,7 @@ interface BuildingSizeProps {
 export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit }: BuildingSizeProps) {
   const dispatch = useAppDispatch();
   const buildingData = useAppSelector((state) => state.buildingData);
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
 
   // Safe destructuring with defaults
   const sceneQuestions = buildingData?.sceneQuestions || [];
@@ -165,7 +166,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
           sitePreparation: false,
           openings: [],
         };
-        const basePrice = calculatePrice(specs);
+        const basePrice = calculatePrice(specs, pricingConfig);
 
         // Add a small variation so price obviously changes when inputs change
         // but stays in a realistic range.
@@ -307,7 +308,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
               <div className="space-y-3">
                 {/* Building Use */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'buildingUse' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'buildingUse' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('buildingUse')}
                 >
@@ -336,7 +337,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Construction Framing Type */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'framingType' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'framingType' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('framingType')}
                 >
@@ -365,7 +366,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Roof Pitch */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'roofPitch' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'roofPitch' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('roofPitch')}
                 >
@@ -395,7 +396,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Truss Spacing and Length */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'trussSpacing' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'trussSpacing' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('trussSpacing')}
                 >
@@ -461,7 +462,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Width */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'width' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'width' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('width')}
                 >
@@ -547,7 +548,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
 
                 {/* Height */}
                 <div
-                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'height' ? 'bg-yellow-100 border-2 border-yellow-300' : 'hover:bg-cream-200'
+                  className={`mb-3 cursor-pointer p-3 rounded-lg transition-all ${activeSection === 'height' ? 'bg-cream-100 border-2 border-brown-300' : 'hover:bg-cream-200'
                     }`}
                   onClick={() => setActiveSection('height')}
                 >
@@ -797,8 +798,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                         </div>
                       )}
                       {!framingType && (
-                        <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                          <p className="text-xs text-yellow-800">
+                        <div className="mb-3 p-3 bg-cream-50 border border-brown-200 rounded">
+                          <p className="text-xs text-brown-800">
                             Please select a Construction Framing Type first to see the roof pitch illustration.
                           </p>
                         </div>
@@ -917,10 +918,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                   {activeSection === 'buildingUse' && (
                     <div className="mt-4 p-3 bg-cream-200 border border-green-200 rounded">
                       <p className="text-xs text-brown-600 italic leading-relaxed">
-                        The building estimates from this program are for code exempt applications (examples: buildings used for personal storage or agricultural use). Menards can provide estimates for all types of &quot;Engineered&quot; Post Frame Buildings (examples: used for a business, rental or personal storage buildings that need to be code compliant).
-                      </p>
-                      <p className="text-xs text-brown-600 italic leading-relaxed mt-2">
-                        If you need to meet a specific snow or wind load rating or are required to provide sealed blueprints, please chat with a post frame specialist or visit your local Menards store for more information.
+                        The building estimates from this program are for code exempt applications (examples: buildings used for personal storage or agricultural use). Coupe Building Co. can provide estimates for all types of &quot;Engineered&quot; Post Frame Buildings (examples: used for a business, rental or personal storage buildings that need to be code compliant).
+                        If you need to meet a specific snow or wind load rating or are required to provide sealed blueprints, please contact a post frame specialist for more information.
                       </p>
                       <p className="text-xs text-brown-600 font-semibold italic leading-relaxed mt-2">
                         All Building Designs should be verified by local officials prior to starting your project.
@@ -964,8 +963,8 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
                       }}
                     />
                   ) : (
-                    <div className="p-6 bg-yellow-50 border border-yellow-200 rounded">
-                      <p className="text-sm text-yellow-800">
+                    <div className="p-6 bg-cream-50 border border-brown-200 rounded">
+                      <p className="text-sm text-brown-800">
                         Please fill in Width, Length, Height, and Truss Spacing to view the 3D scene.
                       </p>
                     </div>

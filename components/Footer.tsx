@@ -39,8 +39,7 @@ export default function Footer({
 
             {/* Center Text */}
             <div className="flex-[2] text-center text-[8px] min-[601px]:text-[11px] text-white font-medium leading-tight px-2">
-                ©Postframe - v4.9.92-SNAPSHOT &nbsp;&nbsp;
-                <div className="inline md:block min-[601px]:inline">©2004–2025 Menard, Inc. All Rights Reserved.</div>
+                © Coupe Building Company. All Rights Reserved.
             </div>
 
             {/* Continue Button */}

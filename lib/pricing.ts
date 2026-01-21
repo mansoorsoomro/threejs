@@ -142,8 +142,8 @@ export interface BuildingSpecs {
   openings: Array<{ id: string; x: number; y: number; width: number; height: number; price: number }>;
 }
 
-export function calculatePrice(specs: BuildingSpecs): number {
-  const pricing = getPricing();
+export function calculatePrice(specs: BuildingSpecs, config?: PricingConfig): number {
+  const pricing = config || getPricing();
   const sqft = specs.width * specs.length;
   const perimeter = (specs.width + specs.length) * 2;
 

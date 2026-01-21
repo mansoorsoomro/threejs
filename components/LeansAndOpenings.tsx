@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { BuildingDesign, Opening } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
+import { useAppSelector } from '@/lib/store/hooks';
 import Building3D from '@/components/Building3D';
 import Footer from './Footer';
 
@@ -97,6 +98,7 @@ const walls = [
 ];
 
 export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: LeansAndOpeningsProps) {
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
   const [selectedOpeningId, setSelectedOpeningId] = useState<string | null>(null);
   const [selectedOpeningType, setSelectedOpeningType] = useState<string | null>(null);
   const [selectedWall, setSelectedWall] = useState<'front' | 'back' | 'left' | 'right'>('back');
@@ -270,7 +272,7 @@ export default function LeansAndOpenings({ design, onSubmit, onNext, onBack }: L
       height: o.height,
       price: o.price,
     })),
-  });
+  }, pricingConfig);
 
   const infoSeed = `${currentDesign.width}-${currentDesign.length}-${currentDesign.clearHeight}-${currentDesign.trussSpacing}`;
   let infoHash = 0;

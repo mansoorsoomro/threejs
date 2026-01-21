@@ -2,19 +2,20 @@
 
 import React, { useState } from 'react';
 import Landing from '@/components/Landing';
-import StoreSelect from '@/components/StoreSelect';
+import ClientInfo from '@/components/ClientInfo';
 import BuildingSize from '@/components/BuildingSize';
 import BuildingInfo from '@/components/BuildingInfo';
 import BuildingAccessories from '@/components/BuildingAccessories';
 import LeansAndOpenings from '@/components/LeansAndOpenings';
 import BuildingSummary from '@/components/BuildingSummary';
+import BuildingDelivery from '@/components/BuildingDelivery';
 import StepNavigation from '@/components/StepNavigation';
 import { BuildingDesign, Store } from '@/types/building';
 
-type Step = 'landing' | 0 | 1 | 2 | 3 | 4 | 5;
+type Step = 'landing' | 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const STEPS = [
-    'Store Selection',
+    'Client Info',
     'Building Size',
     'Building Info',
     'Accessories',
@@ -98,11 +99,10 @@ export default function Home() {
                 <main className={`flex-1 overflow-auto relative ${currentStep === 0 ? 'pb-0' : 'pb-24'}`}>
                     {currentStep === 0 && (
                         <div className="w-full">
-                            <StoreSelect
-                                buildingZipCode={design.buildingZipCode}
-                                selectedStore={design.selectedStore}
-                                onZipCodeChange={handleZipCodeChange}
-                                onStoreSelect={handleStoreSelect}
+                            <ClientInfo
+                                design={design}
+                                onSubmit={updateDesign}
+                                onNext={handleNext}
                                 onBack={handleBack}
                             />
                         </div>
@@ -149,6 +149,15 @@ export default function Home() {
                         <BuildingSummary
                             design={design}
                             onBack={handleBack}
+                            onNext={handleNext}
+                        />
+                    )}
+
+                    {currentStep === 6 && (
+                        <BuildingDelivery
+                            design={design}
+                            onBack={handleBack}
+                            onRestart={() => setCurrentStep('landing')}
                         />
                     )}
                 </main>

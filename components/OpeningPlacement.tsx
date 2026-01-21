@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { BuildingDesign, Opening } from '@/types/building';
-import { windowOptions, doorOptions, OpeningOption } from '@/data/windowsDoors';
+import { windowOptions, doorOptions, OpeningOption } from '@/data/openingOptions';
 
 interface OpeningPlacementProps {
   design: BuildingDesign;
@@ -48,7 +48,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h3 className="text-xl font-bold mb-4">Window & Door Placement</h3>
-      
+
       {/* Wall Selection */}
       <div className="mb-4">
         <label className="block text-sm font-medium mb-2">Select Wall</label>
@@ -57,11 +57,10 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
             <button
               key={wall}
               onClick={() => setSelectedWall(wall)}
-              className={`px-4 py-2 rounded ${
-                selectedWall === wall
+              className={`px-4 py-2 rounded ${selectedWall === wall
                   ? 'bg-blue-600 text-white'
                   : 'bg-cream-400 text-brown-700 hover:bg-gray-300'
-              }`}
+                }`}
             >
               {wall.charAt(0).toUpperCase() + wall.slice(1)}
             </button>
@@ -169,7 +168,7 @@ export default function OpeningPlacement({ design, onOpeningsChange }: OpeningPl
               ))}
           </div>
         )}
-        
+
         {/* Show all openings summary */}
         {design.openings && design.openings.length > 0 && (
           <div className="mt-4 pt-4 border-t">

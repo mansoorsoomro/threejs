@@ -39,7 +39,7 @@ export default function StepNavigation({ currentStep, steps }: StepNavigationPro
             <div className="flex items-center min-[1101px]:mr-6 max-[500px]:hidden">
               <Image
                 src="/assets/logowhite.png"
-                alt="Menards Logo"
+                alt="Coupe Building Co. Logo"
                 width={180}
                 height={60}
                 className="h-12 md:h-16 w-auto"

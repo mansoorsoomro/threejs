@@ -1,9 +1,9 @@
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { BuildingDesign } from '@/types/building';
-import { calculatePrice } from './pricing';
+import { calculatePrice, PricingConfig } from './pricing';
 
-export async function generatePDF(design: BuildingDesign): Promise<Blob> {
+export async function generatePDF(design: BuildingDesign, config?: PricingConfig): Promise<Blob> {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageWidth = pdf.internal.pageSize.getWidth();
   const pageHeight = pdf.internal.pageSize.getHeight();
@@ -39,7 +39,7 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   pdf.setFont('helvetica', 'normal');
   const sqft = design.width * design.length;
   const perimeter = (design.width + design.length) * 2;
-  
+
   pdf.text(`Building Use: ${design.buildingUse.charAt(0).toUpperCase() + design.buildingUse.slice(1)}`, margin, yPos);
   yPos += 6;
   pdf.text(`Dimensions: ${design.width}' W × ${design.length}' L`, margin, yPos);
@@ -146,7 +146,7 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
       height: o.height,
       price: o.price,
     })),
-  });
+  }, config);
 
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(14);
@@ -161,6 +161,53 @@ export async function generatePDF(design: BuildingDesign): Promise<Blob> {
   pdf.setFont('helvetica', 'normal');
   pdf.text(`Price per sq ft: $${(totalPrice / sqft).toFixed(2)}`, margin, yPos);
   yPos += 10;
+
+  // Renderings Page
+  if (design.rendering3D || design.floorPlanImage) {
+    pdf.addPage();
+    yPos = margin;
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.text('Building Visualizations', margin, yPos);
+    yPos += 15;
+
+    if (design.rendering3D) {
+      pdf.setFontSize(12);
+      pdf.text('3D Perspective View', margin, yPos);
+      yPos += 7;
+
+      try {
+        // rendering3D is a dataURL
+        const imgWidth = pageWidth - (margin * 2);
+        const imgHeight = (imgWidth * 9) / 16; // Assumed aspect ratio
+        pdf.addImage(design.rendering3D, 'PNG', margin, yPos, imgWidth, imgHeight);
+        yPos += imgHeight + 15;
+      } catch (e) {
+        console.error('Error adding 3D image to PDF:', e);
+      }
+    }
+
+    if (design.floorPlanImage) {
+      if (yPos > pageHeight - 80) {
+        pdf.addPage();
+        yPos = margin;
+      }
+
+      pdf.setFontSize(12);
+      pdf.text('Floor Plan View', margin, yPos);
+      yPos += 7;
+
+      try {
+        const imgWidth = pageWidth - (margin * 2);
+        // Floor plan image aspect ratio
+        pdf.addImage(design.floorPlanImage, 'PNG', margin, yPos, imgWidth, imgWidth);
+        yPos += imgWidth + 15;
+      } catch (e) {
+        console.error('Error adding floor plan image to PDF:', e);
+      }
+    }
+  }
 
   // Footer
   pdf.setFontSize(8);

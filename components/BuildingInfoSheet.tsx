@@ -2,12 +2,14 @@
 
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
+import { useAppSelector } from '@/lib/store/hooks';
 
 interface BuildingInfoSheetProps {
   design: BuildingDesign;
 }
 
 export default function BuildingInfoSheet({ design }: BuildingInfoSheetProps) {
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
   const totalPrice = calculatePrice({
     width: design.width,
     length: design.length,
@@ -30,7 +32,7 @@ export default function BuildingInfoSheet({ design }: BuildingInfoSheetProps) {
       height: o.height,
       price: o.price,
     })),
-  });
+  }, pricingConfig);
 
   const sqft = design.width * design.length;
   const perimeter = (design.width + design.length) * 2;
@@ -38,7 +40,7 @@ export default function BuildingInfoSheet({ design }: BuildingInfoSheetProps) {
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h3 className="text-2xl font-bold mb-4">Building Information Sheet</h3>
-      
+
       <div className="space-y-4">
         {/* Client Info */}
         <div className="border-b pb-4">

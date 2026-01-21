@@ -5,17 +5,17 @@
 Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-NEXT_PUBLIC_MENARDS_API_BASE_URL=https://external-midwest.menards.com/postframe-web
+NEXT_PUBLIC_BUILDING_API_BASE_URL=https://external-midwest.menards.com/postframe-web
 ```
 
 ## Setup Instructions
 
-1. Copy the `.env.example` file to `.env.local`:
+1. Create the `.env.local` file:
    ```bash
-   cp .env.example .env.local
+   touch .env.local
    ```
 
-2. Update the values in `.env.local` if needed (default values should work for Menards API)
+2. Update the values in `.env.local` if needed (default values should work for the Building API)
 
 3. Restart your development server after creating/updating `.env.local`:
    ```bash

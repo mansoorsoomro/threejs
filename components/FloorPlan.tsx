@@ -648,6 +648,18 @@ export default function FloorPlan({ design, onOpeningAdd, onOpeningRemove, onOpe
     // Fit the diagram to show all content
     diagram.commandHandler.zoomToFit();
 
+    // For PDF generation - capture the current view as data URL
+    (window as any).captureFloorPlan = () => {
+      if (diagramRef.current) {
+        return diagramRef.current.makeImageData({
+          background: 'white',
+          type: 'image/png',
+          returnType: 'dataURL'
+        });
+      }
+      return null;
+    };
+
     return () => {
       if (diagramRef.current) {
         diagramRef.current.div = null;

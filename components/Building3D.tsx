@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { BuildingDesign } from '@/types/building';
-import { wallColors, roofColors, trimColors } from '@/data/menardsColors';
+import { wallColors, roofColors, trimColors } from '@/data/buildingColors';
 
 interface Building3DProps {
   design: BuildingDesign;
@@ -494,6 +494,16 @@ export default function Building3D({ design }: Building3DProps) {
         sceneRef.current = scene;
         rendererRef.current = renderer;
         threeRef.current = THREE;
+
+        // For PDF generation - capture the current 3D view as data URL
+        (window as any).captureBuilding3D = () => {
+          if (rendererRef.current && sceneRef.current && cameraRef.current) {
+            // Force a render before capture
+            rendererRef.current.render(sceneRef.current, cameraRef.current);
+            return rendererRef.current.domElement.toDataURL('image/png');
+          }
+          return null;
+        };
 
         // Get colors from local state (allows real-time updates)
         const wallColorHex = wallColors.find(c => c.value === localWallColor)?.hex || '#808080';
@@ -3305,8 +3315,8 @@ export default function Building3D({ design }: Building3DProps) {
           </div>
 
           {/* WebGL Notice */}
-          <div className="absolute top-4 right-4 bg-yellow-100 border border-yellow-300 rounded-lg p-3 max-w-xs">
-            <p className="text-xs text-yellow-800">
+          <div className="absolute top-4 right-4 bg-cream-100 border border-brown-300 rounded-lg p-3 max-w-xs">
+            <p className="text-xs text-brown-800">
               <strong>Note:</strong> WebGL is disabled. Showing CSS 3D preview. Enable WebGL for full 3D rendering.
             </p>
           </div>

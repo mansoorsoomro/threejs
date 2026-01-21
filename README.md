@@ -41,5 +41,5 @@ npm run dev
 - `/components` - React components
 - `/lib` - Utility functions and pricing logic
 - `/public` - Static assets
-- `/data` - Pricing data and Menards color options
+- `/data` - Pricing data and Coupe Building Co. color options
 

@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { BuildingDesign } from '@/types/building';
 import { calculatePrice } from '@/lib/pricing';
-import { wallColors, trimColors, roofColors } from '@/data/menardsColors';
+import { useAppSelector } from '@/lib/store/hooks';
+import { wallColors, trimColors, roofColors } from '@/data/buildingColors';
 import FloorPlan from '@/components/FloorPlan';
 import Footer from './Footer';
 
@@ -12,29 +14,8 @@ interface BuildingSummaryProps {
   onBack?: () => void;
 }
 
-interface Accessories {
-  eaveLightA?: string;
-  eaveLightB?: string;
-  wallInsulation?: string;
-  interiorWallLiner?: string;
-  ceilingInsulation?: string;
-  ceilingLiner?: string;
-  ridgeVentilation?: string;
-  gableVents?: string;
-  ridgeOptions?: string;
-  gutters?: string;
-  endCaps?: string;
-  snowGuards?: string;
-  skylights?: string;
-  cupolas?: string;
-  roofCondensation?: string;
-  outsideClosure?: string;
-  wallCondensation?: string;
-  gableAccent?: string;
-}
-
 export default function BuildingSummary({ design, onNext, onBack }: BuildingSummaryProps) {
-  // use design prop instead of localStorage
+  const pricingConfig = useAppSelector((state) => state.pricing.config);
   const accessories = design;
 
   const totalPrice = calculatePrice({
@@ -59,7 +40,7 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
       height: o.height,
       price: o.price,
     })),
-  });
+  }, pricingConfig);
 
   const infoSeed = `${design.width}-${design.length}-${design.clearHeight}-${design.trussSpacing}`;
   let infoHash = 0;
@@ -109,6 +90,7 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
     return design.floorFinish;
   };
 
+
   return (
     <div className="min-h-screen bg-cream-200">
       <div className="w-full py-8 px-4">
@@ -122,302 +104,35 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Width:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.width} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{design.width} ft</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Length:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.length} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{design.length} ft</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Truss Spacing:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.trussSpacing} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{design.trussSpacing} ft</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Floor Finish:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getFloorFinishLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{getFloorFinishLabel()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Inside Clear Height:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.clearHeight} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Exterior Wall Panel:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">Pro-Rib</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{design.clearHeight} ft</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Exterior Wall Color:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getWallColorLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Roof Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">Pro-Rib</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{getWallColorLabel()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Roof Color:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getRoofColorLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{getRoofColorLabel()}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Trim Color:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getTrimColorLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Sidewall Posts:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.sidewallPosts}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Gradeboard Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getGradeBoardLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Girt Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{getGirtTypeLabel()}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Endwall Overhangs:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.endWallOverhang} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Sidewall Overhangs:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.sidewallOverhang} ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Post Embedment Depth:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">4 ft</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Footing Pad Size:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">14 in x 4 in (Pre-cast)</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Mini Print:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">Email Only</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Wall Fastener Location:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">In the Flat</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Roof Fastener Location:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">On the Rib</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Building Use:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900 capitalize">{design.buildingUse}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Pitch:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{design.roofPitch || '4/12'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Framing Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">Post Framing</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{getTrimColorLabel()}</span>
                   </div>
                 </div>
               </div>
@@ -428,237 +143,19 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Sidewall A Eave Light:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.eaveLightA || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{accessories.eaveLightA || 'None'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-brown-700">Sidewall B Eave Light:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.eaveLightB || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm font-semibold text-brown-900">{accessories.eaveLightB || 'None'}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Wall Insulation Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.wallInsulation || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm text-brown-700">Wall Insulation:</span>
+                    <span className="text-sm font-semibold text-brown-900">{accessories.wallInsulation || 'None'}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Wall Liner Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.interiorWallLiner || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Ceiling Insulation Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.ceilingInsulation || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Ceiling Liner Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.ceilingLiner || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Ridge Vent Quantity:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.ridgeVentilation || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Gable Vent Type:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.gableVents || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Ridge Options:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.ridgeOptions || 'Universal Ridge Cap'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Gutters:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.gutters || 'No'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">End Cap:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.endCaps || 'No'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Snow Guard:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.snowGuards || 'No'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Skylight Size:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.skylights || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Cupola Size:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.cupolas || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Roof Condensation Control:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.roofCondensation || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Outside Closure Strip:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.outsideClosure || 'Standard'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Wall Condensation Control:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.wallCondensation || 'None'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-brown-700">Gable Accent:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-brown-900">{accessories.gableAccent ? 'Yes' : 'No'}</span>
-                      <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    <span className="text-sm text-brown-700">Roof Insulation:</span>
+                    <span className="text-sm font-semibold text-brown-900">{accessories.ceilingInsulation || 'None'}</span>
                   </div>
                 </div>
               </div>
@@ -677,18 +174,9 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
                     ${totalPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 mb-2">
-                  <p className="text-base font-semibold text-brown-900">
-                    Design Id: <span className="font-normal">{designId}</span>
-                  </p>
-                  <svg className="w-5 h-5 text-brown-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
+                <p className="text-base font-semibold text-brown-900">
+                  Design Id: <span className="font-normal">{designId}</span>
+                </p>
                 <p className="text-base font-semibold text-brown-900">
                   Design Name: <span className="font-normal">{designName}</span>
                 </p>
@@ -701,14 +189,16 @@ export default function BuildingSummary({ design, onNext, onBack }: BuildingSumm
             </div>
           </div>
 
-          {/* Footer with Back and Next actions */}
-          <Footer
-            onBack={onBack}
-            onContinue={onNext}
-            isContinueDisabled={!onNext}
-            continueLabel="Next: Delivery"
-            showContinue={!!onNext}
-          />
+          {/* Navigation Footer */}
+          <div className="mt-8 border-t border-brown-200 pt-8">
+            <Footer
+              onBack={onBack}
+              onContinue={onNext}
+              isContinueDisabled={!onNext}
+              continueLabel="Continue to Final Quote Request"
+              showContinue={true}
+            />
+          </div>
         </div>
       </div>
     </div>

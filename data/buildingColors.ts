@@ -1,4 +1,4 @@
-// Menards color options - these should be updated with actual Menards color codes
+// Building color options
 export const wallColors = [
   // Designer Colors
   { value: 'dover-gray', label: 'Dover Gray', hex: '#808080' },

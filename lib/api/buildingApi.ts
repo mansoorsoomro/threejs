@@ -32,7 +32,7 @@ export interface Loadings {
  * Fetch scene questions
  */
 export const fetchSceneQuestions = async (): Promise<SceneQuestion[]> => {
-  const url = `/api/menards/getSceneQuestions.do`;
+  const url = `/api/building-api/getSceneQuestions.do`;
 
   try {
     const response = await fetch(url, {
@@ -58,7 +58,7 @@ export const fetchSceneQuestions = async (): Promise<SceneQuestion[]> => {
  * Fetch openings
  */
 export const fetchOpenings = async (): Promise<Opening[]> => {
-  const url = `/api/menards/getOpenings.do`;
+  const url = `/api/building-api/getOpenings.do`;
 
   try {
     const response = await fetch(url, {
@@ -88,7 +88,7 @@ export const fetchLoadings = async (zipCode: string): Promise<Loadings> => {
     throw new Error('Zip code must be 5 digits');
   }
 
-  const url = `/api/menards/getLoadings.do?zipCode=${zipCode}`;
+  const url = `/api/building-api/getLoadings.do?zipCode=${zipCode}`;
 
   try {
     const response = await fetch(url, {
