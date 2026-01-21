@@ -1316,7 +1316,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
                       </ul>
                       <div className="mb-4">
                         <img
-                          src="https://external-midwest.menards.com/postframe-web/web/img/canvas/building_walls_depiction.svg"
+                          src="/assets/building_walls_depiction.svg"
                           alt="Building Walls Depiction - Sidewall A, Sidewall B, Endwall C, Endwall D"
                           className="w-full h-auto max-h-48 object-contain rounded border border-cream-300"
                         />
@@ -1341,7 +1341,7 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
                       </ul>
                       <div className="mb-4">
                         <img
-                          src="https://external-midwest.menards.com/postframe-web/web/img/canvas/building_walls_depiction.svg"
+                          src="/assets/building_walls_depiction.svg"
                           alt="Building Walls Depiction - Sidewall A, Sidewall B, Endwall C, Endwall D"
                           className="w-full h-auto max-h-48 object-contain rounded border border-cream-300"
                         />

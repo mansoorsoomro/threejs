@@ -5,7 +5,7 @@
 Create a `.env.local` file in the root directory with the following variables:
 
 ```env
-NEXT_PUBLIC_BUILDING_API_BASE_URL=https://external-midwest.menards.com/postframe-web
+NEXT_PUBLIC_BUILDING_API_BASE_URL=https://api.example-supplier.com/building-api
 ```
 
 ## Setup Instructions

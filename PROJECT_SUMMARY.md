@@ -20,9 +20,9 @@ A comprehensive building design application with real-time 3D visualization, flo
 - ✅ Inside Clear Height (8', 10', 12', 14', 16', 18', 20')
 - ✅ Girt Type (2x4, 2x6)
 - ✅ Grade Board Type (2x6, 2x8)
-- ✅ Wall Colors (Menards options)
-- ✅ Trim Colors (Menards options)
-- ✅ Roof Colors (Menards options)
+- ✅ Wall Colors (Brand options)
+- ✅ Trim Colors (Brand options)
+- ✅ Roof Colors (Brand options)
 - ✅ End Wall Overhang (0', 1', 2')
 - ✅ Sidewall Overhang (0', 1', 2')
 - ✅ Window and Door Opening Selection
@@ -87,8 +87,8 @@ threejs/
 │   ├── FloorPlan.tsx             # Floor plan visualization
 │   └── OpeningPlacement.tsx      # Window/door placement tool
 ├── data/
-│   ├── menardsColors.ts          # Color options (update with actual Menards colors)
-│   └── windowsDoors.ts            # Window and door options
+│   ├── buildingColors.ts         # Color options (update with actual brand colors)
+│   └── openingOptions.ts         # Opening options
 ├── lib/
 │   ├── pdfGenerator.ts           # PDF generation utility
 │   └── pricing.ts                # Pricing calculation logic
@@ -109,15 +109,15 @@ threejs/
    - Add SMTP credentials (see ENV_SETUP.md)
    - If not configured, quotes will be logged to console
 
-3. **Update Menards Colors**
-   - Edit `data/menardsColors.ts`
-   - Replace placeholder colors with actual Menards color codes from their website
-   - Update hex values to match Menards color palette
+3. **Update Brand Colors**
+   - Edit `data/buildingColors.ts`
+   - Replace placeholder colors with actual brand color codes
+   - Update hex values to match the brand color palette
 
-4. **Update Window/Door Options**
-   - Edit `data/windowsDoors.ts`
-   - Add actual Menards window and door options
-   - Update pricing to match current Menards prices
+4. **Update Opening Options**
+   - Edit `data/openingOptions.ts`
+   - Add actual window and door options
+   - Update pricing to match current prices
 
 5. **Run Development Server**
    ```bash
@@ -130,10 +130,10 @@ threejs/
 
 ## Important Notes
 
-### Menards Integration
-- The color options in `data/menardsColors.ts` are placeholders
-- **Action Required**: Update with actual Menards color codes from their reference website
-- Window and door options in `data/windowsDoors.ts` should also be updated with actual Menards products
+### Brand Integration
+- The color options in `data/buildingColors.ts` are placeholders
+- **Action Required**: Update with actual brand color codes
+- Opening options in `data/openingOptions.ts` should also be updated with actual products
 
 ### Pricing
 - Default pricing is set in `lib/pricing.ts`
@@ -155,7 +155,7 @@ threejs/
 
 ## Next Steps
 
-1. Update Menards color and product data
+1. Update brand color and product data
 2. Configure email settings
 3. Test all functionality
 4. Customize styling/branding

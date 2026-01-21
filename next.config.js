@@ -12,7 +12,7 @@ const nextConfig = {
     return [
       {
         source: '/api/building-api/:path*',
-        destination: 'https://external-midwest.menards.com/postframe-web/:path*',
+        destination: `${process.env.NEXT_PUBLIC_BUILDING_API_BASE_URL || 'https://api.example-supplier.com/building-api'}/:path*`,
       },
     ];
   },

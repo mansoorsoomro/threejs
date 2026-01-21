@@ -1,6 +1,6 @@
 import { Store } from '@/types/building';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_BUILDING_API_BASE_URL || 'https://external-midwest.menards.com/postframe-web';
+const API_BASE_URL = process.env.NEXT_PUBLIC_BUILDING_API_BASE_URL || 'https://api.example-supplier.com/building-api';
 
 export interface BuildingStoreResponse {
   inAllowedRegion: boolean;

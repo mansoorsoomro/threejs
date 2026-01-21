@@ -1,0 +1,7 @@
+<svg viewBox="0 0 180 80" xmlns="http://www.w3.org/2000/svg">
+    <rect x="60.0" y="22.0" width="60" height="30" style="stroke: rgb(60,60,60); fill: none"></rect>
+    <text style="white-space: pre; fill: rgb(60,60,60); font-family: Arial, sans-serif; font-size: 10px;" x="68" y="16">Sidewall A</text>
+    <text style="white-space: pre; fill: rgb(60,60,60); font-family: Arial, sans-serif; font-size: 10px;" x="68" y="65.0">Sidewall B</text>
+    <text style="white-space: pre; fill: rgb(60,60,60); font-family: Arial, sans-serif; font-size: 10px;" x="126" y="40">Endwall D</text>
+    <text style="white-space: pre; fill: rgb(60,60,60); font-family: Arial, sans-serif; font-size: 10px;" x="10" y="40">Endwall C</text>
+</svg>

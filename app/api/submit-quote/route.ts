@@ -51,15 +51,23 @@ async function sendEmail(design: BuildingDesign, pdfBuffer: Buffer) {
     },
   });
 
+  // email addresses
+  const recipients = ['sales@coupebuildingco.com'];
+  if (design.clientEmail) {
+    recipients.push(design.clientEmail);
+  }
+
   // Email content
   const mailOptions = {
     from: process.env.SMTP_USER || 'noreply@coupebuildingco.com',
-    to: 'sales@coupebuildingco.com',
+    to: recipients.join(', '),
     subject: `New Building Quote - ${design.clientName}`,
     text: `New building quote received from ${design.clientName}.\n\nPlease see attached PDF for full details.`,
     html: `
       <h2>New Building Quote</h2>
       <p><strong>Client:</strong> ${design.clientName}</p>
+      <p><strong>Email:</strong> ${design.clientEmail}</p>
+      <p><strong>Phone:</strong> ${design.clientPhone}</p>
       <p><strong>Address:</strong> ${design.clientAddress}</p>
       <p>Please see attached PDF for complete building specifications, floor plan, and pricing.</p>
     `,

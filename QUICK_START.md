@@ -55,8 +55,8 @@ Open your browser:
 
 ## Important Notes
 
-- **Menards Colors**: Update `data/menardsColors.ts` with actual Menards color codes
-- **Window/Door Options**: Update `data/windowsDoors.ts` with actual Menards products
+- **Brand Colors**: Update `data/buildingColors.ts` with actual brand color codes
+- **Opening Options**: Update `data/openingOptions.ts` with actual products
 - **Email**: Configure SMTP in `.env.local` for email functionality
 - **Pricing**: Default pricing is in `lib/pricing.ts`, editable via admin panel
 
@@ -76,7 +76,7 @@ Open your browser:
 
 ## Next Steps
 
-1. Update Menards color/product data
+1. Update brand color/product data
 2. Customize styling to match brand
 3. Test all features
 4. Deploy to production
