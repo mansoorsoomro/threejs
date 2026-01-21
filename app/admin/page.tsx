@@ -14,7 +14,6 @@ export default function AdminPage() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isVercel, setIsVercel] = useState(false);
-  const [hasKV, setHasKV] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -122,8 +121,8 @@ export default function AdminPage() {
               <span className="font-bold underline uppercase tracking-tight">Vercel Environment Detected</span>
             </div>
             <p className="text-sm font-medium">
-              If saving fails with a "Read-Only" error, please ensure you have connected a <strong>Vercel KV Database</strong>.
-              Refer to <code>VERCEL_SETUP.md</code> in the project root for instructions.
+              If saving fails with a "Read-Only" error, please ensure you have configured your <strong>MongoDB Atlas URI</strong> in Vercel.
+              Refer to <code>MONGODB_SETUP.md</code> in the project root for instructions.
             </p>
           </div>
         )}

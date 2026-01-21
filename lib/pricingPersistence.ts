@@ -1,19 +1,40 @@
-import { kv } from '@vercel/kv';
+import { MongoClient } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
 import { PricingConfig, defaultPricing } from './pricing';
 
 const PRICING_FILE_PATH = path.join(process.cwd(), 'data', 'pricing-config.json');
-const KV_KEY = 'pricing-config';
+const MONGODB_URI = process.env.MONGODB_URI;
+const DB_NAME = 'building-designer';
+const COLLECTION_NAME = 'pricing';
+
+let client: MongoClient | null = null;
+
+async function getMongoClient() {
+    if (!MONGODB_URI) return null;
+    if (!client) {
+        client = new MongoClient(MONGODB_URI);
+        await client.connect();
+    }
+    return client;
+}
 
 export async function getPricingConfig(): Promise<PricingConfig> {
-    // 1. Try Vercel KV first (Production)
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    // 1. Try MongoDB first (Production/Atlas)
+    if (MONGODB_URI) {
         try {
-            const config = await kv.get<PricingConfig>(KV_KEY);
-            if (config) return config;
+            const mongoClient = await getMongoClient();
+            if (mongoClient) {
+                const db = mongoClient.db(DB_NAME);
+                const config = await db.collection(COLLECTION_NAME).findOne<PricingConfig>({});
+                if (config) {
+                    // Remove MongoDB _id if present to match PricingConfig type
+                    const { _id, ...rest } = config as any;
+                    return rest as PricingConfig;
+                }
+            }
         } catch (error) {
-            console.error('Failed to fetch from Vercel KV:', error);
+            console.error('Failed to fetch from MongoDB:', error);
         }
     }
 
@@ -32,13 +53,22 @@ export async function getPricingConfig(): Promise<PricingConfig> {
 }
 
 export async function savePricingConfig(config: PricingConfig): Promise<{ success: boolean; error?: string }> {
-    // 1. Save to Vercel KV (Production)
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    // 1. Save to MongoDB (Production/Atlas)
+    if (MONGODB_URI) {
         try {
-            await kv.set(KV_KEY, config);
-            return { success: true };
+            const mongoClient = await getMongoClient();
+            if (mongoClient) {
+                const db = mongoClient.db(DB_NAME);
+                // Use updateOne with upsert: true to maintain a single config document
+                await db.collection(COLLECTION_NAME).updateOne(
+                    {},
+                    { $set: config },
+                    { upsert: true }
+                );
+                return { success: true };
+            }
         } catch (error: any) {
-            console.error('Failed to save to Vercel KV:', error);
+            console.error('Failed to save to MongoDB:', error);
             return { success: false, error: 'Failed to save to Database: ' + error.message };
         }
     }
@@ -53,11 +83,11 @@ export async function savePricingConfig(config: PricingConfig): Promise<{ succes
         return { success: true };
     } catch (error: any) {
         console.error('Failed to save to local filesystem:', error);
-        // If we're on Vercel but KV is not configured, show specific error
+        // If we're on Vercel but MongoDB is not configured, show specific error
         if (process.env.VERCEL) {
             return {
                 success: false,
-                error: "Vercel is 'Read-Only'. Please connect a Vercel KV Database. See VERCEL_SETUP.md for instructions."
+                error: "Vercel is 'Read-Only'. Please configure MONGODB_URI in Vercel environment variables."
             };
         }
         return { success: false, error: 'Internal Server Error: ' + error.message };
