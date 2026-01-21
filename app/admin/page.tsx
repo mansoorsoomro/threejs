@@ -101,7 +101,7 @@ export default function AdminPage() {
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-xl p-6 md:p-8 border border-brown-100">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-extrabold text-brown-900 tracking-tight">Pricing Management</h1>
+            <h1 className="text-3xl font-extrabold text-brown-900 tracking-tight">Pricing Management 123</h1>
             <p className="text-brown-600 text-sm mt-1 font-medium">Configure global pricing parameters for building quotes</p>
           </div>
           <button
