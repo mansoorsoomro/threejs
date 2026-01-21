@@ -112,7 +112,7 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {isVercel && (
+        {/* {isVercel && (
           <div className="mb-6 p-4 bg-amber-50 text-amber-800 rounded-lg border border-amber-200 shadow-sm">
             <div className="flex items-center gap-2 mb-1">
               <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -125,7 +125,7 @@ export default function AdminPage() {
               Refer to <code>MONGODB_SETUP.md</code> in the project root for instructions.
             </p>
           </div>
-        )}
+        )} */}
 
         {saved && (
           <div className="mb-6 p-4 bg-green-50 text-green-800 rounded-lg border border-green-200 flex items-center gap-2 shadow-sm">
