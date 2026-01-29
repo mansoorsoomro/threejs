@@ -273,11 +273,11 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
   };
 
   return (
-    <div className="min-h-screen bg-cream-200 overflow-auto pb-20">
-      <div className="w-full h-full p-2 md:p-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-[10px] min-h-screen">
+    <div className="h-full bg-cream-200 overflow-hidden">
+      <div className="w-full h-full p-1 pb-[80px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-2 md:gap-[10px] h-full">
           {/* Left Side - Options */}
-          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-4 flex flex-col max-h-screen lg:h-full overflow-hidden order-2 lg:order-1">
+          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-4 flex flex-col h-full overflow-hidden order-2 lg:order-1">
             <h2 className="text-base md:text-lg font-bold text-brown-900 mb-3 md:mb-4">
               Building Parameters
             </h2>
@@ -596,7 +596,7 @@ export default function BuildingSize({ zipCode, onNext, onBack, design, onSubmit
           </div>
 
           {/* Right Side - Data Display */}
-          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-8 flex flex-col max-h-[60vh] lg:max-h-full lg:h-full overflow-hidden order-1 lg:order-2">
+          <div className="bg-white rounded-lg shadow-md p-3 md:p-4 lg:col-span-8 flex flex-col h-full overflow-hidden order-1 lg:order-2">
             <div className="mb-2 md:mb-3 flex-shrink-0">
               <div className="flex space-x-2 border-b">
                 <button

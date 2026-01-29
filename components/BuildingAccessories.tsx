@@ -269,8 +269,8 @@ export default function BuildingAccessories({ design, onSubmit, onNext, onBack }
   ]);
 
   return (
-    <div className="h-screen bg-cream-200 overflow-hidden">
-      <div className="w-full h-full p-2">
+    <div className="h-full bg-cream-200 overflow-hidden">
+      <div className="w-full h-full p-1 pb-[80px]">
         <div className="grid grid-cols-12 gap-[10px] h-full">
           {/* Left Column - Options panel */}
           <div className="bg-white rounded-lg shadow-md p-4 col-span-12 lg:col-span-4 flex flex-col h-full overflow-hidden">

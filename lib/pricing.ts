@@ -144,58 +144,78 @@ export interface BuildingSpecs {
 
 export function calculatePrice(specs: BuildingSpecs, config?: PricingConfig): number {
   const pricing = config || getPricing();
-  const sqft = specs.width * specs.length;
-  const perimeter = (specs.width + specs.length) * 2;
+
+  // Safeguard against NaN or invalid dimensions
+  const width = specs.width || 0;
+  const length = specs.length || 0;
+
+  const sqft = width * length;
+  const perimeter = (width + length) * 2;
 
   let total = 0;
 
   // Base price
-  total += sqft * pricing.basePricePerSqFt;
+  total += sqft * (pricing.basePricePerSqFt || 0);
 
-  // Truss spacing multiplier
-  total *= pricing.trussSpacing[specs.trussSpacing];
+  // Truss spacing multiplier - default to 1 if invalid
+  const trussMult = pricing.trussSpacing[specs.trussSpacing] ?? 1.0;
+  total *= trussMult;
 
   // Floor finish
-  total += sqft * pricing.floorFinish[specs.floorFinish];
+  const floorPrice = pricing.floorFinish[specs.floorFinish] ?? 0;
+  total += sqft * floorPrice;
 
   // Thickened edge slab
   if (specs.thickenedEdgeSlab) {
-    total += perimeter * pricing.thickenedEdgeSlab;
+    total += perimeter * (pricing.thickenedEdgeSlab || 0);
   }
 
   // Post construction slab
   if (specs.postConstructionSlab) {
-    total += sqft * pricing.postConstructionSlab;
+    total += sqft * (pricing.postConstructionSlab || 0);
   }
 
   // Sidewall posts (estimate based on spacing)
   const postSpacing = 8; // feet between posts
   const numPosts = Math.ceil(perimeter / postSpacing);
-  total += numPosts * pricing.sidewallPosts[specs.sidewallPosts];
+  const postPrice = pricing.sidewallPosts[specs.sidewallPosts] ?? 0;
+  total += numPosts * postPrice;
 
-  // Clear height multiplier
-  total *= pricing.clearHeight[specs.clearHeight];
+  // Clear height multiplier - default to 1.0 if not found
+  const heightMult = pricing.clearHeight[specs.clearHeight] ?? 1.0;
+  total *= heightMult;
 
   // Girt type
-  total += perimeter * pricing.girtType[specs.girtType];
+  const girtPrice = pricing.girtType[specs.girtType] ?? 0;
+  total += perimeter * girtPrice;
 
   // Grade board
-  total += perimeter * pricing.gradeBoard[specs.gradeBoard];
+  const gradeBoardPrice = pricing.gradeBoard[specs.gradeBoard] ?? 0;
+  total += perimeter * gradeBoardPrice;
 
   // Overhangs
-  total += specs.width * 2 * pricing.overhang[specs.endWallOverhang];
-  total += specs.length * 2 * pricing.overhang[specs.sidewallOverhang];
+  const endWallOverhangPrice = pricing.overhang[specs.endWallOverhang] ?? 0;
+  total += width * 2 * endWallOverhangPrice;
+
+  const sidewallOverhangPrice = pricing.overhang[specs.sidewallOverhang] ?? 0;
+  total += length * 2 * sidewallOverhangPrice;
 
   // Site preparation
   if (specs.sitePreparation) {
-    total += pricing.sitePreparation;
+    total += (pricing.sitePreparation || 0);
   }
 
   // Openings (windows and doors)
   if (specs.openings && specs.openings.length > 0) {
     specs.openings.forEach(opening => {
-      total += opening.price;
+      // Ensure opening price is a number
+      total += (opening.price || 0);
     });
+  }
+
+  // Final NaN check
+  if (isNaN(total)) {
+    return 0;
   }
 
   return Math.round(total);
