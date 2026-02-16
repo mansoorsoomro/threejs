@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1",
+        "name": "Main Store",
+        "address": "123 Building Way, Construction City, ST 12345",
+        "distance": 0,
+        "phone": "555-0123",
+        "zipCode": "12345"
+    },
+    {
+        "id": "2",
+        "name": "Local Depot",
+        "address": "456 Hardware St, Builder Town, ST 12345",
+        "distance": 5.2,
+        "phone": "555-0456",
+        "zipCode": "12345"
+    }
+]

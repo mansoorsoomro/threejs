@@ -1,0 +1,8 @@
+{
+    "topChordLiveLoad": 20,
+    "topChordDeadLoad": 5,
+    "bottomChordLiveLoad": 0,
+    "bottomChordDeadLoad": 5,
+    "groundSnowLoad": 30,
+    "windLoad": 115
+}

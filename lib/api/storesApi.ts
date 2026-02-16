@@ -55,35 +55,23 @@ const transformStore = (store: BuildingStoreResponse['closestStores'][0]): Store
  * Uses Next.js rewrites to proxy the external API (no CORS issues)
  */
 export const fetchStoresByZipCode = async (zipCode: string, offset: number = 1): Promise<Store[]> => {
-  if (zipCode.length !== 5) {
-    throw new Error('Zip code must be 5 digits');
-  }
-
-  // Use Next.js rewrite proxy - calls /api/building-api which rewrites to external API
-  const url = `/api/building-api/getClosestStores.do?storesPerPage=10&offset=${offset}&zipCode=${zipCode}`;
+  const url = `/data/stores.json`;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
+    const response = await fetch(url);
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch stores: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch stores: ${response.status}`);
     }
 
-    const data: BuildingStoreResponse = await response.json();
+    const data: Store[] = await response.json();
 
-    if (!data.closestStores || data.closestStores.length === 0) {
-      return [];
-    }
-
-    return data.closestStores.map(transformStore);
+    // In static mode, we just return the mockup stores
+    // Filter by zip if you want to be slightly more realistic
+    return data.filter(s => s.zipCode === zipCode || !zipCode);
   } catch (error) {
     console.error('Error fetching stores:', error);
-    throw error;
+    return [];
   }
 };
 

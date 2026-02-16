@@ -17,7 +17,7 @@ export const fetchPricingThunk = createAsyncThunk(
     'pricing/fetchPricing',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await fetch('/api/pricing');
+            const response = await fetch('/pricing.json');
             if (!response.ok) {
                 throw new Error('Failed to fetch pricing');
             }

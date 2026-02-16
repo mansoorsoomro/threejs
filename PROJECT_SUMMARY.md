@@ -55,17 +55,17 @@ A comprehensive building design application with real-time 3D visualization, flo
 - ✅ Pricing breakdown
 - ✅ Professional formatting
 
-### 5. Email Submission
-- ✅ PDF attachment
-- ✅ Email to sales@coupebuildingco.com
-- ✅ Client information included
-- ✅ Configurable SMTP settings
+### 5. Quote Submission
+- ✅ Simplified for static hosting
+- ✅ Uses `mailto:` protocol (no backend server required)
+- ✅ Triggers user's email client with pre-filled design specifications
+- ✅ Includes all client info and design parameters in the email body
 
 ### 6. Admin Panel
 - ✅ Accessible at `/admin`
-- ✅ Edit all pricing parameters
-- ✅ Save/Reset functionality
-- ✅ Real-time updates
+- ✅ Dynamic pricing management via `pricing.json`
+- ✅ **Static Export Mode**: Generates downloadable `pricing.json` for easy updates on static hosts (Hostinger/Netlify/Vercel)
+- ✅ Real-time preview of pricing changes
 
 ## Project Structure
 
@@ -135,10 +135,11 @@ threejs/
 - **Action Required**: Update with actual brand color codes
 - Opening options in `data/openingOptions.ts` should also be updated with actual products
 
-### Pricing
-- Default pricing is set in `lib/pricing.ts`
-- Admin can modify pricing via `/admin` panel
-- Pricing is stored in browser localStorage (consider database for production)
+### Pricing & Data
+- Pricing is stored in `public/pricing.json` for static access
+- Building data and store info are stored in `public/data/*.json`
+- This allows for a "Serverless" deployment (no Node.js or MongoDB required)
+- Admin modifies the JSON file, which is then uploaded to the host
 
 ### Email Configuration
 - Email functionality requires SMTP credentials

@@ -1,0 +1,16 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # Handle trailing slashes for static folders
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_URI} ^/(.+)$
+  RewriteRule ^(.*)$ $1/ [L,R=301]
+
+  # Serve index.html for root
+  DirectoryIndex index.html
+
+  # Custom 404 page
+  ErrorDocument 404 /404/index.html
+</IfModule>

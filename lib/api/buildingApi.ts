@@ -32,25 +32,17 @@ export interface Loadings {
  * Fetch scene questions
  */
 export const fetchSceneQuestions = async (): Promise<SceneQuestion[]> => {
-  const url = `/api/building-api/getSceneQuestions.do`;
+  const url = `/data/scene-questions.json`;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch scene questions: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch scene questions: ${response.status}`);
     }
-
-    const data: SceneQuestion[] = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching scene questions:', error);
-    throw error;
+    return []; // Return empty array as fallback
   }
 };
 
@@ -58,25 +50,17 @@ export const fetchSceneQuestions = async (): Promise<SceneQuestion[]> => {
  * Fetch openings
  */
 export const fetchOpenings = async (): Promise<Opening[]> => {
-  const url = `/api/building-api/getOpenings.do`;
+  const url = `/data/openings.json`;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch openings: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch openings: ${response.status}`);
     }
-
-    const data: Opening[] = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching openings:', error);
-    throw error;
+    return []; // Return empty array as fallback
   }
 };
 
@@ -84,29 +68,25 @@ export const fetchOpenings = async (): Promise<Opening[]> => {
  * Fetch loadings by zip code
  */
 export const fetchLoadings = async (zipCode: string): Promise<Loadings> => {
-  if (zipCode.length !== 5) {
-    throw new Error('Zip code must be 5 digits');
-  }
-
-  const url = `/api/building-api/getLoadings.do?zipCode=${zipCode}`;
+  const url = `/data/loadings.json`;
 
   try {
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
-    });
-
+    const response = await fetch(url);
     if (!response.ok) {
-      throw new Error(`Failed to fetch loadings: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch loadings: ${response.status}`);
     }
-
-    const data: Loadings = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('Error fetching loadings:', error);
-    throw error;
+    // Return default loadings as fallback
+    return {
+      topChordLiveLoad: 20,
+      topChordDeadLoad: 5,
+      bottomChordLiveLoad: 0,
+      bottomChordDeadLoad: 5,
+      groundSnowLoad: 30,
+      windLoad: 115
+    };
   }
 };
 

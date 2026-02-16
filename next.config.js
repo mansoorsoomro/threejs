@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
+  trailingSlash: true,
   reactStrictMode: true,
   webpack: (config) => {
     config.externals.push({
@@ -8,14 +10,8 @@ const nextConfig = {
     });
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/building-api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_BUILDING_API_BASE_URL || 'https://api.example-supplier.com/building-api'}/:path*`,
-      },
-    ];
-  },
+  // Note: rewrites and API routes will not work in static export.
+  // We keep them for local development if needed, but they won't be in the production 'out' folder.
 }
 
 module.exports = nextConfig

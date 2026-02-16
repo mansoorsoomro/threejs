@@ -45,26 +45,25 @@ export default function BuildingDelivery({ design, onBack, onRestart }: Building
         setIsSubmitting(true);
         setSubmitStatus('idle');
         try {
-            // Capture screenshots if functions are available on window
-            const rendering3D = (window as any).captureBuilding3D ? (window as any).captureBuilding3D() : null;
-            const floorPlanImage = (window as any).captureFloorPlan ? (window as any).captureFloorPlan() : null;
+            // In static mode, we use mailto to send the quote details
+            const subject = encodeURIComponent(`Building Quote Request - ${design.clientName}`);
 
-            const response = await fetch('/api/submit-quote', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...design,
-                    rendering3D,
-                    floorPlanImage,
-                    totalPrice
-                }),
-            });
+            const bodyLines = [
+                `Name: ${design.clientName}`,
+                `Email: ${design.clientEmail}`,
+                `Phone: ${design.clientPhone}`,
+                `Address: ${design.clientAddress}, ${design.buildingZipCode}`,
+                `Building Specs: ${design.width}x${design.length}x${design.clearHeight}`,
+                `Estimated Price: $${totalPrice.toLocaleString()}`,
+                `Use the online designer to view this Design ID: ${design.width}-${design.length}`
+            ];
 
-            if (response.ok) {
-                setSubmitStatus('success');
-            } else {
-                setSubmitStatus('error');
-            }
+            const body = encodeURIComponent(bodyLines.join('\n'));
+
+            // Open user's email client
+            window.location.href = `mailto:sales@coupebuildingco.com?subject=${subject}&body=${body}`;
+
+            setSubmitStatus('success');
         } catch (error) {
             console.error('Error submitting quote:', error);
             setSubmitStatus('error');

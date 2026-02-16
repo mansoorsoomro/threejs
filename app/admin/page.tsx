@@ -13,7 +13,7 @@ export default function AdminPage() {
   const [pricing, setPricing] = useState<PricingConfig>(currentPricing);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isVercel, setIsVercel] = useState(false);
+  const [showJson, setShowJson] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,7 +21,6 @@ export default function AdminPage() {
   useEffect(() => {
     setPricing(currentPricing);
     // Check environment (in a real app, this would be an API check)
-    setIsVercel(process.env.NEXT_PUBLIC_VERCEL === '1' || window.location.hostname.includes('vercel.app'));
   }, [currentPricing]);
 
   const handleLogin = (e: React.FormEvent) => {
@@ -35,20 +34,20 @@ export default function AdminPage() {
   };
 
   const handleSave = async () => {
-    try {
-      const credentials = { email, password };
-      const resultAction = await dispatch(updatePricingThunk({ pricing, credentials }));
+    // In static mode, we can't save to server, so we show the JSON for download/copy
+    setShowJson(true);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  };
 
-      if (updatePricingThunk.fulfilled.match(resultAction)) {
-        setSaved(true);
-        setError(null);
-        setTimeout(() => setSaved(false), 2000);
-      } else {
-        setError(resultAction.payload as string || 'Failed to save pricing');
-      }
-    } catch (err) {
-      setError('An unexpected error occurred');
-    }
+  const handleDownload = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pricing, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "pricing.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
   };
 
   const handleReset = () => {
@@ -132,16 +131,39 @@ export default function AdminPage() {
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
             </svg>
-            <span className="font-semibold">Pricing configuration saved successfully!</span>
+            <span className="font-semibold">Pricing generated! Scroll down to download the file.</span>
           </div>
         )}
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 text-red-800 rounded-lg border border-red-200 flex items-center gap-2 shadow-sm">
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-            </svg>
-            <span className="font-semibold">{error}</span>
+        {showJson && (
+          <div className="mb-8 p-6 bg-brown-50 rounded-xl border-2 border-brown-200 shadow-inner">
+            <h3 className="text-lg font-bold text-brown-900 mb-2">How to update prices on Hostinger:</h3>
+            <ol className="list-decimal list-inside text-sm text-brown-700 space-y-2 mb-4">
+              <li>Click the <strong>Download pricing.json</strong> button below.</li>
+              <li>Go to your <strong>Hostinger File Manager</strong>.</li>
+              <li>Upload the new <code>pricing.json</code> to your <code>public_html</code> folder.</li>
+              <li>The new prices will be live instantly!</li>
+            </ol>
+            <div className="flex gap-4">
+              <button
+                onClick={handleDownload}
+                className="px-6 py-2 bg-brown-600 text-white rounded-lg font-bold hover:bg-brown-700 transition-all flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Download pricing.json
+              </button>
+              <button
+                onClick={() => setShowJson(false)}
+                className="px-4 py-2 border border-brown-300 text-brown-600 rounded-lg font-medium hover:bg-white transition-all"
+              >
+                Hide
+              </button>
+            </div>
+            <pre className="mt-6 p-4 bg-white rounded border border-brown-100 text-[10px] overflow-auto max-h-40 font-mono">
+              {JSON.stringify(pricing, null, 2)}
+            </pre>
           </div>
         )}
 
